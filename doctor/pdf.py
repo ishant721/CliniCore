@@ -3,7 +3,7 @@ from urllib import response
 from django.shortcuts import render
 from django.template.loader import get_template
 from django.http import HttpResponse
-from xhtml2pdf import pisa
+import weasyprint
 from .models import Report
 from .models import  Report,Specimen,Test
 from hospital.models import Patient
@@ -11,13 +11,14 @@ from datetime import datetime
 
 
 def render_to_pdf(template_src, context_dict={}):
-    template=get_template(template_src)
-    html=template.render(context_dict)
-    result=BytesIO()
-    pdf=pisa.pisaDocument(BytesIO(html.encode("ISO-8859-1")), result)
-    if not pdf.err:
-        return HttpResponse(result.getvalue(),content_type="aplication/pdf")
-    return None
+    template = get_template(template_src)
+    html = template.render(context_dict)
+    try:
+        pdf_file = weasyprint.HTML(string=html).write_pdf()
+        response = HttpResponse(pdf_file, content_type='application/pdf')
+        return response
+    except Exception as e:
+        return None
 
 
 
