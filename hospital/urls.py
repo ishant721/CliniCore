@@ -48,6 +48,8 @@ urlpatterns = [
     path('test-add-to-cart/<int:pk>/<int:pk2>/', views.test_add_to_cart, name='test-add-to-cart'),
     path('delete-prescription/<int:pk>/', views.delete_prescription, name='delete-prescription'),
     path('delete-report/<int:pk>/', views.delete_report, name='delete-report'),
+    path('setup-2fa/', views.setup_two_factor, name='setup-2fa'),
+    path('security-settings/', views.security_settings, name='security-settings'),
 
 ]
 

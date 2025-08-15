@@ -101,17 +101,25 @@
 
 
                       <div class="form-floating mt-3 mb-3">
-                        <input type="text" class="form-control" name='username' id="floatingInput" placeholder="User Name">
+                        <input type="text" class="form-control" name='username' id="floatingInput" placeholder="User Name" value="{% if username %}{{ username }}{% endif %}" required>
                         <label for="floatingInput">User Name</label>
                       </div>
 
                       <div class="form-floating mt-3 mb-3">
-                        <input type="password" class="form-control" name='password' id="myInput" placeholder="Password"> 
+                        <input type="password" class="form-control" name='password' id="myInput" placeholder="Password" required> 
                         <label for="floatingInput">Password</label>
 
                         <input type="checkbox" class="mt-2" onclick="myFunction11()">Show Password
                         
                       </div>
+
+                      {% if require_2fa %}
+                      <div class="form-floating mt-3 mb-3">
+                        <input type="text" class="form-control" name='otp_code' id="otpInput" placeholder="Enter 2FA Code" maxlength="6" required>
+                        <label for="otpInput">2FA Code</label>
+                        <small class="text-muted">Enter the 6-digit code sent to your email</small>
+                      </div>
+                      {% endif %}
                       
 
                       <div class="text-right">

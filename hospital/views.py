@@ -142,35 +142,82 @@ def login_user(request):
     elif request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
+        otp_code = request.POST.get('otp_code', '')
 
         try:
             user = User.objects.get(username=username)
-        except:
+        except User.DoesNotExist:
             messages.error(request, 'Username does not exist')
+            return render(request, 'patient-login.html')
 
-        user = authenticate(username=username, password=password)
+        # Check if account is locked
+        if user.is_account_locked():
+            messages.error(request, 'Account is temporarily locked due to multiple failed login attempts. Please try again later.')
+            return render(request, 'patient-login.html')
 
-        if user is not None:
+        # Authenticate user
+        authenticated_user = authenticate(username=username, password=password)
+
+        if authenticated_user is not None:
+            # Reset failed attempts on successful password verification
+            user.failed_login_attempts = 0
+            user.save()
+
             if not user.is_active:
                 # User is not active, redirect to OTP verification
                 messages.warning(request, 'Your account is not active. Please verify your email with OTP.')
-                # Resend OTP if it's expired or not set
                 if not user.otp_code or user.otp_expires_at < datetime.now():
                     if send_otp_email(user, "account verification"):
                         messages.info(request, 'A new OTP has been sent to your email.')
                     else:
                         messages.error(request, 'Error sending OTP email. Please try again.')
                 return redirect('otp_verify', user_id=user.id)
-            else:
-                login(request, user)
-                if request.user.is_patient:   
-                    messages.success(request, 'User Logged in Successfully')    
-                    return redirect('patient-dashboard')
+            
+            # Check if 2FA is enabled
+            if user.two_factor_enabled:
+                if not otp_code:
+                    # Send 2FA OTP
+                    if send_otp_email(user, "two_factor_authentication"):
+                        messages.info(request, 'Please enter the 2FA code sent to your email.')
+                        return render(request, 'patient-login.html', {'require_2fa': True, 'username': username})
+                    else:
+                        messages.error(request, 'Error sending 2FA code. Please try again.')
+                        return render(request, 'patient-login.html')
                 else:
-                    messages.error(request, 'Invalid credentials. Not a Patient')
-                    return redirect('logout')
+                    # Verify 2FA OTP
+                    if user.otp_code == otp_code and user.otp_expires_at > datetime.now():
+                        user.otp_code = None
+                        user.otp_expires_at = None
+                        user.save()
+                    else:
+                        messages.error(request, 'Invalid or expired 2FA code.')
+                        return render(request, 'patient-login.html', {'require_2fa': True, 'username': username})
+            
+            # Check if password reset is required
+            if user.password_reset_required:
+                messages.warning(request, 'You must change your password before continuing.')
+                return redirect('change-password', pk=user.id)
+            
+            login(request, user)
+            if user.is_patient:   
+                messages.success(request, 'User Logged in Successfully')    
+                return redirect('patient-dashboard')
+            else:
+                messages.error(request, 'Invalid credentials. Not a Patient')
+                return redirect('logout')
         else:
-            messages.error(request, 'Invalid username or password')
+            # Handle failed login attempt
+            user.failed_login_attempts += 1
+            
+            # Lock account after 5 failed attempts
+            if user.failed_login_attempts >= 5:
+                user.lock_account(duration_minutes=30)
+                messages.error(request, 'Account locked due to multiple failed login attempts. Please try again in 30 minutes.')
+            else:
+                remaining_attempts = 5 - user.failed_login_attempts
+                messages.error(request, f'Invalid username or password. {remaining_attempts} attempts remaining.')
+            
+            user.save()
 
     return render(request, 'patient-login.html')
 
@@ -749,6 +796,66 @@ def delete_report(request,pk):
         logout(request)
         messages.error(request, 'Not Authorized')
         return render(request, 'patient-login.html')
+
+
+
+@csrf_exempt
+@login_required(login_url="login")
+def setup_two_factor(request):
+    """Setup two-factor authentication"""
+    if request.user.is_patient:
+        patient = Patient.objects.get(user=request.user)
+        
+        if request.method == 'POST':
+            action = request.POST.get('action')
+            
+            if action == 'enable':
+                # Generate backup codes
+                backup_codes = generate_backup_codes()
+                request.user.backup_codes = backup_codes
+                request.user.two_factor_enabled = True
+                request.user.save()
+                
+                messages.success(request, 'Two-factor authentication has been enabled successfully!')
+                return render(request, 'setup-2fa.html', {
+                    'patient': patient,
+                    'backup_codes': backup_codes,
+                    'action_completed': True
+                })
+            
+            elif action == 'disable':
+                request.user.two_factor_enabled = False
+                request.user.backup_codes = []
+                request.user.save()
+                
+                messages.success(request, 'Two-factor authentication has been disabled.')
+                return redirect('profile-settings')
+        
+        context = {
+            'patient': patient,
+            'two_factor_enabled': request.user.two_factor_enabled
+        }
+        return render(request, 'setup-2fa.html', context)
+    else:
+        return redirect('logout')
+
+@csrf_exempt
+@login_required(login_url="login")
+def security_settings(request):
+    """Security settings page"""
+    if request.user.is_patient:
+        patient = Patient.objects.get(user=request.user)
+        
+        # Get recent login attempts (you might want to create a LoginAttempt model)
+        context = {
+            'patient': patient,
+            'two_factor_enabled': request.user.two_factor_enabled,
+            'failed_attempts': request.user.failed_login_attempts,
+            'last_password_change': request.user.last_password_change,
+        }
+        return render(request, 'security-settings.html', context)
+    else:
+        return redirect('logout')
 
 @csrf_exempt
 @receiver(user_logged_in)

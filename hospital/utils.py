@@ -10,32 +10,32 @@ from django.conf import settings
 
 
 def searchDoctors(request):
-    
+
     search_query = ''
-    
+
     if request.GET.get('search_query'):
         search_query = request.GET.get('search_query')
-        
+
     #skills = Skill.objects.filter(name__icontains=search_query)
-    
+
     doctors = Doctor_Information.objects.filter(register_status='Accepted').distinct().filter(
         Q(name__icontains=search_query) |
         Q(hospital_name__name__icontains=search_query) |  
         Q(department__icontains=search_query))
-    
+
     return doctors, search_query
 
 
 def searchHospitals(request):
-    
+
     search_query = ''
-    
+
     if request.GET.get('search_query'):
         search_query = request.GET.get('search_query')
-        
-    
+
+
     hospitals = Hospital_Information.objects.distinct().filter(Q(name__icontains=search_query))
-    
+
     return hospitals, search_query
 
 
@@ -53,8 +53,8 @@ def paginateHospitals(request, hospitals, results):
         # display last page if page is out of range
         page = paginator.num_pages
         hospitals = paginator.page(page)
-        
-    
+
+
     # if there are many pages, we will see some at a time in the pagination bar (range window)
     # leftIndex(left button) = current page no. - 4 
     leftIndex = (int(page) - 4)
@@ -72,66 +72,121 @@ def paginateHospitals(request, hospitals, results):
 
 
 # def searchDepartmentDoctors(request, pk):
-    
+
 #     search_query = ''
-    
+
 #     if request.GET.get('search_query'):
 #         search_query = request.GET.get('search_query')
-        
-    
+
+
 #     departments = hospital_department.object.filter(hospital_department_id=pk).filter(
 #         Q(doctor__name__icontains=search_query) |  
 #         Q(doctor__department__icontains=search_query))
-    
+
 #     return departments, search_query
 
 def searchDepartmentDoctors(request, pk):
-    
+
     search_query = ''
-    
+
     if request.GET.get('search_query'):
         search_query = request.GET.get('search_query')
-        
+
     departments = hospital_department.objects.get(hospital_department_id=pk)
-    
+
     doctors = Doctor_Information.objects.filter(department_name=departments).filter(
         Q(name__icontains=search_query))
-    
+
     # doctors = Doctor_Information.objects.filter(department_name=departments).filter(
     #     Q(name__icontains=search_query) |
     #     Q(specialization_name__name__icontains=search_query))
-    
+
     return doctors, search_query
 
 
 
 # products = Products.objects.filter(price__range=[10, 100])
 
-def send_otp_email(user, otp_type="verification"):
-    """
-    Generates and sends an OTP to the user's email.
-    otp_type can be 'verification' for registration or 'reset_password' for password reset.
-    """
-    otp_code = str(random.randint(100000, 999999))
-    user.otp_code = otp_code
-    user.otp_expires_at = datetime.now() + timedelta(minutes=5) # OTP valid for 5 minutes
-    user.save()
-
-    subject = f'Your OTP for CliniCore {otp_type.replace("_", " ").title()}'
-    message = f'''Hi {user.username},
-
-Your One-Time Password (OTP) for {otp_type.replace("_", " ")} is: {otp_code}
-
-This OTP is valid for 5 minutes. Please do not share it with anyone.
-
-Thanks,
-CliniCore Team'''
-    from_email = settings.EMAIL_HOST_USER
-    recipient_list = [user.email]
-
+def send_otp_email(user, purpose="registration"):
+    """Send OTP email to user with enhanced security"""
     try:
-        send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+        # Generate 6-digit OTP
+        otp_code = str(random.randint(100000, 999999))
+
+        # Set OTP expiration time based on purpose
+        if purpose == "two_factor_authentication":
+            otp_expires_at = datetime.now() + timedelta(minutes=5)  # Shorter for 2FA
+        else:
+            otp_expires_at = datetime.now() + timedelta(minutes=15)
+
+        # Save OTP to user
+        user.otp_code = otp_code
+        user.otp_expires_at = otp_expires_at
+        user.save()
+
+        # Prepare email content based on purpose
+        if purpose == "registration":
+            subject = "HealthStack - Account Verification"
+            template_message = f"""
+            Welcome to HealthStack!
+
+            Your verification code is: {otp_code}
+
+            This code will expire in 15 minutes. Please do not share this code with anyone.
+
+            If you didn't request this verification, please ignore this email.
+            """
+        elif purpose == "password_reset":
+            subject = "HealthStack - Password Reset"
+            template_message = f"""
+            Password Reset Request
+
+            Your password reset code is: {otp_code}
+
+            This code will expire in 15 minutes. Please do not share this code with anyone.
+
+            If you didn't request a password reset, please ignore this email and ensure your account is secure.
+            """
+        elif purpose == "two_factor_authentication":
+            subject = "HealthStack - Two-Factor Authentication"
+            template_message = f"""
+            Two-Factor Authentication Code
+
+            Your 2FA code is: {otp_code}
+
+            This code will expire in 5 minutes. Please do not share this code with anyone.
+
+            If you didn't attempt to log in, please secure your account immediately.
+            """
+        else:
+            subject = "HealthStack - Verification Code"
+            template_message = f"""
+            Verification Code
+
+            Your verification code is: {otp_code}
+
+            This code will expire in 15 minutes. Please do not share this code with anyone.
+            """
+
+        # Send email
+        send_mail(
+            subject,
+            template_message,
+            settings.EMAIL_HOST_USER,
+            [user.email],
+            fail_silently=False,
+        )
         return True
+
     except Exception as e:
         print(f"Error sending OTP email: {e}")
         return False
+
+def generate_backup_codes():
+    """Generate backup codes for 2FA"""
+    import secrets
+    codes = []
+    for _ in range(10):
+        code = secrets.token_hex(4).upper()
+        codes.append(f"{code[:4]}-{code[4:]}")
+    return codes

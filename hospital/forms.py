@@ -1,27 +1,53 @@
 from django.forms import ModelForm
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
-# from django.contrib.auth.models import User
+from hospital.models import User, Patient
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
+from .validators import PasswordStrengthValidator
 
-from .models import Patient, User
 # Create a custom form that inherits from user form (reason --> for modify and customize)
 
 
 class CustomUserCreationForm(UserCreationForm):
+    email = forms.EmailField(required=True)
+
     class Meta:
         model = User
-        # password1 and password2 are required fields (django default)
-        fields = ['username', 'email', 'password1', 'password2']
-        # labels = {
-        #     'first_name': 'Name',
-        # }
+        fields = ['first_name', 'last_name', 'username', 'email', 'password1', 'password2']
+        widgets = {
+            'first_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'First Name'}),
+            'last_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Last Name'}),
+            'username': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Username'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Email'}),
+            'password1': forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Password'}),
+            'password2': forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Confirm Password'}),
+        }
 
-    # create a style for model form
-    def __init__(self, *args, **kwargs):
-        super(CustomUserCreationForm, self).__init__(*args, **kwargs)
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if User.objects.filter(email=email).exists():
+            raise ValidationError("A user with this email already exists.")
+        return email
 
-        for name, field in self.fields.items():
-            field.widget.attrs.update({'class': 'form-control floating'})
+    def clean_password1(self):
+        password1 = self.cleaned_data.get('password1')
+        if password1:
+            # Use our custom password validator
+            validator = PasswordStrengthValidator()
+            try:
+                validator.validate(password1, user=None)
+            except ValidationError as e:
+                raise ValidationError(e.messages)
+        return password1
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.email = self.cleaned_data['email']
+        user.is_active = False  # Require email verification
+        if commit:
+            user.save()
+        return user
 
 
 class PatientForm(forms.ModelForm):

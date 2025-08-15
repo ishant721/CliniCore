@@ -29,8 +29,34 @@ class User(AbstractUser):
     is_pharmacist = models.BooleanField(default=False)
     otp_code = models.CharField(max_length=6, blank=True, null=True)
     otp_expires_at = models.DateTimeField(blank=True, null=True)
-    #login_status = models.CharField(max_length=200, null=True, blank=True, default="offline")
     login_status = models.BooleanField(default=False)
+    
+    # Security enhancements
+    failed_login_attempts = models.PositiveIntegerField(default=0)
+    account_locked_until = models.DateTimeField(blank=True, null=True)
+    two_factor_enabled = models.BooleanField(default=False)
+    two_factor_secret = models.CharField(max_length=32, blank=True, null=True)
+    backup_codes = models.JSONField(default=list, blank=True)
+    last_password_change = models.DateTimeField(auto_now_add=True)
+    password_reset_required = models.BooleanField(default=False)
+    
+    def is_account_locked(self):
+        """Check if account is currently locked"""
+        if self.account_locked_until:
+            return timezone.now() < self.account_locked_until
+        return False
+    
+    def lock_account(self, duration_minutes=30):
+        """Lock account for specified duration"""
+        from django.utils import timezone
+        self.account_locked_until = timezone.now() + timezone.timedelta(minutes=duration_minutes)
+        self.save()
+    
+    def unlock_account(self):
+        """Unlock account and reset failed attempts"""
+        self.failed_login_attempts = 0
+        self.account_locked_until = None
+        self.save()
     
 class Hospital_Information(models.Model):
     # ('database value', 'display_name')
