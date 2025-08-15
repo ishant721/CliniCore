@@ -1,0 +1,27 @@
+apps.populate(settings.INSTALLED_APPS)
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/django/apps/registry.py", line 124, in populate
+    app_config.ready()
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/debug_toolbar/apps.py", line 22, in ready
+    for cls in DebugToolbar.get_panel_classes():
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/debug_toolbar/toolbar.py", line 127, in get_panel_classes
+    import_string(panel_path) for panel_path in dt_settings.get_panels()
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/django/utils/module_loading.py", line 30, in import_string
+    return cached_import(module_path, class_name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/django/utils/module_loading.py", line 15, in cached_import
+    module = import_module(module_path)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/nix/store/vnvdzw4182wb2ifzi0cczhv80yfnpx1q-python3-3.12.11/lib/python3.12/importlib/__init__.py", line 90, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 999, in exec_module
+  File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/debug_toolbar/panels/staticfiles.py", line 6, in <module>
+    from django.core.files.storage import get_storage_class
+ImportError: cannot import name 'get_storage_class' from 'django.core.files.storage' (/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/django/core/files/storage/__init__.py)
