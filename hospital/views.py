@@ -17,7 +17,7 @@ import random
 from django.contrib.auth.signals import user_logged_in, user_logged_out
 from django.dispatch import receiver
 from django.template.loader import get_template
-from xhtml2pdf import pisa
+import weasyprint
 from .utils import searchDoctors, searchHospitals, searchDepartmentDoctors, paginateHospitals, send_otp_email
 from .models import Patient, User
 from doctor.models import Doctor_Information, Appointment,Report, Specimen, Test, Prescription, Prescription_medicine, Prescription_test
@@ -729,13 +729,14 @@ def prescription_view(request,pk):
 
 @csrf_exempt
 def render_to_pdf(template_src, context_dict={}):
-    template=get_template(template_src)
-    html=template.render(context_dict)
-    result=BytesIO()
-    pres_pdf=pisa.pisaDocument(BytesIO(html.encode("ISO-8859-1")), result)
-    if not pres_pdf.err:
-        return HttpResponse(result.getvalue(),content_type="aplication/pres_pdf")
-    return None
+    template = get_template(template_src)
+    html = template.render(context_dict)
+    try:
+        pdf_file = weasyprint.HTML(string=html).write_pdf()
+        response = HttpResponse(pdf_file, content_type='application/pdf')
+        return response
+    except Exception as e:
+        return None
 
 
 # def prescription_pdf(request,pk):
@@ -765,7 +766,7 @@ def prescription_pdf(request,pk):
     context={'patient':patient,'prescription':prescription,'prescription_test':prescription_test,'prescription_medicine':prescription_medicine}
     pres_pdf=render_to_pdf('prescription_pdf.html', context)
     if pres_pdf:
-        response=HttpResponse(pres_pdf, content_type='application/pres_pdf')
+        response=HttpResponse(pres_pdf, content_type='application/pdf')
         content="inline; filename=prescription.pdf"
         response['Content-Disposition']= content
         return response
