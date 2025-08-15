@@ -172,7 +172,7 @@ def send_otp_email(user, purpose="registration"):
         send_mail(
             subject,
             template_message,
-            settings.EMAIL_HOST_USER,
+            settings.DEFAULT_FROM_EMAIL,
             [user.email],
             fail_silently=False,
         )
