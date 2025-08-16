@@ -7,6 +7,12 @@
 {% block content %}
 <!-- Main Wrapper -->
 <div class="main-wrapper">
+    <!-- Header -->
+    <header class="header">
+        {% include 'navbar_home.html' %}
+    </header>
+    <!-- /Header -->
+
     <!-- Page Content -->
     <div class="content">
         <div class="container-fluid">
@@ -25,23 +31,16 @@
                                 </div>
                                 
                                 <!-- Display Messages -->
-                                {% if messages %}
-                                    {% for message in messages %}
-                                        <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show" role="alert">
-                                            {{ message }}
-                                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                                <span aria-hidden="true">&times;</span>
-                                            </button>
-                                        </div>
-                                    {% endfor %}
-                                {% endif %}
+                                {% include 'message.html' %}
                                 
                                 <!-- OTP Form -->
-                                <form method="post">
+                                <form method="POST" action="{% url 'otp_verify' user_id=user_id reset_password=reset_password %}">
                                     {% csrf_token %}
-                                    <div class="form-group form-focus">
-                                        <input type="text" name="otp_code" class="form-control floating" maxlength="6" required>
-                                        <label class="focus-label">Enter OTP Code</label>
+                                    
+                                    <div class="form-floating mt-3 mb-3">
+                                        <input type="text" class="form-control" name="otp_code" id="otp_code" placeholder="Enter OTP Code" maxlength="6" required>
+                                        <label for="otp_code">OTP Code</label>
+                                        <small class="text-muted">Enter the 6-digit code sent to your email</small>
                                     </div>
                                     
                                     <div class="text-right">
@@ -64,6 +63,28 @@
         </div>
     </div>
     <!-- /Page Content -->
+
+    <!-- Footer -->
+    {% include 'footer.html' %}
+    <!-- /Footer -->
 </div>
 <!-- /Main Wrapper -->
+
+<!-- jQuery -->
+<script src="{% static 'HealthStack-System/js/Normal/jquery.min.js' %}"></script>
+
+<!-- Bootstrap Core JS -->
+<script src="{% static 'HealthStack-System/js/Normal/popper.min.js' %}"></script>
+<script src="{% static 'HealthStack-System/js/Normal/bootstrap.min.js' %}"></script>
+
+<!-- Custom JS -->
+<script src="{% static 'HealthStack-System/Outside_assets/js/script.js' %}"></script>
+
+<!-- Auto-focus on OTP input -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    document.getElementById('otp_code').focus();
+});
+</script>
+
 {% endblock %}

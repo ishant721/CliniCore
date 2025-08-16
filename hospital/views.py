@@ -163,17 +163,19 @@ def login_user(request):
             user.failed_login_attempts = 0
             user.save()
 
+            # Check if user is not active (not verified)
             if not user.is_active:
-                # User is not active, redirect to OTP verification
-                messages.warning(request, 'Your account is not active. Please verify your email with OTP.')
-                if not user.otp_code or user.otp_expires_at < timezone.now():
-                    if send_otp_email(user, "account verification"):
-                        messages.info(request, 'A new OTP has been sent to your email.')
-                    else:
-                        messages.error(request, 'Error sending OTP email. Please try again.')
-                return redirect('otp_verify', user_id=user.id)
+                # User is registered but not verified, send OTP for verification
+                messages.warning(request, 'Your account is not verified. Please verify your email with the OTP sent to your email.')
+                
+                # Always send a new OTP for unverified users trying to login
+                if send_otp_email(user, "account verification"):
+                    messages.info(request, 'A new OTP has been sent to your email address for verification.')
+                else:
+                    messages.error(request, 'Error sending OTP email. Please try again.')
+                return redirect('otp_verify', user_id=user.id, reset_password='False')
 
-            # Check if 2FA is enabled
+            # Check if 2FA is enabled for active users
             if user.two_factor_enabled:
                 if not otp_code:
                     # Send 2FA OTP
@@ -265,14 +267,21 @@ def otp_verify(request, user_id, reset_password=False):
             user.otp_expires_at = None # Clear OTP expiration
             user.save()
 
-            if reset_password:
+            if reset_password == 'True':
                 messages.success(request, 'OTP verified successfully. You can now reset your password.')
                 return redirect('password_reset_confirm_otp', user_id=user.id) # Redirect to new password reset confirm page
             else:
                 user.is_active = True # Activate user account
                 user.save()
-                messages.success(request, 'Account verified successfully! You can now log in.')
-                return redirect('login')
+                
+                # If this was during login flow, log the user in automatically
+                login(request, user)
+                if user.is_patient:
+                    messages.success(request, 'Account verified successfully! Welcome to HealthStack.')
+                    return redirect('patient-dashboard')
+                else:
+                    messages.success(request, 'Account verified successfully! You can now log in.')
+                    return redirect('login')
         else:
             messages.error(request, 'Invalid or expired OTP. Please try again.')
             return render(request, 'otp_verify.html', {'user_id': user_id, 'reset_password': reset_password})
