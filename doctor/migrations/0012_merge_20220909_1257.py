@@ -6,7 +6,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('doctor', '0009_prescription_extra_information'),
+        ('doctor', '0009_prescription_extra_information_and_more'),
         ('doctor', '0011_alter_prescription_patient_alter_report_doctor'),
     ]
 
