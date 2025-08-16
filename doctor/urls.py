@@ -38,6 +38,8 @@ urlpatterns = [
     path('create-prescription-from-report/<int:report_id>/<int:patient_id>/', views.create_prescription_from_report, name='create-prescription-from-report'),
     path('doctor-setup-2fa/', views.doctor_setup_two_factor, name="doctor-setup-2fa"),
     path('doctor-security-settings/', views.doctor_security_settings, name="doctor-security-settings"),
+    path('doctor-schedule-settings/', views.doctor_schedule_settings, name="doctor-schedule-settings"),
+    path('automated-booking/', views.automated_booking_view, name="automated-booking"),
 
 ]
 

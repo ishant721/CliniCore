@@ -32,7 +32,7 @@ class Doctor_Information(models.Model):
         ('Physiatrists', 'Physiatrists'),
         ('Dermatologists', 'Dermatologists'),
     )
-    
+
     doctor_id = models.AutoField(primary_key=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True, related_name='profile')
     name = models.CharField(max_length=200, null=True, blank=True)
@@ -53,11 +53,11 @@ class Doctor_Information(models.Model):
     consultation_fee = models.IntegerField(null=True, blank=True)
     report_fee = models.IntegerField(null=True, blank=True)
     dob = models.CharField(max_length=200, null=True, blank=True)
-    
+
     # New fields for location
     latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
     longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
-    
+
     # Marketplace features
     is_marketplace_active = models.BooleanField(default=False)
     home_visit_available = models.BooleanField(default=False)
@@ -67,26 +67,26 @@ class Doctor_Information(models.Model):
     home_visit_fee = models.IntegerField(null=True, blank=True)
     online_consultation_fee = models.IntegerField(null=True, blank=True)
     average_response_time = models.IntegerField(default=30)  # in minutes
-    
+
     # Ratings and reviews
     marketplace_rating = models.DecimalField(max_digits=3, decimal_places=2, default=5.0)
     total_marketplace_reviews = models.IntegerField(default=0)
     total_consultations = models.IntegerField(default=0)
-    
+
     # Education
     institute = models.CharField(max_length=200, null=True, blank=True)
     degree = models.CharField(max_length=200, null=True, blank=True)
     completion_year = models.CharField(max_length=200, null=True, blank=True)
-    
+
     # work experience
     work_place = models.CharField(max_length=200, null=True, blank=True)
     designation = models.CharField(max_length=200, null=True, blank=True)
     start_year = models.CharField(max_length=200, null=True, blank=True)
     end_year = models.CharField(max_length=200, null=True, blank=True)
-    
+
     # register_status = models.BooleanField(default=False) default='pending'
     register_status =  models.CharField(max_length=200, null=True, blank=True)
-    
+
     # ForeignKey --> one to one relationship with Hospital_Information model.
     hospital_name = models.ForeignKey(Hospital_Information, on_delete=models.SET_NULL, null=True, blank=True)
 
@@ -117,7 +117,7 @@ class Appointment(models.Model):
     payment_status = models.CharField(max_length=200, null=True, blank=True, default='pending')
     transaction_id = models.CharField(max_length=255, null=True, blank=True)
     message = models.CharField(max_length=255, null=True, blank=True)
-    
+
 
     def __str__(self):
         return str(self.patient.username)
@@ -128,10 +128,10 @@ class Education(models.Model):
     degree = models.CharField(max_length=200, null=True, blank=True)
     institute = models.CharField(max_length=200, null=True, blank=True)
     year_of_completion = models.CharField(max_length=200, null=True, blank=True)
-    
+
     def __str__(self):
         return str(self.doctor.name)
-    
+
 class Experience(models.Model):
     experience_id = models.AutoField(primary_key=True)
     doctor = models.ForeignKey(Doctor_Information, on_delete=models.CASCADE, null=True, blank=True)
@@ -139,7 +139,7 @@ class Experience(models.Model):
     from_year = models.CharField(max_length=200, null=True, blank=True)
     to_year = models.CharField(max_length=200, null=True, blank=True)
     designation = models.CharField(max_length=200, null=True, blank=True)
-    
+
     def __str__(self):
         return str(self.doctor.name)
 
@@ -177,7 +177,7 @@ class Specimen(models.Model):
     specimen_type = models.CharField(max_length=200, null=True, blank=True)
     collection_date = models.CharField(max_length=200, null=True, blank=True)
     receiving_date = models.CharField(max_length=200, null=True, blank=True)
-    
+
     def __str__(self):
         return str(self.report.report_id)
 
@@ -188,11 +188,11 @@ class Test(models.Model):
     result = models.CharField(max_length=200, null=True, blank=True)
     unit = models.CharField(max_length=200, null=True, blank=True)
     referred_value = models.CharField(max_length=200, null=True, blank=True)
-    
+
     def __str__(self):
         return str(self.report.report_id)
 
-        
+
 class Prescription(models.Model):
     # medicine name, quantity, days, time, description, test, test_descrip
     prescription_id = models.AutoField(primary_key=True)
@@ -221,7 +221,7 @@ class Prescription_medicine(models.Model):
     frequency = models.CharField(max_length=200, null=True, blank=True)
     relation_with_meal = models.CharField(max_length=200, null=True, blank=True)
     instruction = models.TextField(null=True, blank=True)
-    
+
     # New fields for medicine ordering
     is_ordered = models.BooleanField(default=False)
     order_status = models.CharField(max_length=50, default='pending', choices=[
@@ -243,7 +243,7 @@ class Prescription_test(models.Model):
     test_info_id = models.CharField(max_length=200, null=True, blank=True)
     test_info_price = models.CharField(max_length=200, null=True, blank=True)
     test_info_pay_status = models.CharField(max_length=200, null=True, blank=True)
-    
+
     """
     (create prescription)
     doctor input --> test_id 
@@ -253,7 +253,7 @@ class Prescription_test(models.Model):
 
     def __str__(self):
         return str(self.prescription.prescription_id)
-    
+
 # # test cart system
 class testCart(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='test_cart')
@@ -263,13 +263,13 @@ class testCart(models.Model):
     purchased = models.BooleanField(default=False)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
-    
+
     def __str__(self):
         return f'{self.item.test_info_id} X {self.item.test_name}'
 
     def get_total(self): 
         total = self.item.test_info_price
-        
+
         return total
 
 class testOrder(models.Model):
@@ -287,7 +287,7 @@ class testOrder(models.Model):
         for order_item in self.orderitems.all():
             total += float(order_item.get_total())
         return total
-    
+
     # TOTAL
     def final_bill(self):
         vat= 20.00
@@ -304,3 +304,48 @@ class Doctor_review(models.Model):
 
     def __str__(self):
         return str(self.patient.username)
+
+class DoctorSchedule(models.Model):
+    DAYS_OF_WEEK = [
+        ('monday', 'Monday'),
+        ('tuesday', 'Tuesday'),
+        ('wednesday', 'Wednesday'),
+        ('thursday', 'Thursday'),
+        ('friday', 'Friday'),
+        ('saturday', 'Saturday'),
+        ('sunday', 'Sunday'),
+    ]
+
+    doctor = models.ForeignKey(Doctor_Information, on_delete=models.CASCADE, related_name='schedules')
+    day_of_week = models.CharField(max_length=10, choices=DAYS_OF_WEEK)
+    start_time = models.TimeField()
+    end_time = models.TimeField()
+    max_patients = models.IntegerField(default=10)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        unique_together = ('doctor', 'day_of_week')
+
+    def __str__(self):
+        return f"{self.doctor.name} - {self.day_of_week}"
+
+
+class AutomatedAppointment(models.Model):
+    STATUS_CHOICES = [
+        ('scheduled', 'Scheduled'),
+        ('confirmed', 'Confirmed'),
+        ('completed', 'Completed'),
+        ('cancelled', 'Cancelled'),
+        ('follow_up_needed', 'Follow-up Needed'),
+    ]
+
+    original_appointment = models.ForeignKey(Appointment, on_delete=models.CASCADE, related_name='automated_appointments')
+    follow_up_appointment = models.ForeignKey(Appointment, on_delete=models.SET_NULL, null=True, blank=True)
+    lab_appointment_scheduled = models.BooleanField(default=False)
+    follow_up_scheduled = models.BooleanField(default=False)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='scheduled')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Automated: {self.original_appointment}"

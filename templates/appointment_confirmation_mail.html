@@ -1,0 +1,29 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Appointment Confirmation</title>
+</head>
+<body>
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #2c3e50;">Appointment Confirmed</h2>
+        
+        <p>Dear {{ patient_name }},</p>
+        
+        <p>Your appointment has been successfully scheduled with <strong>{{ doctor_name }}</strong>.</p>
+        
+        <div style="background-color: #f8f9fa; padding: 20px; border-radius: 5px; margin: 20px 0;">
+            <h3>Appointment Details:</h3>
+            <p><strong>Doctor:</strong> {{ doctor_name }}</p>
+            <p><strong>Date:</strong> {{ appointment_date }}</p>
+            <p><strong>Time:</strong> {{ appointment_time }}</p>
+        </div>
+        
+        <p>Please arrive 15 minutes before your scheduled appointment time.</p>
+        
+        <p>If you need to reschedule or cancel your appointment, please contact us as soon as possible.</p>
+        
+        <p>Best regards,<br>HealthStack Team</p>
+    </div>
+</body>
+</html>

@@ -677,6 +677,26 @@ def create_report(request, pk):
             except BadHeaderError:
                 pass
 
+            report.save()
+
+            # Schedule follow-up appointment
+            try:
+                from doctor.appointment_automation import AppointmentAutomation
+                from doctor.models import Appointment
+
+                # Find the original appointment
+                original_appointment = Appointment.objects.filter(
+                    patient=patient,
+                    doctor=doctor,
+                    appointment_status='completed'
+                ).order_by('-date').first()
+
+                if original_appointment:
+                    AppointmentAutomation.schedule_follow_up(original_appointment)
+
+            except Exception as e:
+                print(f"Error scheduling follow-up: {e}")
+
             messages.success(request, 'Lab report created successfully and notifications sent!')
             return redirect('mypatient-list')
 
@@ -1223,22 +1243,22 @@ def update_report(request, report_id):
             report = get_object_or_404(Report, report_id=report_id)
             specimen = Specimen.objects.filter(report=report)
             tests = Test.objects.filter(report=report)
-            
+
             if request.method == 'POST':
                 # Update report basic info
                 report.status = request.POST.get('status', report.status)
                 report.delivery_date = request.POST.get('delivery_date', report.delivery_date)
                 report.other_information = request.POST.get('other_information', report.other_information)
-                
+
                 # Handle file upload
                 if 'report_file' in request.FILES:
                     report.report_file = request.FILES['report_file']
-                
+
                 # Update specimen information
                 specimen_types = request.POST.getlist('specimen_type')
                 collection_dates = request.POST.getlist('collection_date')
                 receiving_dates = request.POST.getlist('receiving_date')
-                
+
                 # Clear existing specimens and create new ones
                 Specimen.objects.filter(report=report).delete()
                 for i in range(len(specimen_types)):
@@ -1248,13 +1268,13 @@ def update_report(request, report_id):
                         new_specimen.collection_date = collection_dates[i] if i < len(collection_dates) else None
                         new_specimen.receiving_date = receiving_dates[i] if i < len(receiving_dates) else None
                         new_specimen.save()
-                
+
                 # Update test information
                 test_names = request.POST.getlist('test_name')
                 results = request.POST.getlist('result')
                 units = request.POST.getlist('unit')
                 referred_values = request.POST.getlist('referred_value')
-                
+
                 # Clear existing tests and create new ones
                 Test.objects.filter(report=report).delete()
                 for i in range(len(test_names)):
@@ -1265,11 +1285,11 @@ def update_report(request, report_id):
                         new_test.unit = units[i] if i < len(units) else ''
                         new_test.referred_value = referred_values[i] if i < len(referred_values) else ''
                         new_test.save()
-                
+
                 report.save()
                 messages.success(request, 'Report updated successfully!')
                 return redirect('report-list')
-            
+
             context = {
                 'report': report,
                 'specimen': specimen,
@@ -1277,7 +1297,7 @@ def update_report(request, report_id):
                 'lab_workers': lab_workers
             }
             return render(request, 'hospital_admin/update-report.html', context)
-    
+
     return redirect('admin-login')
 
 @csrf_exempt

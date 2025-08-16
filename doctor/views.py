@@ -13,7 +13,7 @@ from django.contrib import messages
 from django.views.decorators.cache import cache_control
 from hospital.models import User, Patient
 from hospital_admin.models import Admin_Information,Clinical_Laboratory_Technician
-from .models import Doctor_Information, Appointment, Education, Experience, Prescription_medicine, Report,Specimen,Test, Prescription_test, Prescription, Doctor_review
+from .models import Doctor_Information, Appointment, Education, Experience, Prescription_medicine, Report,Specimen,Test, Prescription_test, Prescription, Doctor_review, DoctorSchedule, AppointmentAutomation
 from hospital_admin.models import Admin_Information,Clinical_Laboratory_Technician, Test_Information
 from .models import Doctor_Information, Appointment, Education, Experience, Prescription_medicine, Report,Specimen,Test, Prescription_test, Prescription
 from django.db.models import Q, Count
@@ -109,7 +109,7 @@ def doctor_register(request):
             user.save()
 
             # Send OTP for account activation
-            
+
             from hospital.utils import send_otp_email
             if send_otp_email(user, "account verification"):
                 messages.success(request, 'Doctor account was created! Please check your email for OTP to activate your account.')
@@ -229,7 +229,7 @@ def doctor_dashboard(request):
 
                 today_patient_count = today_appointments.count()
                 total_appointments_count = Appointment.objects.filter(doctor=doctor).count()
-                
+
                 reports = Report.objects.filter(doctor=doctor).order_by('-created_at')
 
             else:
@@ -489,7 +489,7 @@ def booking(request, pk):
         appointment.date = transformed_date
         appointment.time = time
         appointment.appointment_status = 'pending'
-        appointment.serial_number = generate_random_string()
+        appointment.serial_number = generate_random_random_string()
         appointment.appointment_type = appointment_type
         appointment.message = message
         appointment.save()
@@ -611,6 +611,10 @@ def create_prescription(request,pk):
 
                     tests.save()
 
+                # Schedule lab appointment if tests were prescribed
+                if test_name and any(test_name):
+                    AppointmentAutomation.schedule_lab_appointment(prescription)
+
                 messages.success(request, 'Prescription Created')
                 return redirect('patient-profile', pk=patient.patient_id)
 
@@ -658,7 +662,7 @@ def report_pdf(request, pk):
 
 @csrf_exempt
 @login_required(login_url="unified-login")
-def patient_search(request, pk):
+def doctor_search(request, pk):
     if request.user.is_authenticated and request.user.is_doctor:
         doctor = Doctor_Information.objects.get(doctor_id=pk)
         id = int(request.GET['search_query'])
@@ -711,12 +715,12 @@ def doctor_view_report(request, pk):
         report = Report.objects.get(report_id=pk)
         specimen = Specimen.objects.filter(report=report)
         test = Test.objects.filter(report=report)
-        
+
         # Mark report as reviewed when doctor views it
         if report.status == 'completed':
             report.status = 'reviewed'
             report.save()
-        
+
         context = {
             'report': report, 
             'test': test, 
@@ -738,10 +742,10 @@ def create_prescription_from_report(request, report_id, patient_id):
         doctor = Doctor_Information.objects.get(user=request.user)
         patient = Patient.objects.get(patient_id=patient_id)
         report = Report.objects.get(report_id=report_id)
-        
+
         if request.method == 'POST':
             prescription = Prescription(doctor=doctor, patient=patient)
-            
+
             medicine_name = request.POST.getlist('medicine_name')
             medicine_quantity = request.POST.getlist('quantity')
             medicine_frequency = request.POST.getlist('frequency')
@@ -749,12 +753,12 @@ def create_prescription_from_report(request, report_id, patient_id):
             medicine_relation_with_meal = request.POST.getlist('relation_with_meal')
             medicine_instruction = request.POST.getlist('instruction')
             extra_information = request.POST.get('extra_information')
-            
+
             # Add reference to the lab report
             prescription.extra_information = f"Based on Lab Report #{report.report_id}\n{extra_information}"
             prescription.create_date = timezone.date.today()
             prescription.save()
-            
+
             # Save medicines
             for i in range(len(medicine_name)):
                 medicine = Prescription_medicine(prescription=prescription)
@@ -765,17 +769,17 @@ def create_prescription_from_report(request, report_id, patient_id):
                 medicine.instruction = medicine_instruction[i]
                 medicine.relation_with_meal = medicine_relation_with_meal[i]
                 medicine.save()
-            
+
             messages.success(request, 'Prescription created successfully based on lab report!')
             return redirect('patient-profile', pk=patient.patient_id)
-        
+
         context = {
             'doctor': doctor,
             'patient': patient,
             'report': report
         }
         return render(request, 'create-prescription-from-report.html', context)
-    
+
     return redirect('doctor-logout')
 
 
@@ -785,10 +789,10 @@ def doctor_setup_two_factor(request):
     """Setup two-factor authentication for doctors"""
     if request.user.is_doctor:
         doctor = Doctor_Information.objects.get(user=request.user)
-        
+
         if request.method == 'POST':
             action = request.POST.get('action')
-            
+
             if action == 'enable':
                 # Generate backup codes
                 from hospital.utils import generate_backup_codes
@@ -796,22 +800,22 @@ def doctor_setup_two_factor(request):
                 request.user.backup_codes = backup_codes
                 request.user.two_factor_enabled = True
                 request.user.save()
-                
+
                 messages.success(request, 'Two-factor authentication has been enabled successfully!')
                 return render(request, 'doctor-setup-2fa.html', {
                     'doctor': doctor,
                     'backup_codes': backup_codes,
                     'action_completed': True
                 })
-            
+
             elif action == 'disable':
                 request.user.two_factor_enabled = False
                 request.user.backup_codes = []
                 request.user.save()
-                
+
                 messages.success(request, 'Two-factor authentication has been disabled.')
                 return redirect('doctor-profile-settings')
-        
+
         context = {
             'doctor': doctor,
             'two_factor_enabled': request.user.two_factor_enabled
@@ -826,7 +830,7 @@ def doctor_security_settings(request):
     """Security settings page for doctors"""
     if request.user.is_doctor:
         doctor = Doctor_Information.objects.get(user=request.user)
-        
+
         context = {
             'doctor': doctor,
             'two_factor_enabled': request.user.two_factor_enabled,
@@ -878,3 +882,80 @@ def doctor_review(request, pk):
         return render(request, 'doctor-profile.html', context)
     else:
         logout(request)
+
+
+@csrf_exempt
+@login_required(login_url='doctor-login')
+def doctor_schedule_settings(request):
+    """Doctor schedule management"""
+    if request.user.is_doctor:
+        doctor = Doctor_Information.objects.get(user=request.user)
+        schedules = DoctorSchedule.objects.filter(doctor=doctor)
+
+        if request.method == 'POST':
+            # Clear existing schedules
+            DoctorSchedule.objects.filter(doctor=doctor).delete()
+
+            # Create new schedules
+            days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']
+            for day in days:
+                if f'{day}_active' in request.POST:
+                    start_time = request.POST.get(f'{day}_start_time')
+                    end_time = request.POST.get(f'{day}_end_time')
+                    max_patients = request.POST.get(f'{day}_max_patients', 10)
+
+                    if start_time and end_time:
+                        DoctorSchedule.objects.create(
+                            doctor=doctor,
+                            day_of_week=day,
+                            start_time=start_time,
+                            end_time=end_time,
+                            max_patients=int(max_patients),
+                            is_active=True
+                        )
+
+            messages.success(request, 'Schedule updated successfully!')
+            return redirect('doctor-schedule-settings')
+
+        # Convert schedules to dict for easier template handling
+        schedule_dict = {}
+        for schedule in schedules:
+            schedule_dict[schedule.day_of_week] = schedule
+
+        context = {
+            'doctor': doctor,
+            'schedules': schedule_dict,
+        }
+        return render(request, 'doctor-schedule-settings.html', context)
+
+    return redirect('doctor-login')
+
+@csrf_exempt
+@login_required(login_url='unified-login')
+def automated_booking_view(request):
+    """Handle automated appointment booking"""
+    if request.method == 'POST':
+        patient_id = request.POST.get('patient_id')
+        doctor_id = request.POST.get('doctor_id')
+
+        try:
+            patient = Patient.objects.get(patient_id=patient_id)
+            doctor = Doctor_Information.objects.get(doctor_id=doctor_id)
+
+            appointment, message = AppointmentAutomation.schedule_appointment(patient, doctor)
+
+            if appointment:
+                messages.success(request, f'Appointment scheduled for {appointment.date} at {appointment.time}')
+            else:
+                messages.error(request, message)
+
+        except (Patient.DoesNotExist, Doctor_Information.DoesNotExist):
+            messages.error(request, 'Invalid patient or doctor selected')
+
+    return redirect('booking')
+
+def testing(request):
+    # hospitals = Hospital_Information.objects.get(hospital_id=1)
+    test = "test"
+    context = {'test': test}
+    return render(request, 'testing.html', context)

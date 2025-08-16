@@ -1,0 +1,30 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Follow-up Appointment Scheduled</title>
+</head>
+<body>
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #2c3e50;">Follow-up Appointment Scheduled</h2>
+        
+        <p>Dear {{ patient_name }},</p>
+        
+        <p>Your lab results are ready! A follow-up appointment has been automatically scheduled with <strong>{{ doctor_name }}</strong> to discuss your results.</p>
+        
+        <div style="background-color: #e8f5e8; padding: 20px; border-radius: 5px; margin: 20px 0;">
+            <h3>Follow-up Appointment Details:</h3>
+            <p><strong>Doctor:</strong> {{ doctor_name }}</p>
+            <p><strong>Date:</strong> {{ appointment_date }}</p>
+            <p><strong>Time:</strong> {{ appointment_time }}</p>
+            <p><strong>Purpose:</strong> Lab results review and consultation</p>
+        </div>
+        
+        <p>During this appointment, your doctor will review your lab results and discuss the next steps in your treatment.</p>
+        
+        <p>Please arrive 15 minutes before your scheduled appointment time.</p>
+        
+        <p>Best regards,<br>HealthStack Team</p>
+    </div>
+</body>
+</html>

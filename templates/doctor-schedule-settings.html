@@ -1,0 +1,135 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Schedule Settings - HealthStack</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
+    
+    <!-- Favicons -->
+    <link type="image/x-icon" href="{% static 'HealthStack-System/images/Normal/favicon.png' %}" rel="icon">
+    
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="{% static 'HealthStack-System/css/Normal/bootstrap.min.css' %}">
+    
+    <!-- Fontawesome CSS -->
+    <link rel="stylesheet" href="{% static 'HealthStack-System/plugins/Normal/fontawesome/css/fontawesome.min.css' %}">
+    
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="{% static 'HealthStack-System/css/Normal/style.css' %}">
+</head>
+
+<body>
+    <!-- Main Wrapper -->
+    <div class="main-wrapper">
+        <!-- Header -->
+        {% include 'doctor-navbar.html' %}
+        <!-- /Header -->
+        
+        <!-- Breadcrumb -->
+        <div class="breadcrumb-bar">
+            <div class="container-fluid">
+                <div class="row align-items-center">
+                    <div class="col-md-12 col-12">
+                        <nav aria-label="breadcrumb" class="page-breadcrumb">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="{% url 'doctor-dashboard' %}">Dashboard</a></li>
+                                <li class="breadcrumb-item active" aria-current="page">Schedule Settings</li>
+                            </ol>
+                        </nav>
+                        <h2 class="breadcrumb-title">Schedule Settings</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /Breadcrumb -->
+        
+        <!-- Page Content -->
+        <div class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <!-- Profile Sidebar -->
+                    <div class="col-md-5 col-lg-4 col-xl-3 theiaStickySidebar">
+                        {% include 'doctor-sidebar.html' %}
+                    </div>
+                    <!-- /Profile Sidebar -->
+                    
+                    <div class="col-md-7 col-lg-8 col-xl-9">
+                        <div class="card">
+                            <div class="card-header">
+                                <h4 class="card-title">Weekly Schedule</h4>
+                                <p class="card-text">Set your availability for each day of the week</p>
+                            </div>
+                            <div class="card-body">
+                                <form method="POST">
+                                    {% csrf_token %}
+                                    
+                                    {% for day, display_name in "monday,Monday|tuesday,Tuesday|wednesday,Wednesday|thursday,Thursday|friday,Friday|saturday,Saturday|sunday,Sunday"|split:"," %}
+                                        {% with day_name=display_name.split:"|"|first day_display=display_name.split:"|"|last %}
+                                        <div class="form-group row">
+                                            <div class="col-12">
+                                                <h5>{{ day_display }}</h5>
+                                                <div class="row">
+                                                    <div class="col-md-2">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="checkbox" name="{{ day_name }}_active" 
+                                                                   id="{{ day_name }}_active" 
+                                                                   {% if schedules|lookup:day_name %}checked{% endif %}>
+                                                            <label class="form-check-label" for="{{ day_name }}_active">
+                                                                Active
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <label class="form-label">Start Time</label>
+                                                        <input type="time" class="form-control" 
+                                                               name="{{ day_name }}_start_time" 
+                                                               value="{% if schedules|lookup:day_name %}{{ schedules|lookup:day_name.start_time }}{% else %}09:00{% endif %}">
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <label class="form-label">End Time</label>
+                                                        <input type="time" class="form-control" 
+                                                               name="{{ day_name }}_end_time" 
+                                                               value="{% if schedules|lookup:day_name %}{{ schedules|lookup:day_name.end_time }}{% else %}17:00{% endif %}">
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <label class="form-label">Max Patients</label>
+                                                        <input type="number" class="form-control" 
+                                                               name="{{ day_name }}_max_patients" 
+                                                               value="{% if schedules|lookup:day_name %}{{ schedules|lookup:day_name.max_patients }}{% else %}10{% endif %}"
+                                                               min="1" max="50">
+                                                    </div>
+                                                </div>
+                                                <hr>
+                                            </div>
+                                        </div>
+                                        {% endwith %}
+                                    {% endfor %}
+                                    
+                                    <div class="text-center">
+                                        <button type="submit" class="btn btn-primary btn-lg">Save Schedule</button>
+                                        <a href="{% url 'doctor-dashboard' %}" class="btn btn-secondary btn-lg">Cancel</a>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /Page Content -->
+    </div>
+    <!-- /Main Wrapper -->
+    
+    <!-- jQuery -->
+    <script src="{% static 'HealthStack-System/js/Normal/jquery.min.js' %}"></script>
+    
+    <!-- Bootstrap Core JS -->
+    <script src="{% static 'HealthStack-System/js/Normal/popper.min.js' %}"></script>
+    <script src="{% static 'HealthStack-System/js/Normal/bootstrap.min.js' %}"></script>
+    
+    <!-- Custom JS -->
+    <script src="{% static 'HealthStack-System/js/Normal/script.js' %}"></script>
+</body>
+</html>
