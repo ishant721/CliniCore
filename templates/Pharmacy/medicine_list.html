@@ -1,0 +1,46 @@
+
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h2>Medicine List</h2>
+            <p>Total Medicines: {{ total_medicines }}</p>
+            
+            <div class="row">
+                {% for medicine in medicines %}
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        {% if medicine.featured_image %}
+                        <img src="{{ medicine.featured_image.url }}" class="card-img-top" alt="{{ medicine.name }}">
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">{{ medicine.name }}</h5>
+                            <p class="card-text">{{ medicine.description|truncatewords:20 }}</p>
+                            <p class="card-text">
+                                <strong>Price: ${{ medicine.price }}</strong><br>
+                                <small class="text-muted">Weight: {{ medicine.weight }}</small><br>
+                                <small class="text-muted">Type: {{ medicine.get_medicine_type_display }}</small><br>
+                                <small class="text-muted">Category: {{ medicine.get_medicine_category_display }}</small><br>
+                                <small class="text-muted">Stock: {{ medicine.stock_quantity }}</small>
+                            </p>
+                            {% if medicine.Prescription_reqiuired == 'yes' %}
+                            <span class="badge badge-warning">Prescription Required</span>
+                            {% endif %}
+                            {% if medicine.is_delivery_available %}
+                            <span class="badge badge-success">Delivery Available</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12">
+                    <p>No medicines available at the moment.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

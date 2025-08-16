@@ -662,7 +662,7 @@ def report_pdf(request, pk):
 #     return render(request, 'testing.html', context)
 
 @csrf_exempt
-@login_required(login_url="unified-login")
+@login_required(login_url="login")
 def doctor_search(request, pk):
     if request.user.is_authenticated and request.user.is_doctor:
         doctor = Doctor_Information.objects.get(doctor_id=pk)
@@ -677,7 +677,7 @@ def doctor_search(request, pk):
         return render(request, 'doctor-login.html')
 
 @csrf_exempt
-@login_required(login_url="unified-login")
+@login_required(login_url="login")
 def doctor_test_list(request):
     if request.user.is_authenticated and request.user.is_doctor:
         doctor = Doctor_Information.objects.get(user=request.user)
@@ -698,7 +698,7 @@ def doctor_test_list(request):
 
 
 @csrf_exempt
-@login_required(login_url="unified-login")
+@login_required(login_url="login")
 def doctor_view_prescription(request, pk):
     if request.user.is_authenticated and request.user.is_doctor:
         doctor = Doctor_Information.objects.get(user=request.user)
@@ -709,7 +709,7 @@ def doctor_view_prescription(request, pk):
         return render(request, 'doctor-view-prescription.html', context)
 
 @csrf_exempt
-@login_required(login_url="unified-login")
+@login_required(login_url="login")
 def doctor_view_report(request, pk):
     if request.user.is_authenticated and request.user.is_doctor:
         doctor = Doctor_Information.objects.get(user=request.user)
@@ -857,7 +857,7 @@ def got_offline(sender, user, request, **kwargs):
         user.save()
 
 @csrf_exempt
-@login_required(login_url="unified-login")
+@login_required(login_url="login")
 def doctor_review(request, pk):
     if request.user.is_doctor:
         # doctor = Doctor_Information.objects.get(user_id=pk)
