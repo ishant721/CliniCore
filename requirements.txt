@@ -18,3 +18,5 @@ virtualenv
 whitenoise
 widgetsnbextension
 djangorestframework-simplejwt
+pyotp
+qrcode
