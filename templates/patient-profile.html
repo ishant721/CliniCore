@@ -51,8 +51,8 @@
        <!-- Header -->
        <header class="header">{% include 'doctor-navbar.html' %}</header>
        <!-- /Header -->
- 
-     
+
+
       <!-- Breadcrumb -->
       <div class="breadcrumb-bar">
         <div class="container-fluid">
@@ -180,17 +180,17 @@
                           >Appointments</a
                         >
                       </li> {% endcomment %}
-                      <li class="nav-item active">
-                        <a class="nav-link" href="#pres" data-toggle="tab"
-                          ><span>Prescription</span></a
-                        >
-                       </li>
                       <li class="nav-item">
-                        <a class="nav-link" href="#medical_records" data-toggle="tab"
-                          ><span> Medical Records</span></a
+                        <a class="nav-link active" href="#prescription" data-toggle="tab"
+                          ><i class="fas fa-clipboard"></i> Prescription</a
                         >
                       </li>
-                
+                      <li class="nav-item">
+                        <a class="nav-link" href="#medical-records" data-toggle="tab"
+                          ><i class="fas fa-file-medical"></i> Medical Records</a
+                        >
+                      </li>
+
                     </ul>
                   </div>
                   <div class="tab-content">
@@ -214,7 +214,7 @@
                                 </tr>
                               </thead>
                               <tbody>
-                               
+
                                 {% for appointment in appointments %}
                                 <tr>
                                   <td>
@@ -256,7 +256,7 @@
                                   </td>
                                   <td class="text-center">
                                     <div class="table-action">
-                                      
+
 
                                       <a href="javascript:void(0);" onclick="return confirm('Accept appointment?');" class="btn btn-sm bg-success-light">
                                         <i class="fas fa-check"></i> Accept
@@ -266,7 +266,7 @@
                                       </a>
                                     </div>
                                   </td>
-                  
+
                                 </tr>
                                 {% endfor %}
                               </tbody>
@@ -278,12 +278,7 @@
                     <!-- /Appointment Tab -->
 
                     <!-- Prescription Tab -->
-                    <div class="tab-pane fade show active" id="pres">
-                      <div class="text-right">
-                        <a href="{% url 'create-prescription' pk=patient.patient_id %}" class="add-new-btn"
-                          >Add Prescription</a
-                        >
-                      </div>
+                    <div class="tab-pane show active" id="prescription">
                       <div class="card card-table mb-0">
                         <div class="card-body">
                           <div class="table-responsive">
@@ -294,56 +289,44 @@
                                   <th>Prescription ID</th>
                                   <th>Patient</th>
                                   <th>Contact</th>
-                                  <th>Action</th>
+                                  <th class="text-center">Action</th>
                                 </tr>
                               </thead>
                               <tbody>
-                                {% for p in prescription %}
+                                {% for prescription in prescription %}
                                 <tr>
-                                  <td>{{p.create_date}}</td>
-                                  <td>{{p.prescription_id}}</td>
+                                  <td>{{ prescription.create_date }}</td>
+                                  <td><a href="javascript:void(0);">{{ prescription.prescription_id }}</a></td>
                                   <td>
                                     <h2 class="table-avatar">
-                                      <a
-                                        href="#"
-                                        class="avatar avatar-sm mr-2"
-                                      >
-                                        <img
+                                      <a href="#" class="avatar avatar-sm mr-2"
+                                        ><img
                                           class="avatar-img rounded-circle"
-                                          src="{{p.patient.featured_image.url}}"
+                                          src="{{ prescription.patient.featured_image.url }}"
                                           alt="User Image"
-                                        />
-                                      </a>
-                                      <a href="#"
-                                        >{{p.patient.name}} </a
-                                      >
+                                      /></a>
+                                      <a href="#">{{ prescription.patient.name }}</a>
                                     </h2>
                                   </td>
-                                  <td>
-                                    {{p.patient.email}}
-                                    <span class="d-block text-info"
-                                      >Phone: {{p.patient.phone_number}}</span
-                                    >
-                                  </td>
-                                  <td class="text-left">
+                                  <td>{{ prescription.patient.phone_number }}</td>
+                                  <td class="text-center">
                                     <div class="table-action">
-                                      {% comment %}
-                                      <a href="{% url 'delete-prescription' pk=p.prescription_id %}" onclick="return confirm('Are you sure you want to Delete?');" class="btn btn-sm bg-danger" >
-                                        <i class="fas fa-trash"></i> Delete <td>
-                                      </a>{% endcomment %}
-                                      
-                                      
                                       <a
-                                        href="{% url 'doctor-view-prescription' pk=p.prescription_id %}"
+                                        href="{% url 'doctor-view-prescription' pk=prescription.prescription_id %}"
                                         class="btn btn-sm bg-info-light"
                                       >
                                         <i class="far fa-eye"></i> View
+                                      </a>
+                                      <a
+                                        href="{% url 'prescription-view' pk=prescription.prescription_id %}"
+                                        class="btn btn-sm bg-primary-light"
+                                      >
+                                        <i class="fas fa-print"></i> Print
                                       </a>
                                     </div>
                                   </td>
                                 </tr>
                                 {% endfor %}
-                                </tr>
                               </tbody>
                             </table>
                           </div>
@@ -351,56 +334,55 @@
                       </div>
                     </div>
                     <!-- /Prescription Tab -->
+
                     <!-- Medical Records Tab -->
-                    <div class="tab-pane fade" id="medical_records">
-                      <div class="text-right">
-                      </div>
+                    <div class="tab-pane" id="medical-records">
                       <div class="card card-table mb-0">
                         <div class="card-body">
                           <div class="table-responsive">
                             <table class="table table-hover table-center mb-0">
                               <thead>
                                 <tr>
-                                  <th>Report Delivery Date</th>
                                   <th>Report ID</th>
-                                  <th>Patient</th>
-                                  <th>Contact</th>
-                                  <th></th>
+                                  <th>Test Date</th>
+                                  <th>Test Name</th>
+                                  <th>Status</th>
+                                  <th>Lab Technician</th>
+                                  <th class="text-center">Action</th>
                                 </tr>
                               </thead>
                               <tbody>
                                 {% for report in report %}
                                 <tr>
-                                  <td>{{report.delivery_date}}</td>
-                                  <td>{{report.report_id}}</td>
+                                  <td><a href="javascript:void(0);">{{ report.report_id }}</a></td>
+                                  <td>{{ report.delivery_date|default:report.created_at|date:"Y-m-d" }}</td>
+                                  <td>{{ report.test_name }}</td>
                                   <td>
-                                    <h2 class="table-avatar">
-                                      <a
-                                        href="#"
-                                        class="avatar avatar-sm mr-2"
-                                      >
-                                        <img
-                                          class="avatar-img rounded-circle"
-                                          src="{{patient.featured_image.url}}"
-                                          alt="User Image"
-                                        />
-                                      </a>
-                                      <a href="#"
-                                        >{{patient.name}} </a
-                                      >
-                                    </h2>
+                                    {% if report.status == 'completed' %}
+                                      <span class="badge badge-pill bg-success-light">Completed</span>
+                                    {% elif report.status == 'reviewed' %}
+                                      <span class="badge badge-pill bg-primary-light">Reviewed</span>
+                                    {% elif report.status == 'in_progress' %}
+                                      <span class="badge badge-pill bg-warning-light">In Progress</span>
+                                    {% else %}
+                                      <span class="badge badge-pill bg-secondary-light">Pending</span>
+                                    {% endif %}
                                   </td>
                                   <td>
-                                    {{patient.email}}
-                                    <span class="d-block text-info"
-                                      >Phone: {{patient.phone_number}}</span
-                                    >
+                                    {% if report.lab_technician %}
+                                      {{ report.lab_technician.name }}
+                                    {% else %}
+                                      -
+                                    {% endif %}
                                   </td>
-                                  <td class="text-right">
+                                  <td class="text-center">
                                     <div class="table-action">
                                       {% comment %}
-                                      <a href="{% url 'delete-medical-record' pk=m.medical_record_id %}" onclick="return confirm('Are you sure you want to Delete?');" class="btn btn-sm bg-danger" >
-                                        <i class="fas fa-trash"></i> Delete <td>
+                                      <a
+                                        href="{% url 'view-report' pk=report.report_id %}"
+                                        class="btn btn-sm bg-primary-light"
+                                      >
+                                        <i class="fas fa-print"></i> Print
                                       </a>
                                       {% endcomment %}
                                       <a
@@ -413,13 +395,13 @@
                                   </td>
                                 </tr>
                                 {% endfor %}
-                                </tr>
                               </tbody>
                             </table>
-
-                    
-
-                    
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- /Medical Records Tab -->
                   </div>
                 </div>
               </div>
@@ -429,7 +411,7 @@
       </div>
       <!-- /Page Content -->
 
-     
+
             </div>
         </div>
         </div>
@@ -493,7 +475,7 @@
     </div>
     <!-- /Add Medical Records Modal -->
 
-    
+
 
     <!-- jQuery -->
     <script src="{% static 'HealthStack-System/js/Normal/jquery.min.js' %}"></script>
