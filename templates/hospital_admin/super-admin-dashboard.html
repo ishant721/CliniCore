@@ -1,0 +1,236 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Super Admin Dashboard - HealthStack</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'HealthStack-System/admin_assets/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'HealthStack-System/admin_assets/css/font-awesome.min.css' %}">
+    <link rel="stylesheet" href="{% static 'HealthStack-System/admin_assets/css/feathericon.min.css' %}">
+    <link rel="stylesheet" href="{% static 'HealthStack-System/admin_assets/css/style.css' %}">
+</head>
+<body>
+    <div class="main-wrapper">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <a href="{% url 'super-admin-dashboard' %}" class="logo">
+                    <img src="{% static 'HealthStack-System/admin_assets/img/logo.png' %}" alt="Logo">
+                </a>
+            </div>
+            <a href="javascript:void(0);" id="toggle_btn">
+                <i class="fe fe-text-align-left"></i>
+            </a>
+            <div class="top-nav-search">
+                <div class="main">
+                    <div class="search-bar">
+                        <input class="form-control" placeholder="Search here" type="search">
+                        <button class="btn"><i class="fa fa-search"></i></button>
+                    </div>
+                </div>
+            </div>
+            <ul class="nav user-menu">
+                <li class="nav-item dropdown has-arrow">
+                    <a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">
+                        <span class="user-img">
+                            <img class="rounded-circle" src="{% static 'HealthStack-System/admin_assets/img/profiles/avatar-01.jpg' %}" alt="Super Admin">
+                        </span>
+                    </a>
+                    <div class="dropdown-menu">
+                        <div class="user-header">
+                            <div class="avatar avatar-sm">
+                                <img src="{% static 'HealthStack-System/admin_assets/img/profiles/avatar-01.jpg' %}" alt="User Image" class="avatar-img rounded-circle">
+                            </div>
+                            <div class="user-text">
+                                <h6>Super Admin</h6>
+                                <p class="text-muted mb-0">{{ user.email }}</p>
+                            </div>
+                        </div>
+                        <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-inner slimscroll">
+                <div id="sidebar-menu" class="sidebar-menu">
+                    <ul>
+                        <li class="menu-title">
+                            <span>Main</span>
+                        </li>
+                        <li class="active">
+                            <a href="{% url 'super-admin-dashboard' %}">
+                                <i class="fe fe-home"></i> <span>Dashboard</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'pending-hospitals-list' %}">
+                                <i class="fe fe-clock"></i> <span>Pending Hospitals <small class="badge badge-primary">{{ pending_hospitals }}</small></span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'hospital-admins-list' %}">
+                                <i class="fe fe-users"></i> <span>Hospital Admins</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'create-hospital-admin' %}">
+                                <i class="fe fe-user-plus"></i> <span>Create Hospital Admin</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{% url 'hospital-list' %}">
+                                <i class="fe fe-building"></i> <span>All Hospitals</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Page Wrapper -->
+        <div class="page-wrapper">
+            <div class="content container-fluid">
+                <!-- Page Header -->
+                <div class="page-header">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <h3 class="page-title">Super Admin Dashboard</h3>
+                            <ul class="breadcrumb">
+                                <li class="breadcrumb-item active">Dashboard</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dashboard Stats -->
+                <div class="row">
+                    <div class="col-xl-3 col-sm-6 col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="dash-widget-header">
+                                    <span class="dash-widget-icon text-warning border-warning">
+                                        <i class="fe fe-clock"></i>
+                                    </span>
+                                    <div class="dash-count">
+                                        <h3>{{ pending_hospitals }}</h3>
+                                    </div>
+                                </div>
+                                <div class="dash-widget-info">
+                                    <h6 class="text-muted">Pending Hospitals</h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-sm-6 col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="dash-widget-header">
+                                    <span class="dash-widget-icon text-success">
+                                        <i class="fe fe-building"></i>
+                                    </span>
+                                    <div class="dash-count">
+                                        <h3>{{ approved_hospitals }}</h3>
+                                    </div>
+                                </div>
+                                <div class="dash-widget-info">
+                                    <h6 class="text-muted">Approved Hospitals</h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-sm-6 col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="dash-widget-header">
+                                    <span class="dash-widget-icon text-info">
+                                        <i class="fe fe-users"></i>
+                                    </span>
+                                    <div class="dash-count">
+                                        <h3>{{ total_hospital_admins }}</h3>
+                                    </div>
+                                </div>
+                                <div class="dash-widget-info">
+                                    <h6 class="text-muted">Hospital Admins</h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xl-3 col-sm-6 col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="dash-widget-header">
+                                    <span class="dash-widget-icon text-primary">
+                                        <i class="fe fe-user-check"></i>
+                                    </span>
+                                    <div class="dash-count">
+                                        <h3>{{ total_doctors }}</h3>
+                                    </div>
+                                </div>
+                                <div class="dash-widget-info">
+                                    <h6 class="text-muted">Total Doctors</h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Hospitals -->
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title">Recent Hospital Registrations</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover table-center">
+                                        <thead>
+                                            <tr>
+                                                <th>Hospital Name</th>
+                                                <th>Admin</th>
+                                                <th>Registration Date</th>
+                                                <th>Status</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for hospital in recent_hospitals %}
+                                            <tr>
+                                                <td>{{ hospital.name }}</td>
+                                                <td>{{ hospital.created_by.name|default:"N/A" }}</td>
+                                                <td>{{ hospital.created_at|date:"M d, Y" }}</td>
+                                                <td>
+                                                    <span class="badge badge-warning">{{ hospital.approval_status|title }}</span>
+                                                </td>
+                                                <td>
+                                                    <a href="{% url 'approve-hospital' hospital.hospital_id %}" class="btn btn-sm btn-success">Approve</a>
+                                                    <a href="{% url 'reject-hospital' hospital.hospital_id %}" class="btn btn-sm btn-danger">Reject</a>
+                                                </td>
+                                            </tr>
+                                            {% empty %}
+                                            <tr>
+                                                <td colspan="5" class="text-center">No pending hospital registrations</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{% static 'HealthStack-System/admin_assets/js/jquery-3.2.1.min.js' %}"></script>
+    <script src="{% static 'HealthStack-System/admin_assets/js/popper.min.js' %}"></script>
+    <script src="{% static 'HealthStack-System/admin_assets/js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'HealthStack-System/admin_assets/js/script.js' %}"></script>
+</body>
+</html>

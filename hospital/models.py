@@ -28,6 +28,7 @@ class User(AbstractUser):
     is_labworker = models.BooleanField(default=False)
     is_pharmacist = models.BooleanField(default=False)
     is_delivery_partner = models.BooleanField(default=False)
+    is_super_admin = models.BooleanField(default=False)
     otp_code = models.CharField(max_length=6, blank=True, null=True)
     otp_expires_at = models.DateTimeField(blank=True, null=True)
     login_status = models.BooleanField(default=False)
@@ -83,6 +84,17 @@ class Hospital_Information(models.Model):
     # New fields for location
     latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
     longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    
+    # Approval status
+    approval_status = models.CharField(max_length=20, choices=[
+        ('pending', 'Pending'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+    ], default='pending')
+    created_by = models.ForeignKey('hospital_admin.Admin_Information', on_delete=models.SET_NULL, null=True, blank=True, related_name='created_hospitals')
+    approved_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, limit_choices_to={'is_super_admin': True})
+    created_at = models.DateTimeField(auto_now_add=True)
+    approved_at = models.DateTimeField(null=True, blank=True)
 
     # String representation of object
     def __str__(self):

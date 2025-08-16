@@ -39,6 +39,10 @@ from .utils import searchMedicines
 @login_required(login_url='unified-login')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def admin_dashboard(request):
+    # Check for super admin first
+    if request.user.is_super_admin:
+        return redirect('super-admin-dashboard')
+    
     # admin = Admin_Information.objects.get(user_id=pk)
     if request.user.is_hospital_admin:
         user = Admin_Information.objects.get(user=request.user)
@@ -278,7 +282,17 @@ def emergency_details(request):
 @login_required(login_url='unified-login')
 def hospital_list(request):
     user = Admin_Information.objects.get(user=request.user)
-    hospitals = Hospital_Information.objects.all()
+    
+    if request.user.is_super_admin:
+        # Super admin can see all hospitals
+        hospitals = Hospital_Information.objects.all().order_by('-created_at')
+    else:
+        # Regular admin can only see approved hospitals and their own pending ones
+        hospitals = Hospital_Information.objects.filter(
+            Q(approval_status='approved') | 
+            Q(created_by=user, approval_status='pending')
+        ).order_by('-created_at')
+    
     context = { 'admin': user, 'hospitals': hospitals}
     return render(request, 'hospital_admin/hospital-list.html', context)
 
@@ -349,6 +363,8 @@ def add_hospital(request):
 
             # print(department_name[0])
 
+            hospital.approval_status = 'pending'
+            hospital.created_by = user
             hospital.save()
 
             for i in range(len(department_name)):
@@ -367,7 +383,7 @@ def add_hospital(request):
                 services.service_name = service_name[i]
                 services.save()
 
-            messages.success(request, 'Hospital Added')
+            messages.success(request, 'Hospital registration submitted for approval. You will receive an email once approved.')
             return redirect('hospital-list')
 
         context = { 'admin': user}
@@ -1197,6 +1213,171 @@ def delete_test(request,pk):
             return redirect('test-list')
 
 @csrf_exempt
+
+
+# Super Admin Views
+@csrf_exempt
+@login_required(login_url='unified-login')
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
+def super_admin_dashboard(request):
+    if not request.user.is_super_admin:
+        messages.error(request, 'Access denied. Super admin privileges required.')
+        return redirect('logout')
+    
+    # Statistics
+    pending_hospitals = Hospital_Information.objects.filter(approval_status='pending').count()
+    approved_hospitals = Hospital_Information.objects.filter(approval_status='approved').count()
+    total_hospital_admins = Admin_Information.objects.count()
+    total_doctors = Doctor_Information.objects.count()
+    total_patients = Patient.objects.count()
+    
+    # Recent activities
+    recent_hospitals = Hospital_Information.objects.filter(approval_status='pending').order_by('-created_at')[:5]
+    
+    context = {
+        'pending_hospitals': pending_hospitals,
+        'approved_hospitals': approved_hospitals,
+        'total_hospital_admins': total_hospital_admins,
+        'total_doctors': total_doctors,
+        'total_patients': total_patients,
+        'recent_hospitals': recent_hospitals,
+    }
+    return render(request, 'hospital_admin/super-admin-dashboard.html', context)
+
+@csrf_exempt
+@login_required(login_url='unified-login')
+def pending_hospitals_list(request):
+    if not request.user.is_super_admin:
+        messages.error(request, 'Access denied. Super admin privileges required.')
+        return redirect('logout')
+    
+    hospitals = Hospital_Information.objects.filter(approval_status='pending').order_by('-created_at')
+    context = {'hospitals': hospitals}
+    return render(request, 'hospital_admin/pending-hospitals-list.html', context)
+
+@csrf_exempt
+@login_required(login_url='unified-login')
+def approve_hospital(request, pk):
+    if not request.user.is_super_admin:
+        messages.error(request, 'Access denied. Super admin privileges required.')
+        return redirect('logout')
+    
+    hospital = Hospital_Information.objects.get(hospital_id=pk)
+    hospital.approval_status = 'approved'
+    hospital.approved_by = request.user
+    hospital.approved_at = timezone.now()
+    hospital.save()
+    
+    # Send approval email to hospital admin who created it
+    if hospital.created_by:
+        admin_email = hospital.created_by.email
+        admin_name = hospital.created_by.name
+        
+        subject = "Hospital Registration Approved - HealthStack"
+        values = {
+            "admin_name": admin_name,
+            "hospital_name": hospital.name,
+            "approval_date": hospital.approved_at.strftime("%B %d, %Y"),
+        }
+        
+        html_message = render_to_string('hospital_admin/hospital-approval-mail.html', {'values': values})
+        plain_message = strip_tags(html_message)
+        
+        try:
+            send_mail(subject, plain_message, 'super_admin@healthstack.com', [admin_email], html_message=html_message, fail_silently=False)
+        except BadHeaderError:
+            pass
+    
+    messages.success(request, f'Hospital "{hospital.name}" has been approved successfully!')
+    return redirect('pending-hospitals-list')
+
+@csrf_exempt
+@login_required(login_url='unified-login')
+def reject_hospital(request, pk):
+    if not request.user.is_super_admin:
+        messages.error(request, 'Access denied. Super admin privileges required.')
+        return redirect('logout')
+    
+    hospital = Hospital_Information.objects.get(hospital_id=pk)
+    hospital.approval_status = 'rejected'
+    hospital.approved_by = request.user
+    hospital.approved_at = timezone.now()
+    hospital.save()
+    
+    # Send rejection email
+    if hospital.created_by:
+        admin_email = hospital.created_by.email
+        admin_name = hospital.created_by.name
+        
+        subject = "Hospital Registration Rejected - HealthStack"
+        values = {
+            "admin_name": admin_name,
+            "hospital_name": hospital.name,
+            "rejection_date": hospital.approved_at.strftime("%B %d, %Y"),
+        }
+        
+        html_message = render_to_string('hospital_admin/hospital-rejection-mail.html', {'values': values})
+        plain_message = strip_tags(html_message)
+        
+        try:
+            send_mail(subject, plain_message, 'super_admin@healthstack.com', [admin_email], html_message=html_message, fail_silently=False)
+        except BadHeaderError:
+            pass
+    
+    messages.success(request, f'Hospital "{hospital.name}" has been rejected.')
+    return redirect('pending-hospitals-list')
+
+@csrf_exempt 
+@login_required(login_url='unified-login')
+def create_hospital_admin(request):
+    if not request.user.is_super_admin:
+        messages.error(request, 'Access denied. Super admin privileges required.')
+        return redirect('logout')
+    
+    if request.method == 'POST':
+        username = request.POST['username']
+        email = request.POST['email']
+        password = request.POST['password']
+        name = request.POST['name']
+        phone_number = request.POST['phone_number']
+        
+        # Create user
+        user = User.objects.create(
+            username=username,
+            email=email,
+            first_name=name.split(' ')[0] if name else '',
+            last_name=' '.join(name.split(' ')[1:]) if len(name.split(' ')) > 1 else '',
+            is_hospital_admin=True
+        )
+        user.set_password(password)
+        user.save()
+        
+        # Create admin information
+        admin = Admin_Information.objects.create(
+            user=user,
+            username=username,
+            name=name,
+            email=email,
+            phone_number=phone_number,
+            role='hospital'
+        )
+        
+        messages.success(request, f'Hospital Admin "{name}" created successfully!')
+        return redirect('hospital-admins-list')
+    
+    return render(request, 'hospital_admin/create-hospital-admin.html')
+
+@csrf_exempt
+@login_required(login_url='unified-login')
+def hospital_admins_list(request):
+    if not request.user.is_super_admin:
+        messages.error(request, 'Access denied. Super admin privileges required.')
+        return redirect('logout')
+    
+    admins = Admin_Information.objects.filter(user__is_hospital_admin=True).order_by('-user__date_joined')
+    context = {'admins': admins}
+    return render(request, 'hospital_admin/hospital-admins-list.html', context)
+
 def pharmacist_dashboard(request):
     if request.user.is_authenticated:
         if request.user.is_pharmacist:

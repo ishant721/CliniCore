@@ -1,0 +1,102 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Pending Hospitals - Super Admin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'HealthStack-System/admin_assets/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'HealthStack-System/admin_assets/css/font-awesome.min.css' %}">
+    <link rel="stylesheet" href="{% static 'HealthStack-System/admin_assets/css/style.css' %}">
+</head>
+<body>
+    <div class="main-wrapper">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-left">
+                <a href="{% url 'super-admin-dashboard' %}" class="logo">
+                    <img src="{% static 'HealthStack-System/admin_assets/img/logo.png' %}" alt="Logo">
+                </a>
+            </div>
+        </div>
+
+        <!-- Page Wrapper -->
+        <div class="page-wrapper">
+            <div class="content container-fluid">
+                <div class="page-header">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h3 class="page-title">Pending Hospital Registrations</h3>
+                        </div>
+                        <div class="col-auto text-right">
+                            <a class="btn btn-primary" href="{% url 'super-admin-dashboard' %}">
+                                Back to Dashboard
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover table-center">
+                                        <thead>
+                                            <tr>
+                                                <th>Hospital Name</th>
+                                                <th>Address</th>
+                                                <th>Type</th>
+                                                <th>Admin</th>
+                                                <th>Registration Date</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for hospital in hospitals %}
+                                            <tr>
+                                                <td>
+                                                    <h2 class="table-avatar">
+                                                        <a href="#" class="avatar avatar-sm mr-2">
+                                                            <img class="avatar-img rounded-circle" src="{{ hospital.featured_image.url }}" alt="Hospital Image">
+                                                        </a>
+                                                        <a href="#">{{ hospital.name }}</a>
+                                                    </h2>
+                                                </td>
+                                                <td>{{ hospital.address }}</td>
+                                                <td>{{ hospital.hospital_type|title }}</td>
+                                                <td>{{ hospital.created_by.name|default:"N/A" }}</td>
+                                                <td>{{ hospital.created_at|date:"M d, Y" }}</td>
+                                                <td>
+                                                    <div class="actions">
+                                                        <a class="btn btn-sm bg-success-light mr-2" href="{% url 'approve-hospital' hospital.hospital_id %}">
+                                                            <i class="fe fe-check"></i> Approve
+                                                        </a>
+                                                        <a class="btn btn-sm bg-danger-light" href="{% url 'reject-hospital' hospital.hospital_id %}">
+                                                            <i class="fe fe-x"></i> Reject
+                                                        </a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            {% empty %}
+                                            <tr>
+                                                <td colspan="6" class="text-center">No pending hospital registrations</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{% static 'HealthStack-System/admin_assets/js/jquery-3.2.1.min.js' %}"></script>
+    <script src="{% static 'HealthStack-System/admin_assets/js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'HealthStack-System/admin_assets/js/script.js' %}"></script>
+</body>
+</html>

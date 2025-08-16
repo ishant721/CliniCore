@@ -47,6 +47,15 @@ urlpatterns = [
     path('admin-doctor-profile/<int:pk>/', views.admin_doctor_profile,name='admin-doctor-profile'),
     path('accept-doctor/<int:pk>/', views.accept_doctor,name='accept-doctor'),
     path('reject-doctor/<int:pk>/', views.reject_doctor,name='reject-doctor'),
+
+    # Super Admin URLs
+    path('super-admin-dashboard/', views.super_admin_dashboard, name='super-admin-dashboard'),
+    path('pending-hospitals/', views.pending_hospitals_list, name='pending-hospitals-list'),
+    path('approve-hospital/<int:pk>/', views.approve_hospital, name='approve-hospital'),
+    path('reject-hospital/<int:pk>/', views.reject_hospital, name='reject-hospital'),
+    path('create-hospital-admin/', views.create_hospital_admin, name='create-hospital-admin'),
+    path('hospital-admins-list/', views.hospital_admins_list, name='hospital-admins-list'),
+
     path('delete-department/<int:pk>',views.delete_department,name='delete-department'),
     path('edit-department/<int:pk>',views.edit_department,name='edit-department'),
     path('delete-specialization/<int:pk>/<int:pk2>/',views.delete_specialization,name='delete-specialization'),

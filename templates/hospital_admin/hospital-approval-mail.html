@@ -1,0 +1,33 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Hospital Registration Approved</title>
+</head>
+<body>
+    <h2>Congratulations! Your Hospital Registration Has Been Approved</h2>
+    
+    <p>Dear {{ values.admin_name }},</p>
+    
+    <p>We are pleased to inform you that your hospital registration for <strong>{{ values.hospital_name }}</strong> has been approved by our super admin.</p>
+    
+    <p><strong>Approval Details:</strong></p>
+    <ul>
+        <li>Hospital Name: {{ values.hospital_name }}</li>
+        <li>Approval Date: {{ values.approval_date }}</li>
+    </ul>
+    
+    <p>You can now:</p>
+    <ul>
+        <li>Manage your hospital information</li>
+        <li>Review and approve doctor registrations</li>
+        <li>Add and manage hospital staff</li>
+        <li>Access all hospital admin features</li>
+    </ul>
+    
+    <p>Thank you for choosing HealthStack!</p>
+    
+    <p>Best regards,<br>
+    HealthStack Super Admin Team</p>
+</body>
+</html>

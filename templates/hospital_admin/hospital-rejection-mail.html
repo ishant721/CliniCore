@@ -1,0 +1,25 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Hospital Registration Rejected</title>
+</head>
+<body>
+    <h2>Hospital Registration Status Update</h2>
+    
+    <p>Dear {{ values.admin_name }},</p>
+    
+    <p>We regret to inform you that your hospital registration for <strong>{{ values.hospital_name }}</strong> has been rejected.</p>
+    
+    <p><strong>Rejection Details:</strong></p>
+    <ul>
+        <li>Hospital Name: {{ values.hospital_name }}</li>
+        <li>Rejection Date: {{ values.rejection_date }}</li>
+    </ul>
+    
+    <p>If you believe this was an error or would like to resubmit with additional information, please contact our support team.</p>
+    
+    <p>Best regards,<br>
+    HealthStack Super Admin Team</p>
+</body>
+</html>
