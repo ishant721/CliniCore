@@ -1,93 +1,83 @@
-{% load static %}
-		
-    <!-- Logo -->
-    <div class="header-left">
-        <a href="{% url 'admin-dashboard' %}" class="logo">
-            <img src="{% static 'HealthStack-System/images/Normal/logo.jpg' %}" alt="Logo">
-        </a>
-        <a href="{% url 'admin-dashboard' %}" class="logo logo-small">
-            <img src="{% static 'HealthStack-System/images/Normal/favicon.png' %}" alt="Logo" width="30" height="30">
-        </a>
-    </div>
-    <!-- /Logo -->
-    
-    <a href="javascript:void(0);" id="toggle_btn">
-        <i class="fe fe-text-align-left"></i>
-    </a>
-    
-    <!-- <div class="top-nav-search">
-        <form>
-            <input type="text" class="form-control" placeholder="Search here">
-            <button class="btn" type="submit"><i class="fa fa-search"></i></button>
-        </form>
-    </div> -->
-    
-    <!-- Mobile Menu Toggle -->
-    <a class="mobile_btn" id="mobile_btn">
-        <i class="fe fe-text-align-left"></i>
-    </a>
-    <!-- /Mobile Menu Toggle -->
-    
-    <!-- Header Right Menu -->
-    <ul class="nav user-menu">
 
-        {% comment %} <!-- Notifications -->
-        <li class="nav-item dropdown noti-dropdown">
-            <a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">
-                <i class="fe fe-bell"></i> <span class="badge badge-pill">3</span>
-            </a>
-            <div class="dropdown-menu notifications">
-                <div class="topnav-dropdown-header">
-                    <span class="notification-title">Notifications</span>
-                    <a href="javascript:void(0)" class="clear-noti"> Clear All </a>
-                </div>
-                <div class="noti-content">
-                    <ul class="notification-list">
-                        <li class="notification-message">
-                            <a href="#">
-                                <div class="media">
-                                    <span class="avatar avatar-sm">
-                                        <img class="avatar-img rounded-circle" alt="User Image" src="assets/img/doctors/doctor-thumb-01.jpg">
-                                    </span>
-                                    <div class="media-body">
-                                        <p class="noti-details"><span class="noti-title">Dr. Ruby Perrin</span> Schedule <span class="noti-title">her appointment</span></p>
-                                        <p class="noti-time"><span class="notification-time">4 mins ago</span></p>
-                                    </div>
-                                </div>
-                            </a>
-                        </li>
-                       
-                    </ul>
-                </div>
-                <div class="topnav-dropdown-footer">
-                    <a href="#">View all Notifications</a>
-                </div>
-            </div> 
-        </li>
-        <!-- /Notifications --> {% endcomment %}
-        
-        <!-- User Menu -->
-        <li class="nav-item dropdown has-arrow">
-            <a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">
-                <span class="user-img"><img class="rounded-circle" src="{{admin.featured_image.url}}" width="31" alt="{{admin.name}}"></span>
-            </a>
-            <div class="dropdown-menu">
-                <div class="user-header">
-                    <div class="avatar avatar-sm">
-                        <img src="{{admin.featured_image.url}}" alt="User Image" class="avatar-img rounded-circle">
-                    </div>
-                    <div class="user-text">
-                        <h6>{{admin.name}}</h6>
-                        <p class="text-muted mb-0">Administrator</p>
-                    </div>
-                </div>
-                <a class="dropdown-item" href="{%url 'hospital-admin-profile' pk=user.id %}">My Profile</a>
-                {% comment %} <a class="dropdown-item" href="settings.html">Settings</a> {% endcomment %}
-                <a class="dropdown-item" href="{% url 'admin-logout' %}">Logout</a>
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+        <!-- CliniCore Brand -->
+        <a class="navbar-brand clinicore-brand" href="/">
+            <div class="clinicore-icon">
+                <i class="fas fa-heartbeat"></i>
             </div>
-        </li>
-        <!-- /User Menu -->
+            <span>CliniCore</span>
+        </a>
         
-    </ul>
-    <!-- /Header Right Menu -->
-    
+        <!-- Mobile menu button -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <!-- Navigation Menu -->
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/hospital_admin/admin-dashboard/">
+                        <i class="fas fa-tachometer-alt me-1"></i>Dashboard
+                    </a>
+                </li>
+                {% if user.is_superuser %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="/hospital_admin/pending-hospitals-list/">
+                            <i class="fas fa-hospital me-1"></i>Hospitals
+                        </a>
+                    </li>
+                {% endif %}
+                <li class="nav-item">
+                    <a class="nav-link" href="/hospital_admin/doctor-list/">
+                        <i class="fas fa-user-md me-1"></i>Doctors
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/hospital_admin/patient-list/">
+                        <i class="fas fa-users me-1"></i>Patients
+                    </a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="servicesDropdown" role="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-cogs me-1"></i>Services
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="/hospital_admin/medicine-list/"><i class="fas fa-pills me-2"></i>Medicines</a></li>
+                        <li><a class="dropdown-item" href="/hospital_admin/test-list/"><i class="fas fa-flask me-2"></i>Lab Tests</a></li>
+                        <li><a class="dropdown-item" href="/hospital_admin/pharmacist-list/"><i class="fas fa-prescription-bottle-alt me-2"></i>Pharmacists</a></li>
+                        <li><a class="dropdown-item" href="/hospital_admin/lab-worker-list/"><i class="fas fa-microscope me-2"></i>Lab Workers</a></li>
+                    </ul>
+                </li>
+            </ul>
+            
+            <!-- Right side menu -->
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-user-shield me-1"></i>
+                        {% if user.first_name %}
+                            {{ user.first_name }}
+                        {% else %}
+                            {{ user.username }}
+                        {% endif %}
+                        {% if user.is_superuser %}
+                            <span class="badge bg-warning ms-2">Super Admin</span>
+                        {% endif %}
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="/hospital_admin/profile/"><i class="fas fa-user me-2"></i>Profile</a></li>
+                        <li><a class="dropdown-item" href="/hospital_admin/admin-setup-2fa/"><i class="fas fa-shield-alt me-2"></i>Security</a></li>
+                        {% if user.is_superuser %}
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/hospital_admin/super-admin-dashboard/"><i class="fas fa-crown me-2"></i>Super Admin Panel</a></li>
+                        {% endif %}
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="/logout/"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>

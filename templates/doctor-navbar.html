@@ -1,107 +1,68 @@
-{% load static %}
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container">
+        <!-- CliniCore Brand -->
+        <a class="navbar-brand clinicore-brand" href="/">
+            <div class="clinicore-icon">
+                <i class="fas fa-heartbeat"></i>
+            </div>
+            <span>CliniCore</span>
+        </a>
 
-<nav class="navbar navbar-expand-lg header-nav">
-  <div class="navbar-header">
-    <a id="mobile_btn" href="javascript:void(0);">
-      <span class="bar-icon">
-        <span></span>
-        <span></span>
-        <span></span>
-      </span>
-    </a>
-    <a href="{% url 'hospital_home'%}" class="navbar-brand logo">
-      <img
-        src="{% static 'HealthStack-System/images/Normal/logo.jpg' %}"
-        class="img-fluid"
-        alt="Logo"
-      />
-    </a>
-  </div>
-  <div class="main-menu-wrapper">
-    <div class="menu-header">
-      <a href="{% url 'hospital_home'%}" class="menu-logo">
-        <img
-          src="{% static 'HealthStack-System/images/Normal/logo.jpg' %}"
-          class="img-fluid"
-          alt="Logo"
-        />
-      </a>
-      <a id="menu_close" class="menu-close" href="javascript:void(0);">
-        <i class="fas fa-times"></i>
-      </a>
-    </div>
-    <ul class="main-nav">
-      <li>
-        <a href="{% url 'hospital_home'%}">Home</a>
-      </li>
+        <!-- Mobile menu button -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
 
-      <li>
-        <a href="{% url 'doctor-dashboard'%}">Dashboard</a>
-      </li>
+        <!-- Navigation Menu -->
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="/doctor-dashboard/">
+                        <i class="fas fa-tachometer-alt me-1"></i>Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/appointments/">
+                        <i class="fas fa-calendar-check me-1"></i>Appointments
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/my-patients/">
+                        <i class="fas fa-users me-1"></i>My Patients
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/schedule-timings/">
+                        <i class="fas fa-clock me-1"></i>Schedule
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/doctor-test-list/">
+                        <i class="fas fa-flask me-1"></i>Lab Tests
+                    </a>
+                </li>
+            </ul>
 
-      <li><a href="{% url 'multiple-hospital' %}" style="text-decoration: none;">Hospitals</a></li>
-
-
-      <li>
-        <a href="{% url 'about-us'%}">About Us</a>
-      </li>
-      
-      <li>
-        <a href="{% url 'chat-home' pk=user.id %}">Chat with Patients</a>
-      </li>
-    
-      <li class="login-link">
-        <a href="{% url 'unified-login' %}">Login / Signup</a>
-      </li>
-    </ul>
-  </div>
-  <ul class="nav header-navbar-rht">
-    <li class="nav-item contact-item">
-      <div class="header-contact-img">
-        <i class="far fa-hospital"></i>
-      </div>
-      <div class="header-contact-detail">
-        <p class="contact-header">Contact</p>
-        <p class="contact-info-header">+88{{doctor.phone_number}}</p>
-      </div>
-    </li>
-    <!-- User Menu -->
-    <li class="nav-item dropdown has-arrow logged-item">
-      <a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">
-        <span class="user-img">
-          <img
-            class="rounded-circle"
-            src="{{ doctor.featured_image.url }}"
-            width="31"
-            alt="Darren Elder"
-          />
-        </span>
-      </a>
-      <div class="dropdown-menu dropdown-menu-right">
-        <div class="user-header">
-          <div class="avatar avatar-sm">
-            <img
-              src="{{ doctor.featured_image.url }}"
-              alt="User Image"
-              class="avatar-img rounded-circle"
-            />
-          </div>
-          <div class="user-text">
-            <h6>{{doctor.name}}</h6>
-            <p class="text-muted mb-0">Doctor</p>
-          </div>
+            <!-- Right side menu -->
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                        <i class="fas fa-user-md me-1"></i>
+                        Dr. {% if user.first_name %}
+                            {{ user.first_name }}
+                        {% else %}
+                            {{ user.username }}
+                        {% endif %}
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="/doctor-profile/"><i class="fas fa-user me-2"></i>Profile</a></li>
+                        <li><a class="dropdown-item" href="/doctor-profile-settings/"><i class="fas fa-cog me-2"></i>Settings</a></li>
+                        <li><a class="dropdown-item" href="/doctor-setup-2fa/"><i class="fas fa-shield-alt me-2"></i>Security</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="/logout/"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                    </ul>
+                </li>
+            </ul>
         </div>
-        <a class="dropdown-item" href="{% url 'doctor-dashboard' %}"
-          >Dashboard</a
-        >
-        <a
-          class="dropdown-item"
-          href="{% url 'doctor-profile-settings' %}"
-          >Profile Settings</a
-        >
-        <a class="dropdown-item" href="{% url 'doctor-logout' %}">Logout</a>
-      </div>
-    </li>
-    <!-- /User Menu -->
-  </ul>
+    </div>
 </nav>
