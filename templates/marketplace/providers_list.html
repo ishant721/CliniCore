@@ -1,13 +1,13 @@
-
 {% extends 'base.html' %}
 {% load static %}
 
 {% block title %}Find {{ service_type|title }} Providers - HealthStack Marketplace{% endblock %}
 
 {% block content %}
+{% include 'patient_navbar.html' %}
 <div class="content">
     <div class="container-fluid">
-        
+
         <!-- Search Header -->
         <div class="row mb-4">
             <div class="col-lg-12">
@@ -219,7 +219,7 @@
                                 <a class="page-link" href="?{{ request.GET.urlencode }}&page={{ providers.previous_page_number }}">&laquo; Previous</a>
                             </li>
                         {% endif %}
-                        
+
                         {% for num in providers.paginator.page_range %}
                             {% if providers.number == num %}
                                 <li class="page-item active">
@@ -231,7 +231,7 @@
                                 </li>
                             {% endif %}
                         {% endfor %}
-                        
+
                         {% if providers.has_next %}
                             <li class="page-item">
                                 <a class="page-link" href="?{{ request.GET.urlencode }}&page={{ providers.next_page_number }}">Next &raquo;</a>
