@@ -1,0 +1,129 @@
+
+{% extends 'base_authenticated.html' %}
+{% load static %}
+
+{% block title %}Medicine Price Comparison{% endblock %}
+
+{% block content %}
+<div class="main-wrapper">
+    <!-- Header -->
+    <header class="header">
+        {% include 'patient_navbar.html' %}
+    </header>
+    
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        {% include 'patient-sidebar.html' %}
+    </aside>
+    
+    <!-- Page Wrapper -->
+    <div class="page-wrapper">
+        <div class="content container-fluid">
+            
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <h3 class="page-title">Medicine Price Comparison</h3>
+                        <ul class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="{% url 'patient-dashboard' %}">Dashboard</a></li>
+                            <li class="breadcrumb-item active">Medicine Comparison</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <!-- /Page Header -->
+            
+            {% if comparison_data %}
+                {% for data in comparison_data %}
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title">
+                            {{ data.prescription_medicine.medicine_name }}
+                            <span class="badge badge-info">{{ data.prescription_medicine.quantity }} {{ data.prescription_medicine.frequency }}</span>
+                        </h5>
+                        <p class="text-muted">Duration: {{ data.prescription_medicine.duration }} | {{ data.prescription_medicine.relation_with_meal }}</p>
+                    </div>
+                    <div class="card-body">
+                        {% if data.available_options %}
+                            <div class="row">
+                                {% for option in data.available_options %}
+                                <div class="col-md-6 col-lg-4 mb-3">
+                                    <div class="card h-100 {% if forloop.first %}border-success{% endif %}">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                                <h6 class="card-title">{{ option.medicine.name }}</h6>
+                                                {% if forloop.first %}
+                                                    <span class="badge badge-success">Best Price</span>
+                                                {% endif %}
+                                            </div>
+                                            
+                                            <p class="text-muted small">{{ option.medicine.manufacturer }}</p>
+                                            <p class="text-muted small">{{ option.pharmacy_shop.name }}</p>
+                                            
+                                            <div class="price-info mb-2">
+                                                {% if option.discount_percentage > 0 %}
+                                                    <span class="text-muted"><del>${{ option.price }}</del></span>
+                                                    <span class="text-success font-weight-bold">${{ option.discounted_price|floatformat:2 }}</span>
+                                                    <span class="badge badge-warning">{{ option.discount_percentage }}% OFF</span>
+                                                {% else %}
+                                                    <span class="font-weight-bold">${{ option.price }}</span>
+                                                {% endif %}
+                                            </div>
+                                            
+                                            <div class="small text-muted mb-2">
+                                                <i class="fas fa-star text-warning"></i> {{ option.rating }}
+                                                <br>
+                                                <i class="fas fa-clock"></i> {{ option.delivery_time }} mins delivery
+                                                <br>
+                                                <i class="fas fa-boxes"></i> {{ option.stock_quantity }} in stock
+                                            </div>
+                                            
+                                            <form method="post" action="{% url 'order-medicine' %}">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="medicine_id" value="{{ option.medicine.serial_number }}">
+                                                <input type="hidden" name="pharmacy_shop_id" value="{{ option.pharmacy_shop.shop_id }}">
+                                                <input type="hidden" name="prescription_medicine_id" value="{{ data.prescription_medicine.medicine_id }}">
+                                                <div class="form-group">
+                                                    <label for="quantity_{{ option.medicine.serial_number }}">Quantity:</label>
+                                                    <input type="number" name="quantity" id="quantity_{{ option.medicine.serial_number }}" 
+                                                           class="form-control form-control-sm" value="1" min="1" max="{{ option.stock_quantity }}">
+                                                </div>
+                                                <button type="submit" class="btn btn-primary btn-sm btn-block">
+                                                    Order from {{ option.pharmacy_shop.name }}
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                No pharmacies currently have this medicine in stock. Please check back later or contact your doctor for alternatives.
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i>
+                    You don't have any pending prescriptions to order medicines for.
+                </div>
+            {% endif %}
+            
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Auto-refresh every 5 minutes to get updated prices
+    setTimeout(function() {
+        location.reload();
+    }, 300000);
+</script>
+{% endblock %}

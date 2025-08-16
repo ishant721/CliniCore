@@ -1,0 +1,39 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Lab Report Ready - HealthStack</title>
+</head>
+<body>
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #2c3e50;">Your Lab Report is Ready!</h2>
+        
+        <p>Dear {{ values.patient_name }},</p>
+        
+        <p>We are pleased to inform you that your laboratory test results are now available.</p>
+        
+        <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
+            <strong>Report Details:</strong><br>
+            Report ID: #{{ values.report_id }}<br>
+            Attending Doctor: Dr. {{ values.doctor_name }}<br>
+            Report Date: {{ values.delivery_date }}<br>
+        </div>
+        
+        <p>You can now:</p>
+        <ul>
+            <li>View your report online through your patient portal</li>
+            <li>Download a PDF copy of your results</li>
+            <li>Schedule a follow-up appointment with Dr. {{ values.doctor_name }}</li>
+        </ul>
+        
+        <p style="color: #e74c3c; font-weight: bold;">
+            Important: Please review your results with your doctor for proper interpretation and next steps.
+        </p>
+        
+        <p>If you have any questions, please don't hesitate to contact us.</p>
+        
+        <p>Best regards,<br>
+        HealthStack Laboratory Team</p>
+    </div>
+</body>
+</html>

@@ -23,6 +23,24 @@ class Pharmacist(models.Model):
         return str(self.user.username)
 
 
+class PharmacyShop(models.Model):
+    shop_id = models.AutoField(primary_key=True)
+    name = models.CharField(max_length=200)
+    address = models.CharField(max_length=300)
+    phone_number = models.CharField(max_length=20)
+    email = models.EmailField(max_length=200, null=True, blank=True)
+    license_number = models.CharField(max_length=100)
+    is_verified = models.BooleanField(default=False)
+    delivery_available = models.BooleanField(default=True)
+    delivery_radius = models.IntegerField(default=10)  # in kilometers
+    average_delivery_time = models.IntegerField(default=60)  # in minutes
+    rating = models.DecimalField(max_digits=3, decimal_places=2, default=5.0)
+    total_reviews = models.IntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return self.name
+
 class Medicine(models.Model):
     MEDICINE_TYPE = (
         ('tablets', 'tablets'),
@@ -58,6 +76,8 @@ class Medicine(models.Model):
     serial_number = models.AutoField(primary_key=True)
     medicine_id = models.CharField(max_length=200, null=True, blank=True)
     name = models.CharField(max_length=200, null=True, blank=True)
+    generic_name = models.CharField(max_length=200, null=True, blank=True)
+    manufacturer = models.CharField(max_length=200, null=True, blank=True)
     weight = models.CharField(max_length=200, null=True, blank=True)
     quantity = models.IntegerField(null=True, blank=True, default=0)
     featured_image = models.ImageField(upload_to='medicines/', default='medicines/default.png', null=True, blank=True)
@@ -67,6 +87,7 @@ class Medicine(models.Model):
     price = models.IntegerField(null=True, blank=True, default=0)
     stock_quantity = models.IntegerField(null=True, blank=True, default=0)
     Prescription_reqiuired = models.CharField(max_length=200, choices=REQUIREMENT_TYPE, null=True, blank=True)
+    pharmacy_shop = models.ForeignKey(PharmacyShop, on_delete=models.CASCADE, null=True, blank=True)
     
     # Delivery features
     is_delivery_available = models.BooleanField(default=True)
@@ -80,6 +101,24 @@ class Medicine(models.Model):
     
     def __str__(self):
         return str(self.name)
+
+class MedicinePrice(models.Model):
+    medicine = models.ForeignKey(Medicine, on_delete=models.CASCADE)
+    pharmacy_shop = models.ForeignKey(PharmacyShop, on_delete=models.CASCADE)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    discount_percentage = models.DecimalField(max_digits=5, decimal_places=2, default=0)
+    stock_quantity = models.IntegerField(default=0)
+    is_available = models.BooleanField(default=True)
+    last_updated = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        unique_together = ['medicine', 'pharmacy_shop']
+    
+    def get_discounted_price(self):
+        return self.price * (1 - self.discount_percentage / 100)
+    
+    def __str__(self):
+        return f"{self.medicine.name} - {self.pharmacy_shop.name} - ${self.price}"
     
 
 class Cart(models.Model):

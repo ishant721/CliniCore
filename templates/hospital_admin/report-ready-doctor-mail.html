@@ -1,0 +1,36 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Lab Report Completed - HealthStack</title>
+</head>
+<body>
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #2c3e50;">Lab Report Completed</h2>
+        
+        <p>Dear Dr. {{ values.doctor_name }},</p>
+        
+        <p>The laboratory results for your patient are now available for review.</p>
+        
+        <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0;">
+            <strong>Patient Details:</strong><br>
+            Patient Name: {{ values.patient_name }}<br>
+            Report ID: #{{ values.report_id }}<br>
+            Completion Date: {{ values.delivery_date }}<br>
+        </div>
+        
+        <p>You can now:</p>
+        <ul>
+            <li>Review the complete lab report in your doctor portal</li>
+            <li>Add your interpretation and recommendations</li>
+            <li>Prescribe medications based on the results</li>
+            <li>Schedule follow-up appointments if needed</li>
+        </ul>
+        
+        <p>The patient has also been notified that their results are ready.</p>
+        
+        <p>Best regards,<br>
+        HealthStack Laboratory Team</p>
+    </div>
+</body>
+</html>

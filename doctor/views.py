@@ -711,12 +711,72 @@ def doctor_view_report(request, pk):
         report = Report.objects.get(report_id=pk)
         specimen = Specimen.objects.filter(report=report)
         test = Test.objects.filter(report=report)
-        context = {'report': report, 'test': test, 'specimen': specimen, 'doctor': doctor}
+        
+        # Mark report as reviewed when doctor views it
+        if report.status == 'completed':
+            report.status = 'reviewed'
+            report.save()
+        
+        context = {
+            'report': report, 
+            'test': test, 
+            'specimen': specimen, 
+            'doctor': doctor,
+            'can_prescribe': True
+        }
         return render(request, 'doctor-view-report.html', context)
     else:
         logout(request)
         messages.info(request, 'Not Authorized')
         return render(request, 'doctor-login.html')
+
+@csrf_exempt
+@login_required(login_url="doctor-login")
+def create_prescription_from_report(request, report_id, patient_id):
+    """Create prescription based on lab report findings"""
+    if request.user.is_doctor:
+        doctor = Doctor_Information.objects.get(user=request.user)
+        patient = Patient.objects.get(patient_id=patient_id)
+        report = Report.objects.get(report_id=report_id)
+        
+        if request.method == 'POST':
+            prescription = Prescription(doctor=doctor, patient=patient)
+            
+            medicine_name = request.POST.getlist('medicine_name')
+            medicine_quantity = request.POST.getlist('quantity')
+            medicine_frequency = request.POST.getlist('frequency')
+            medicine_duration = request.POST.getlist('duration')
+            medicine_relation_with_meal = request.POST.getlist('relation_with_meal')
+            medicine_instruction = request.POST.getlist('instruction')
+            extra_information = request.POST.get('extra_information')
+            
+            # Add reference to the lab report
+            prescription.extra_information = f"Based on Lab Report #{report.report_id}\n{extra_information}"
+            prescription.create_date = timezone.date.today()
+            prescription.save()
+            
+            # Save medicines
+            for i in range(len(medicine_name)):
+                medicine = Prescription_medicine(prescription=prescription)
+                medicine.medicine_name = medicine_name[i]
+                medicine.quantity = medicine_quantity[i]
+                medicine.frequency = medicine_frequency[i]
+                medicine.duration = medicine_duration[i]
+                medicine.instruction = medicine_instruction[i]
+                medicine.relation_with_meal = medicine_relation_with_meal[i]
+                medicine.save()
+            
+            messages.success(request, 'Prescription created successfully based on lab report!')
+            return redirect('patient-profile', pk=patient.patient_id)
+        
+        context = {
+            'doctor': doctor,
+            'patient': patient,
+            'report': report
+        }
+        return render(request, 'create-prescription-from-report.html', context)
+    
+    return redirect('doctor-logout')
 
 
 @csrf_exempt

@@ -19,8 +19,16 @@ urlpatterns = [
     path('add-to-cart/<int:pk>', views.add_to_cart, name='add-to-cart'),
     path('increase-item/<int:pk>/', views.increase_cart, name='increase-item'),
     path('decrease-item/<int:pk>/', views.decrease_cart, name='decrease-item'),
+    path('', views.medicine_list, name='medicine-list'),
+    path('add-medicine/', views.add_medicine, name='add-medicine'),
+    path('edit-medicine/<int:pk>/', views.edit_medicine, name='edit-medicine'),
+    path('delete-medicine/<int:pk>/', views.delete_medicine, name='delete-medicine'),
+    path('medicine-comparison/', views.medicine_price_comparison, name='medicine-comparison'),
+    path('order-medicine/', views.order_medicine, name='order-medicine'),
+    path('pharmacy-shops/', views.pharmacy_shop_list, name='pharmacy-shops'),
+    path('pharmacy-shop/<int:shop_id>/', views.pharmacy_shop_detail, name='pharmacy-shop-detail'),
 ]
-    
+
 
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -555,6 +555,10 @@ def create_report(request, pk):
             referred_value = request.POST.getlist('referred_value')
             delivery_date = request.POST.get('delivery_date')
             other_information= request.POST.get('other_information')
+            
+            # Handle file upload for lab report
+            if 'report_file' in request.FILES:
+                report.report_file = request.FILES['report_file']
 
             # # Save to report table
             # report.test_name = test_name
@@ -611,6 +615,72 @@ def create_report(request, pk):
             except BadHeaderError:
                 return HttpResponse('Invalid header found') 
 
+            report.delivery_date = delivery_date
+            report.other_information = other_information
+            report.lab_technician = lab_workers
+            report.status = 'completed'
+            
+            report.save()
+
+            # Create specimen records
+            for i in range(len(specimen_type)):
+                specimens = Specimen(report=report)
+                specimens.specimen_type = specimen_type[i]
+                specimens.collection_date = collection_date[i]
+                specimens.receiving_date = receiving_date[i]
+                specimens.save()
+                
+            # Create test records
+            for i in range(len(test_name)):
+                test_record = Test(report=report)
+                test_record.test_name = test_name[i]
+                test_record.result = result[i]
+                test_record.unit = unit[i]
+                test_record.referred_value = referred_value[i]
+                test_record.save()
+
+            # Send email notifications
+            patient_email = patient.email
+            patient_name = patient.name
+            doctor_email = doctor.email
+            doctor_name = doctor.name
+            report_id = report.report_id
+
+            # Email to patient
+            subject_patient = "Lab Report Ready - HealthStack"
+            values_patient = {
+                "patient_name": patient_name,
+                "doctor_name": doctor_name,
+                "report_id": report_id,
+                "delivery_date": delivery_date,
+            }
+
+            html_message_patient = render_to_string('hospital_admin/report-ready-patient-mail.html', {'values': values_patient})
+            plain_message_patient = strip_tags(html_message_patient)
+
+            try:
+                send_mail(subject_patient, plain_message_patient, 'hospital_admin@gmail.com', [patient_email], html_message=html_message_patient, fail_silently=False)
+            except BadHeaderError:
+                pass
+
+            # Email to doctor
+            subject_doctor = "Lab Report Completed - HealthStack"
+            values_doctor = {
+                "doctor_name": doctor_name,
+                "patient_name": patient_name,
+                "report_id": report_id,
+                "delivery_date": delivery_date,
+            }
+
+            html_message_doctor = render_to_string('hospital_admin/report-ready-doctor-mail.html', {'values': values_doctor})
+            plain_message_doctor = strip_tags(html_message_doctor)
+
+            try:
+                send_mail(subject_doctor, plain_message_doctor, 'hospital_admin@gmail.com', [doctor_email], html_message=html_message_doctor, fail_silently=False)
+            except BadHeaderError:
+                pass
+
+            messages.success(request, 'Lab report created successfully and notifications sent!')
             return redirect('mypatient-list')
 
         context = {'prescription':prescription,'lab_workers':lab_workers,'tests':tests}

@@ -158,6 +158,15 @@ class Report(models.Model):
     referred_value = models.CharField(max_length=200, null=True, blank=True)
     delivery_date = models.CharField(max_length=200, null=True, blank=True)
     other_information = models.CharField(max_length=200, null=True, blank=True)
+    report_file = models.FileField(upload_to='lab_reports/', null=True, blank=True)
+    status = models.CharField(max_length=50, default='completed', choices=[
+        ('pending', 'Pending'),
+        ('in_progress', 'In Progress'),
+        ('completed', 'Completed'),
+        ('reviewed', 'Reviewed by Doctor'),
+    ])
+    created_at = models.DateTimeField(auto_now_add=True)
+    lab_technician = models.ForeignKey('hospital_admin.Clinical_Laboratory_Technician', on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
         return str(self.patient.username)

@@ -240,3 +240,170 @@ def decrease_cart(request, pk):
         messages.error(request, 'Not Authorized')
         return render(request, 'patient-login.html') 
 # Create your views here.
+import json
+from django.db.models import Min, Q
+from django.core.paginator import Paginator
+from doctor.models import Prescription_medicine
+
+@csrf_exempt
+@login_required(login_url="unified-login")
+def medicine_price_comparison(request):
+    """Compare prices of medicines across different pharmacy shops"""
+    if request.user.is_patient:
+        patient = Patient.objects.get(user=request.user)
+        
+        # Get prescription medicines for the patient
+        prescription_medicines = Prescription_medicine.objects.filter(
+            prescription__patient=patient,
+            is_ordered=False
+        )
+        
+        comparison_data = []
+        
+        for presc_med in prescription_medicines:
+            # Find medicines with similar names or generic names
+            medicines = Medicine.objects.filter(
+                Q(name__icontains=presc_med.medicine_name) |
+                Q(generic_name__icontains=presc_med.medicine_name)
+            ).filter(is_marketplace_active=True)
+            
+            medicine_prices = []
+            for medicine in medicines:
+                prices = MedicinePrice.objects.filter(
+                    medicine=medicine,
+                    is_available=True,
+                    stock_quantity__gt=0
+                ).select_related('pharmacy_shop').order_by('price')
+                
+                for price_obj in prices:
+                    medicine_prices.append({
+                        'medicine': medicine,
+                        'pharmacy_shop': price_obj.pharmacy_shop,
+                        'price': price_obj.price,
+                        'discounted_price': price_obj.get_discounted_price(),
+                        'discount_percentage': price_obj.discount_percentage,
+                        'stock_quantity': price_obj.stock_quantity,
+                        'delivery_time': price_obj.pharmacy_shop.average_delivery_time,
+                        'rating': price_obj.pharmacy_shop.rating,
+                    })
+            
+            if medicine_prices:
+                # Sort by discounted price
+                medicine_prices.sort(key=lambda x: x['discounted_price'])
+                comparison_data.append({
+                    'prescription_medicine': presc_med,
+                    'available_options': medicine_prices
+                })
+        
+        context = {
+            'patient': patient,
+            'comparison_data': comparison_data
+        }
+        
+        return render(request, 'pharmacy/medicine_comparison.html', context)
+    
+    return redirect('unified-login')
+
+@csrf_exempt
+@login_required(login_url="unified-login")
+def order_medicine(request):
+    """Handle medicine ordering from selected pharmacy"""
+    if request.method == 'POST' and request.user.is_patient:
+        patient = Patient.objects.get(user=request.user)
+        
+        medicine_id = request.POST.get('medicine_id')
+        pharmacy_shop_id = request.POST.get('pharmacy_shop_id')
+        quantity = int(request.POST.get('quantity', 1))
+        prescription_medicine_id = request.POST.get('prescription_medicine_id')
+        
+        try:
+            medicine = Medicine.objects.get(serial_number=medicine_id)
+            pharmacy_shop = PharmacyShop.objects.get(shop_id=pharmacy_shop_id)
+            medicine_price = MedicinePrice.objects.get(
+                medicine=medicine,
+                pharmacy_shop=pharmacy_shop
+            )
+            
+            # Create order
+            order = Order.objects.create(
+                user=request.user,
+                ordered=False
+            )
+            
+            # Create cart item
+            cart_item = Cart.objects.create(
+                user=request.user,
+                item=medicine,
+                quantity=quantity,
+                purchased=False
+            )
+            
+            order.orderitems.add(cart_item)
+            
+            # Update prescription medicine status
+            if prescription_medicine_id:
+                presc_med = Prescription_medicine.objects.get(
+                    medicine_id=prescription_medicine_id
+                )
+                presc_med.is_ordered = True
+                presc_med.order_status = 'ordered'
+                presc_med.save()
+            
+            messages.success(request, f'Medicine ordered successfully from {pharmacy_shop.name}!')
+            return redirect('medicine-comparison')
+            
+        except Exception as e:
+            messages.error(request, f'Error placing order: {str(e)}')
+            return redirect('medicine-comparison')
+    
+    return redirect('unified-login')
+
+@csrf_exempt
+@login_required(login_url="unified-login")
+def pharmacy_shop_list(request):
+    """List all verified pharmacy shops"""
+    shops = PharmacyShop.objects.filter(is_verified=True).order_by('-rating')
+    
+    # Add search functionality
+    search_query = request.GET.get('search', '')
+    if search_query:
+        shops = shops.filter(
+            Q(name__icontains=search_query) |
+            Q(address__icontains=search_query)
+        )
+    
+    # Pagination
+    paginator = Paginator(shops, 12)
+    page_number = request.GET.get('page')
+    shops = paginator.get_page(page_number)
+    
+    context = {
+        'shops': shops,
+        'search_query': search_query
+    }
+    
+    return render(request, 'pharmacy/pharmacy_shops.html', context)
+
+@csrf_exempt
+@login_required(login_url="unified-login")
+def pharmacy_shop_detail(request, shop_id):
+    """Show details of a specific pharmacy shop"""
+    shop = PharmacyShop.objects.get(shop_id=shop_id)
+    medicines = Medicine.objects.filter(
+        pharmacy_shop=shop,
+        is_marketplace_active=True
+    ).order_by('name')
+    
+    # Get medicine prices for this shop
+    medicine_prices = MedicinePrice.objects.filter(
+        pharmacy_shop=shop,
+        is_available=True
+    ).select_related('medicine')
+    
+    context = {
+        'shop': shop,
+        'medicines': medicines,
+        'medicine_prices': medicine_prices
+    }
+    
+    return render(request, 'pharmacy/pharmacy_shop_detail.html', context)
