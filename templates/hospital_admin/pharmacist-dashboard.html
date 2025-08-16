@@ -1,331 +1,202 @@
-{% load static %}
-
 <!DOCTYPE html>
 <html lang="en">
-<!-- Mirrored from dreamguys.co.in/demo/doccure/admin/index.html by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 30 Nov 2019 04:12:20 GMT -->
-
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0" />
-  <title>HealthStack</title>
-
-    	<!-- Favicon -->
-
-    	<link rel="shortcut icon" type="image/x-icon" href="{% static 'HealthStack-System/images/Normal/favicon.png' %}"/>
-  <!--[if lt IE 9]>
-			<script src="assets/js/html5shiv.min.js"></script>
-			<script src="assets/js/respond.min.js"></script>
-		<![endif]-->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
+    <title>Pharmacist Dashboard - HealthStack</title>
+    {% load static %}
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="{% static 'HealthStack-System/css/admin/bootstrap.min.css' %}">
+    <!-- Fontawesome CSS -->
+    <link rel="stylesheet" href="{% static 'HealthStack-System/css/admin/font-awesome.min.css' %}">
+    <!-- Feathericon CSS -->
+    <link rel="stylesheet" href="{% static 'HealthStack-System/css/admin/feathericon.min.css' %}">
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="{% static 'HealthStack-System/css/admin/style.css' %}">
 </head>
-
 <body>
-  <!-- Bootstrap CSS -->
-  <link rel="stylesheet" href="{% static 'HealthStack-System/css/Normal/bootstrap.min.css' %}">
-
-  <!-- Fontawesome CSS -->
-  <link rel="stylesheet" href="{% static 'HealthStack-System/plugins/Normal/fontawesome/css/fontawesome.min.css' %}">
-
-  <!-- Feathericon CSS -->
-  <link rel="stylesheet" href="{% static 'HealthStack-System/admin_assets/css/feathericon.min.css'%}">
-
-  <!-- Datatables CSS -->
-  <link rel="stylesheet" href="{% static 'HealthStack-System/plugins/Normal/fontawesome/css/all.min.css' %}">
-
-
-  <!-- Main CSS -->
-  <link rel="stylesheet" href="{% static 'HealthStack-System/css/admin/style.css'%}" />
-
-  <!--[if lt IE 9]>
-      <script src="assets/js/html5shiv.min.js"></script>
-      <script src="assets/js/respond.min.js"></script>
-    <![endif]-->
-  </head>
-
-  <body>
     <!-- Main Wrapper -->
     <div class="main-wrapper">
-      <!-- Header -->
-      <header class="header">{% include 'hospital_admin/pharmacist-navbar.html' %}</header>
-      <!-- /Header -->
+        <!-- Header -->
+        {% include 'hospital_admin/pharmacist-navbar.html' %}
+        <!-- /Header -->
 
-      <!-- Sidebar -->
-      <aside class="sidebar" id="sidebar">
-        {% include 'hospital_admin/pharmacist-sidebar.html' %} </aside>
-      <!-- /Sidebar -->
+        <!-- Sidebar -->
+        {% include 'hospital_admin/pharmacist-sidebar.html' %}
+        <!-- /Sidebar -->
 
-      <!-- Page Wrapper -->
-      <div class="page-wrapper">
-
-        <div class="content container-fluid">
-          <!-- Page Header -->
-          <div class="page-header">
-            <div class="row">
-              <div class="col-sm-12">
-                <h3 class="page-title">Welcome Pharmacist!</h3>
-                <div class="row">
-                  <div class="col-xl-3 col-sm-6 col-12">
-                    <div class="card">
-                      <div class="card-body">
-                        <div class="dash-widget-header">
-                          <span class="dash-widget-icon text-primary border-primary">
-                            <i class="fe fe-users"></i>
-                          </span>
-                          <div class="dash-count">
-                            <h3>{{total_pharmacist_count.count}}</h3>
-                          </div>
-                        </div>
-                        <div class="dash-widget-info">
-                          <h6 class="text-muted">Total Pharmacist</h6>
-                          <div class="progress progress-sm">
-                            <div class="progress-bar bg-primary w-50"></div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col-xl-3 col-sm-6 col-12">
-                    <div class="card">
-                      <div class="card-body">
-                        <div class="dash-widget-header">
-                          <span class="dash-widget-icon text-success">
-                            <i class="fe fe-credit-card"></i>
-                          </span>
-                          <div class="dash-count">
-                            <h3>{{total_medicine_count.count}}</h3>
-                          </div>
-                        </div>
-                        <div class="dash-widget-info">
-                          <h6 class="text-muted">Total Medicines</h6>
-                          <div class="progress progress-sm">
-                            <div class="progress-bar bg-success w-50"></div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col-xl-3 col-sm-6 col-12">
-                    <div class="card">
-                      <div class="card-body">
-                        <div class="dash-widget-header">
-                          <span class="dash-widget-icon text-danger border-danger">
-                            <i class="fe fe-money"></i>
-                          </span>
-                          <div class="dash-count">
-                            <h3>{{total_order_count.count}}</h3>
-                          </div>
-                        </div>
-                        <div class="dash-widget-info">
-                          <h6 class="text-muted">Total Order</h6>
-                          <div class="progress progress-sm">
-                            <div class="progress-bar bg-danger w-50"></div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="col-xl-3 col-sm-6 col-12">
-                    <div class="card">
-                      <div class="card-body">
-                        <div class="dash-widget-header">
-                          <span class="dash-widget-icon text-warning border-warning">
-                            <i class="fe fe-folder"></i>
-                          </span>
-                          <div class="dash-count">
-                            <h3>{{total_cart_count.count}}</h3>
-                          </div>
-                        </div>
-                        <div class="dash-widget-info">
-                          <h6 class="text-muted">Number of Cart Item</h6>
-                          <div class="progress progress-sm">
-                            <div class="progress-bar bg-warning w-50"></div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+        <!-- Page Wrapper -->
+        <div class="page-wrapper">
+            <div class="content container-fluid">
+                <!-- Page Header -->
                 <div class="page-header">
-                  <div class="row">
-                    <div class="col-sm-12">
-                      <h3 class="page-title">List of Medicine</h3>
-                      <ul class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="#">Dashboard</a></li>
-                        <li class="breadcrumb-item active">Medicine</li>
-                      </ul>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <h3 class="page-title">Pharmacist Dashboard</h3>
+                            <ul class="breadcrumb">
+                                <li class="breadcrumb-item active">Dashboard</li>
+                            </ul>
+                        </div>
                     </div>
-                  </div>
                 </div>
+                <!-- /Page Header -->
+
+                <!-- Dashboard Statistics -->
                 <div class="row">
-                  <div class="col-sm-12">
-                    <div class="card">
-                      <div class="card-header">
-                        <h4 class="card-title float-left">Medicine Inventory</h4>
-                        <a href="{% url 'add-medicine' %}" class="btn btn-primary float-right">
-                          <i class="fa fa-plus"></i> Add Medicine
-                        </a>
-                      </div>
-                      <div class="card-body">
-                        <div class="table-responsive">
-                         <table class="datatable table table-hover table-center mb-0">
-                            <thead>
-                             <tr>
-                               <th>Medicine Name</th>
-                               <th>Stock Quantity</th>
-                               <th>Medicine Type</th>
-                               <th>Medicine Category</th>
-                               <th>Price</th>
-                               <th>Status</th>
-                               <th>Action</th>
-                             </tr>
-                            </thead>
-                            <tbody>
-                            {% for medicine in medicine %}
-                             <tr>
-                               <td>
-                                 <h2 class="table-avatar">
-                                   <a href="" class="avatar avatar-sm mr-2"><img class="avatar-img rounded-circle" src="{{medicine.featured_image.url}}" alt="Medicine Image"></a>															
-                                   <a href="">{{medicine.name}}</a>
-                                 </h2>
-                               </td>
-                               <td>
-                                 {{medicine.stock_quantity}}
-                                 {% if medicine.stock_quantity <= 10 %}
-                                   <span class="badge badge-danger ml-1">Low Stock</span>
-                                 {% endif %}
-                               </td>
-                               <td>{{medicine.medicine_type}}</td>
-                               <td>{{medicine.medicine_category}}</td>
-                               <td>${{medicine.price}}</td>
-                               <td>
-                                 {% if medicine.stock_quantity > 0 %}
-                                   <span class="badge badge-success">Available</span>
-                                 {% else %}
-                                   <span class="badge badge-danger">Out of Stock</span>
-                                 {% endif %}
-                               </td>
-                               <td>
-                                 <div class="table-action">
-                                   <a href="{% url 'edit-medicine' pk=medicine.serial_number %}" class="btn btn-sm btn-outline-primary">
-                                     <i class="fe fe-edit"></i>
-                                   </a>
-                                   <a href="#" class="btn btn-sm btn-outline-danger" onclick="confirmDelete('{{medicine.serial_number}}')">
-                                     <i class="fe fe-trash"></i>
-                                   </a>
-                                 </div>
-                               </td>
-                             </tr>
-                             {% empty %}
-                             <tr>
-                               <td colspan="7" class="text-center">No medicines available</td>
-                             </tr>
-                             {% endfor %}
-                             </tbody>
-                         </table>
-                       </div>
-                     </div>
-                   </div>	
-                   </div>
+                    <div class="col-xl-3 col-sm-6 col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="dash-widget-header">
+                                    <span class="dash-widget-icon text-primary border-primary">
+                                        <i class="fe fe-package"></i>
+                                    </span>
+                                    <div class="dash-count">
+                                        <h3>{{ total_medicine_count.count|default:0 }}</h3>
+                                    </div>
+                                </div>
+                                <div class="dash-widget-info">
+                                    <h6 class="text-muted">Total Medicines</h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-                   <!-- Recent Orders Section -->
-                   <div class="row mt-4">
-                     <div class="col-sm-12">
-                       <div class="card">
-                         <div class="card-header">
-                           <h4 class="card-title">Recent Orders</h4>
-                         </div>
-                         <div class="card-body">
-                           <div class="table-responsive">
-                             <table class="table table-hover table-center mb-0">
-                               <thead>
-                                 <tr>
-                                   <th>Order ID</th>
-                                   <th>Patient</th>
-                                   <th>Items</th>
-                                   <th>Total Amount</th>
-                                   <th>Status</th>
-                                   <th>Date</th>
-                                   <th>Action</th>
-                                 </tr>
-                               </thead>
-                               <tbody>
-                                 {% for order in recent_orders %}
-                                 <tr>
-                                   <td>#{{order.id}}</td>
-                                   <td>{{order.user.patient.name}}</td>
-                                   <td>{{order.orderitems.count}} items</td>
-                                   <td>${{order.get_total_cost}}</td>
-                                   <td>
-                                     {% if order.ordered %}
-                                       <span class="badge badge-success">Completed</span>
-                                     {% else %}
-                                       <span class="badge badge-warning">Pending</span>
-                                     {% endif %}
-                                   </td>
-                                   <td>{{order.created_at|date:"M d, Y"}}</td>
-                                   <td>
-                                     <a href="#" class="btn btn-sm btn-outline-primary">
-                                       <i class="fe fe-eye"></i> View
-                                     </a>
-                                   </td>
-                                 </tr>
-                                 {% empty %}
-                                 <tr>
-                                   <td colspan="7" class="text-center">No recent orders</td>
-                                 </tr>
-                                 {% endfor %}
-                               </tbody>
-                             </table>
-                           </div>
-                         </div>
-                       </div>
-                     </div>
-                   </div>
-               </div>
-              </div>
-              
+                    <div class="col-xl-3 col-sm-6 col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="dash-widget-header">
+                                    <span class="dash-widget-icon text-success border-success">
+                                        <i class="fe fe-shopping-cart"></i>
+                                    </span>
+                                    <div class="dash-count">
+                                        <h3>{{ total_order_count.count|default:0 }}</h3>
+                                    </div>
+                                </div>
+                                <div class="dash-widget-info">
+                                    <h6 class="text-muted">Total Orders</h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-3 col-sm-6 col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="dash-widget-header">
+                                    <span class="dash-widget-icon text-warning border-warning">
+                                        <i class="fe fe-users"></i>
+                                    </span>
+                                    <div class="dash-count">
+                                        <h3>{{ total_pharmacist_count.count|default:0 }}</h3>
+                                    </div>
+                                </div>
+                                <div class="dash-widget-info">
+                                    <h6 class="text-muted">Total Pharmacists</h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-xl-3 col-sm-6 col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="dash-widget-header">
+                                    <span class="dash-widget-icon text-info border-info">
+                                        <i class="fe fe-shopping-bag"></i>
+                                    </span>
+                                    <div class="dash-count">
+                                        <h3>{{ total_cart_count.count|default:0 }}</h3>
+                                    </div>
+                                </div>
+                                <div class="dash-widget-info">
+                                    <h6 class="text-muted">Items in Cart</h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Medicines -->
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h4 class="card-title">Medicine Inventory</h4>
+                                <a href="{% url 'add-medicine' %}" class="btn btn-primary btn-sm float-right">Add Medicine</a>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover table-center mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>Medicine</th>
+                                                <th>Category</th>
+                                                <th>Price</th>
+                                                <th>Stock</th>
+                                                <th>Status</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for med in medicine %}
+                                            <tr>
+                                                <td>
+                                                    <h2 class="table-avatar">
+                                                        <a href="#" class="avatar avatar-sm mr-2">
+                                                            <img class="avatar-img rounded-circle" src="{{ med.featured_image.url }}" alt="Medicine Image">
+                                                        </a>
+                                                        <a href="#">{{ med.name }}</a>
+                                                    </h2>
+                                                </td>
+                                                <td>{{ med.medicine_category }}</td>
+                                                <td>${{ med.price }}</td>
+                                                <td>{{ med.stock_quantity|default:0 }}</td>
+                                                <td>
+                                                    {% if med.stock_quantity > 10 %}
+                                                        <span class="badge badge-pill bg-success-light">In Stock</span>
+                                                    {% elif med.stock_quantity > 0 %}
+                                                        <span class="badge badge-pill bg-warning-light">Low Stock</span>
+                                                    {% else %}
+                                                        <span class="badge badge-pill bg-danger-light">Out of Stock</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    <div class="actions">
+                                                        <a class="btn btn-sm bg-primary-light" href="{% url 'edit-medicine' med.serial_number %}">
+                                                            <i class="fe fe-pencil"></i> Edit
+                                                        </a>
+                                                        <a class="btn btn-sm bg-danger-light" href="{% url 'delete-medicine' med.serial_number %}">
+                                                            <i class="fe fe-trash"></i> Delete
+                                                        </a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            {% empty %}
+                                            <tr>
+                                                <td colspan="6" class="text-center">No medicines available</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
-          <!-- /Page Header -->
         </div>
-      </div>
-      <!-- /Page Wrapper -->
+        <!-- /Page Wrapper -->
     </div>
+    <!-- /Main Wrapper -->
 
-  <!-- jQuery -->
-  <script src="{% static 'HealthStack-System/js/admin/jquery-3.2.1.min.js'%}"></script>
-
-  <!-- Bootstrap Core JS -->
-  <script src="{% static 'HealthStack-System/js/admin/popper.min.js'%}"></script>
-  <script src="{% static 'HealthStack-System/js/admin/bootstrap.min.js'%}"></script>
-
-  <!-- Slimscroll JS -->
-
-  <script src="{% static 'HealthStack-System/plugins/admin/slimscroll/jquery.slimscroll.min.js'%}"></script>
-
-  <script src="{% static 'HealthStack-System/plugins/admin/raphael/raphael.min.js'%}"></script>
-
-  <script src=" {% static 'HealthStack-System/plugins/admin/morris/morris.min.js'%}"></script>
-  <script src="{% static 'HealthStack-System/js/admin/chart.morris.js'%}"></script>
-
-  <!-- Custom JS -->
-  <script src="{% static 'HealthStack-System/js/admin/script.js'%}"></script>
-
-  <!-- Chart JS -->
-  <script src="{% static 'HealthStack-System/js/admin/Chart.bundle.min.js'%}"></script>
-
-  <script src="{% static 'HealthStack-System/js/admin/raphael.min.js'%}"></script>
-
-  <script src="{% static 'HealthStack-System/js/admin/morris.min.js'%}"></script>
-
-  <script src="{% static 'HealthStack-System/js/admin/morris_init.js'%}"></script>
-
-  <script>
-    function confirmDelete(medicineId) {
-      if (confirm('Are you sure you want to delete this medicine?')) {
-        window.location.href = '/admin/delete-medicine/' + medicineId + '/';
-      }
-    }
-  </script>
-
+    <!-- jQuery -->
+    <script src="{% static 'HealthStack-System/js/admin/jquery-3.2.1.min.js' %}"></script>
+    <!-- Bootstrap Core JS -->
+    <script src="{% static 'HealthStack-System/js/admin/popper.min.js' %}"></script>
+    <script src="{% static 'HealthStack-System/js/admin/bootstrap.min.js' %}"></script>
+    <!-- Slimscroll JS -->
+    <script src="{% static 'HealthStack-System/plugins/admin/slimscroll/jquery.slimscroll.min.js' %}"></script>
+    <!-- Custom JS -->
+    <script src="{% static 'HealthStack-System/js/admin/script.js' %}"></script>
 </body>
 </html>

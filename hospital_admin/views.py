@@ -1116,16 +1116,20 @@ def labworker_dashboard(request):
         if request.user.is_labworker:
             lab_worker = Clinical_Laboratory_Technician.objects.get(user=request.user)
 
-            # Get appointments that are confirmed
-            confirmed_appointments = Appointment.objects.filter(appointment_status='confirmed')
-
-            # We can further enhance this by adding a status to the report
-            # to check if it's already created or not.
-            # For now, we will list all confirmed appointments.
+            # Get appointments that are confirmed and need lab work
+            confirmed_appointments = Appointment.objects.filter(appointment_status='confirmed')[:10]
+            
+            # Get report statistics
+            completed_reports = Report.objects.filter(lab_technician=lab_worker, status='completed').count()
+            pending_reports = Report.objects.filter(lab_technician=lab_worker, status='pending').count()
+            total_tests = Test_Information.objects.count()
 
             context = {
                 'lab_worker': lab_worker,
-                'appointments': confirmed_appointments
+                'appointments': confirmed_appointments,
+                'completed_reports': completed_reports,
+                'pending_reports': pending_reports,
+                'total_tests': total_tests
             }
             return render(request, 'hospital_admin/labworker-dashboard.html', context)
     # Add a fallback redirect if the user is not a lab worker

@@ -1,0 +1,194 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
+    <title>Create Prescription from Report - HealthStack</title>
+    {% load static %}
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="{% static 'HealthStack-System/css/Normal/bootstrap.min.css' %}">
+    <!-- Fontawesome CSS -->
+    <link rel="stylesheet" href="{% static 'HealthStack-System/plugins/Normal/fontawesome/css/fontawesome.min.css' %}">
+    <link rel="stylesheet" href="{% static 'HealthStack-System/plugins/Normal/fontawesome/css/all.min.css' %}">
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="{% static 'HealthStack-System/css/Normal/style.css' %}">
+</head>
+<body>
+    <!-- Main Wrapper -->
+    <div class="main-wrapper">
+        <!-- Header -->
+        {% include 'doctor-navbar.html' %}
+        <!-- /Header -->
+        
+        <!-- Breadcrumb -->
+        <div class="breadcrumb-bar">
+            <div class="container-fluid">
+                <div class="row align-items-center">
+                    <div class="col-md-12 col-12">
+                        <nav aria-label="breadcrumb" class="page-breadcrumb">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="{% url 'doctor-dashboard' %}">Home</a></li>
+                                <li class="breadcrumb-item active" aria-current="page">Create Prescription from Report</li>
+                            </ol>
+                        </nav>
+                        <h2 class="breadcrumb-title">Create Prescription Based on Lab Report</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /Breadcrumb -->
+        
+        <!-- Page Content -->
+        <div class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-5 col-lg-4 col-xl-3 theiaStickySidebar">
+                        <!-- Sidebar -->
+                        {% include 'doctor-sidebar.html' %}
+                        <!-- /Sidebar -->
+                    </div>
+                    
+                    <div class="col-md-7 col-lg-8 col-xl-9">
+                        <!-- Report Summary -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h4 class="card-title">Lab Report Summary</h4>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <p><strong>Patient:</strong> {{ patient.name }}</p>
+                                        <p><strong>Report ID:</strong> #{{ report.report_id }}</p>
+                                        <p><strong>Date:</strong> {{ report.created_at|date:"M d, Y" }}</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p><strong>Lab Technician:</strong> {{ report.lab_technician.name }}</p>
+                                        <p><strong>Status:</strong> {{ report.status|title }}</p>
+                                    </div>
+                                </div>
+                                
+                                {% if report.other_information %}
+                                <div class="mt-3">
+                                    <strong>Report Notes:</strong>
+                                    <p>{{ report.other_information }}</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Prescription Form -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h4 class="card-title">Create Prescription</h4>
+                            </div>
+                            <div class="card-body">
+                                <form method="POST">
+                                    {% csrf_token %}
+                                    
+                                    <!-- Medicine Section -->
+                                    <div class="form-group">
+                                        <label>Medicines</label>
+                                        <div id="medicine-section">
+                                            <div class="medicine-item mb-3 p-3 border rounded">
+                                                <div class="row">
+                                                    <div class="col-md-3">
+                                                        <input type="text" class="form-control" name="medicine_name" placeholder="Medicine Name" required>
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <input type="number" class="form-control" name="quantity" placeholder="Quantity" required>
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <select class="form-control" name="frequency" required>
+                                                            <option value="">Frequency</option>
+                                                            <option value="1 time a day">1 time a day</option>
+                                                            <option value="2 times a day">2 times a day</option>
+                                                            <option value="3 times a day">3 times a day</option>
+                                                            <option value="4 times a day">4 times a day</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <input type="text" class="form-control" name="duration" placeholder="Duration (days)" required>
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <select class="form-control" name="relation_with_meal" required>
+                                                            <option value="">Meal Relation</option>
+                                                            <option value="Before meal">Before meal</option>
+                                                            <option value="After meal">After meal</option>
+                                                            <option value="With meal">With meal</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-1">
+                                                        <button type="button" class="btn btn-danger btn-sm remove-medicine">
+                                                            <i class="fa fa-trash"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <div class="row mt-2">
+                                                    <div class="col-md-12">
+                                                        <input type="text" class="form-control" name="instruction" placeholder="Special Instructions">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button type="button" class="btn btn-primary btn-sm" id="add-medicine">
+                                            <i class="fa fa-plus"></i> Add Medicine
+                                        </button>
+                                    </div>
+                                    
+                                    <!-- Extra Information -->
+                                    <div class="form-group">
+                                        <label>Additional Notes</label>
+                                        <textarea class="form-control" name="extra_information" rows="4" placeholder="Additional prescription notes based on lab report findings..."></textarea>
+                                    </div>
+                                    
+                                    <div class="submit-section">
+                                        <button type="submit" class="btn btn-primary submit-btn">Create Prescription</button>
+                                        <a href="{% url 'patient-profile' patient.patient_id %}" class="btn btn-secondary">Cancel</a>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /Page Content -->
+    </div>
+    <!-- /Main Wrapper -->
+    
+    <!-- jQuery -->
+    <script src="{% static 'HealthStack-System/js/Normal/jquery.min.js' %}"></script>
+    <!-- Bootstrap Core JS -->
+    <script src="{% static 'HealthStack-System/js/Normal/popper.min.js' %}"></script>
+    <script src="{% static 'HealthStack-System/js/Normal/bootstrap.min.js' %}"></script>
+    <!-- Custom JS -->
+    <script src="{% static 'HealthStack-System/js/Normal/script.js' %}"></script>
+    
+    <script>
+        // Add medicine functionality
+        document.getElementById('add-medicine').addEventListener('click', function() {
+            var medicineSection = document.getElementById('medicine-section');
+            var newMedicine = medicineSection.children[0].cloneNode(true);
+            
+            // Clear the input values
+            var inputs = newMedicine.querySelectorAll('input, select');
+            inputs.forEach(function(input) {
+                input.value = '';
+            });
+            
+            medicineSection.appendChild(newMedicine);
+        });
+        
+        // Remove medicine functionality
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('remove-medicine') || e.target.parentElement.classList.contains('remove-medicine')) {
+                var medicineSection = document.getElementById('medicine-section');
+                if (medicineSection.children.length > 1) {
+                    e.target.closest('.medicine-item').remove();
+                }
+            }
+        });
+    </script>
+</body>
+</html>

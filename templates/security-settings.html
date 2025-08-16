@@ -1,0 +1,162 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
+    <title>Security Settings - HealthStack</title>
+    {% load static %}
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="{% static 'HealthStack-System/css/Normal/bootstrap.min.css' %}">
+    <!-- Fontawesome CSS -->
+    <link rel="stylesheet" href="{% static 'HealthStack-System/plugins/Normal/fontawesome/css/fontawesome.min.css' %}">
+    <link rel="stylesheet" href="{% static 'HealthStack-System/plugins/Normal/fontawesome/css/all.min.css' %}">
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="{% static 'HealthStack-System/css/Normal/style.css' %}">
+</head>
+<body>
+    <!-- Main Wrapper -->
+    <div class="main-wrapper">
+        <!-- Header -->
+        {% include 'patient_navbar.html' %}
+        <!-- /Header -->
+        
+        <!-- Breadcrumb -->
+        <div class="breadcrumb-bar">
+            <div class="container-fluid">
+                <div class="row align-items-center">
+                    <div class="col-md-12 col-12">
+                        <nav aria-label="breadcrumb" class="page-breadcrumb">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="{% url 'patient-dashboard' %}">Home</a></li>
+                                <li class="breadcrumb-item active" aria-current="page">Security Settings</li>
+                            </ol>
+                        </nav>
+                        <h2 class="breadcrumb-title">Security Settings</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /Breadcrumb -->
+        
+        <!-- Page Content -->
+        <div class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-5 col-lg-4 col-xl-3 theiaStickySidebar">
+                        <!-- Sidebar -->
+                        {% include 'patient-sidebar.html' %}
+                        <!-- /Sidebar -->
+                    </div>
+                    
+                    <div class="col-md-7 col-lg-8 col-xl-9">
+                        <!-- Security Settings -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h4 class="card-title">Security Settings</h4>
+                            </div>
+                            <div class="card-body">
+                                <!-- Two Factor Authentication -->
+                                <div class="row mb-4">
+                                    <div class="col-md-8">
+                                        <h5>Two-Factor Authentication</h5>
+                                        <p class="text-muted">Add an extra layer of security to your account</p>
+                                    </div>
+                                    <div class="col-md-4 text-right">
+                                        {% if two_factor_enabled %}
+                                            <span class="badge badge-success">Enabled</span>
+                                            <a href="{% url 'setup-two-factor' %}" class="btn btn-sm btn-outline-primary">Manage</a>
+                                        {% else %}
+                                            <span class="badge badge-secondary">Disabled</span>
+                                            <a href="{% url 'setup-two-factor' %}" class="btn btn-sm btn-primary">Enable</a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                
+                                <!-- Password Settings -->
+                                <div class="row mb-4">
+                                    <div class="col-md-8">
+                                        <h5>Password</h5>
+                                        <p class="text-muted">
+                                            {% if last_password_change %}
+                                                Last changed: {{ last_password_change|date:"M d, Y" }}
+                                            {% else %}
+                                                Change your password regularly for better security
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                    <div class="col-md-4 text-right">
+                                        <a href="{% url 'change-password' patient.user.id %}" class="btn btn-sm btn-primary">Change Password</a>
+                                    </div>
+                                </div>
+                                
+                                <!-- Login Security -->
+                                <div class="row mb-4">
+                                    <div class="col-md-8">
+                                        <h5>Login Security</h5>
+                                        <p class="text-muted">
+                                            Failed login attempts: {{ failed_attempts }}/5
+                                            {% if failed_attempts >= 3 %}
+                                                <span class="text-warning">(Warning: Account may be locked after 5 attempts)</span>
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                <!-- Account Activity -->
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h5>Account Activity</h5>
+                                        <div class="table-responsive">
+                                            <table class="table table-sm">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Activity</th>
+                                                        <th>Date</th>
+                                                        <th>Status</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td>Account Created</td>
+                                                        <td>{{ patient.user.date_joined|date:"M d, Y" }}</td>
+                                                        <td><span class="badge badge-success">Completed</span></td>
+                                                    </tr>
+                                                    {% if last_password_change %}
+                                                    <tr>
+                                                        <td>Password Changed</td>
+                                                        <td>{{ last_password_change|date:"M d, Y" }}</td>
+                                                        <td><span class="badge badge-success">Completed</span></td>
+                                                    </tr>
+                                                    {% endif %}
+                                                    {% if two_factor_enabled %}
+                                                    <tr>
+                                                        <td>Two-Factor Authentication Enabled</td>
+                                                        <td>-</td>
+                                                        <td><span class="badge badge-success">Active</span></td>
+                                                    </tr>
+                                                    {% endif %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /Page Content -->
+    </div>
+    <!-- /Main Wrapper -->
+    
+    <!-- jQuery -->
+    <script src="{% static 'HealthStack-System/js/Normal/jquery.min.js' %}"></script>
+    <!-- Bootstrap Core JS -->
+    <script src="{% static 'HealthStack-System/js/Normal/popper.min.js' %}"></script>
+    <script src="{% static 'HealthStack-System/js/Normal/bootstrap.min.js' %}"></script>
+    <!-- Custom JS -->
+    <script src="{% static 'HealthStack-System/js/Normal/script.js' %}"></script>
+</body>
+</html>
