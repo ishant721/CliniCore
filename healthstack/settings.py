@@ -33,7 +33,7 @@ SECRET_KEY = env('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = ['192.168.0.100', '127.0.0.1','5749-103-109-53-5.in.ngrok.io']
+ALLOWED_HOSTS = ['192.168.0.100', '127.0.0.1','5749-103-109-53-5.in.ngrok.io', 'c708b00c-999d-484b-9f99-7b97f8a64341-00-29nze73m7cbtb.sisko.replit.dev', '*.replit.dev']
 # ALLOWED_HOSTS = ['mobile view', 'local host','ngrok -- keeps on changing']
 
 # Application definition
