@@ -13,13 +13,6 @@
 # db.sqlite3
 
 
-# Environments
-.env
-.venv
-env/
-env_dir/
-venv/
-ENV/
 
 # Mkdocs
 site
