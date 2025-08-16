@@ -56,7 +56,7 @@
       <div class="breadcrumb-bar">
         <div class="container-fluid">
           <div class="row align-items-center">
-            
+
             <div class="col-md-12 col-12">
               <nav aria-label="breadcrumb" class="page-breadcrumb">
                 <ol class="breadcrumb">
@@ -75,7 +75,7 @@
         </div>
       </div>
       <!-- /Breadcrumb -->
-      
+
       <!-- Page Content -->
       <div class="content">
         <div class="container-fluid">
@@ -188,7 +188,7 @@
                                     >
                                   </td>
                                   <td>{{appointment.appointment_type}}</td>
-                                  
+
                                   {% if appointment.appointment_type == 'checkup' %}
                                   <td>{{appointment.doctor.consultation_fee}} BDT</td>
                                   {% else %}
@@ -206,10 +206,10 @@
                                     {% endif %}
                                   </td>
                                   <td class="text-center">
-                                    {% if appointment.payment_status == 'pending' %}
+                                    {% if payment.payment_status == 'pending' %}
                                     <span class="badge badge-pill bg-warning-light">Pending</span>
                                     {% endif %}
-                                    {% if appointment.payment_status == 'VALID' %}
+                                    {% if payment.payment_status == 'VALID' %}
                                     <span class="badge badge-pill bg-success-light">Paid</span>
                                     {% endif %}
                                   </td>
@@ -223,7 +223,7 @@
                                         <i class="fas fa-dollar-sign"></i> Pay
                                         Now
                                       </a>
-                                      
+
                                     </div>
                                   </td>
                                 </tr>
@@ -259,11 +259,11 @@
                                     <a href="javascript:void(0);">{{prescription.prescription_id}}</a>
                                   </td>
                                   <td>{{prescription.doctor.name }}</td>
-                                  
+
 
                                   <!-- <td><a href="#">dental-test.pdf</a></td> -->
 
-                               
+
 
                                   <td>
                                     <h2 class="table-avatar">
@@ -315,7 +315,7 @@
 
                                   <!-- <th>Attachment</th> -->
 
-                                 
+
 
                                   <th>Doctor</th>
                                   <th>Action</th>
@@ -328,11 +328,11 @@
                                     <a href="javascript:void(0);">{{report.report_id}}</a>
                                   </td>
                                   <td>{{report.delivery_date }}</td>
-                                  
+
 
                                   <!-- <td><a href="#">dental-test.pdf</a></td> -->
 
-                               
+
 
                                   <td>
                                     <h2 class="table-avatar">
@@ -359,10 +359,15 @@
                                       >
                                         <i class="far fa-eye"></i> View
                                       </a>
+                                      {% if report.report_file %}
+                                      <span class="badge badge-success badge-pill ml-2">
+                                        <i class="fas fa-file-medical"></i> Digital
+                                      </span>
+                                      {% endif %}
                                       <a href="{% url 'delete-report' pk=report.report_id %}" onclick="return confirm('Are you sure you want to Delete?');" class="btn btn-sm bg-danger-light" >
                                         <i class="fas fa-trash"></i> Delete <td>
                                       </a>
-                                      
+
                                     </div>
                                   </td>
                                 </tr>
@@ -447,7 +452,7 @@
                                   <th>Card Type</th>
                                   <th>Card Issuer</th>
                                   <th>Payment Status</th>
-                      
+
                                 </tr>
                               </thead>
                               <tbody>
@@ -483,11 +488,11 @@
                                     <span class="badge badge-pill bg-warning-light">Pending</span>
                                     {% endif %}
                                   </td>
-                            
+
                                 </tr>
                                 {% endfor %}
-                          
-                             
+
+
 
 
                               </tbody>

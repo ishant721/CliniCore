@@ -78,8 +78,8 @@
 								  </a>
 								  <div class="profile-det-info">
 									<h3><a href="#">{{report.patient.name}}</a></h3>
-			
-			
+
+
 									<div class="patient-details">
 									  <h5><b>ID :</b> {{report.patient.patient_id }}</h5>
 									  <h5 class="mb-0">
@@ -163,7 +163,7 @@
                                                         <th style="border: 2px dotted;">Collection Date/Time</th>
                                                         <th style="border: 2px dotted;">Receiving Date/Time</th>
                                                     </tr>
-                                                    
+
                                                     <tr>
                                                     {% for s in specimen %}
                                                         <th style="border: 2px dotted;">{{s.specimen_type}}</th>
@@ -212,20 +212,46 @@
 
                             <!-- /Invoice Item -->
 
+                            <!-- Digital Report File Section -->
+                            {% if report.report_file %}
+                            <div class="invoice-item">
+                              <div class="row">
+                                <div class="col-md-12">
+                                  <div class="other-info">
+                                    <h4 style="color: #2c3e50; margin-bottom: 15px;"><i class="fas fa-file-medical"></i> <b>Digital Lab Report:</b></h4>
+                                    <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; border-left: 4px solid #3498db;">
+                                      <p style="margin-bottom: 15px;"><strong>Report File:</strong> {{ report.report_file.name|basename }}</p>
+                                      <div class="btn-group" role="group">
+                                        <a href="{{ report.report_file.url }}" target="_blank" class="btn btn-primary btn-sm">
+                                          <i class="fas fa-eye"></i> View Report
+                                        </a>
+                                        <a href="{{ report.report_file.url }}" download class="btn btn-success btn-sm">
+                                          <i class="fas fa-download"></i> Download Report
+                                        </a>
+                                      </div>
+                                      <p style="margin-top: 10px; font-size: 0.9em; color: #6c757d;">
+                                        <i class="fas fa-info-circle"></i> Digital lab report uploaded by laboratory technician.
+                                      </p>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            {% endif %}
 
                             <!-- Invoice Information -->
                             <div class="other-info">
-                                <h4 style="background-color: rgb(84, 147, 199);">Other information</h4>
-                                <p>{{report.other_information}}</p>
+                              <h4><b>Other Information:</b></h4>
+                              <p>{{report.other_information}}</p>
 
-                               {% comment %}
-                                <button class="btn btn-sm bg-primary-light"> <a target="_blank"
-                                        href="{% url 'pdf' pk=report.report_id %}"> Download Report </a></button>
-                                {% endcomment %}
-
-
-                            </div>
-                            <!-- /Invoice Information -->
+                              {% if can_prescribe %}
+                              <div style="margin-top: 20px;">
+                                <a href="{% url 'create-prescription-from-report' report_id=report.report_id patient_id=report.patient.patient_id %}" 
+                                   class="btn btn-primary">
+                                   <i class="fas fa-prescription"></i> Create Prescription Based on Report
+                                </a>
+                              </div>
+                              {% endif %}
 
                         </div>
 
