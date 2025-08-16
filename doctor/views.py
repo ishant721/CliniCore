@@ -705,6 +705,64 @@ def doctor_view_report(request, pk):
 
 
 @csrf_exempt
+@login_required(login_url="doctor-login")
+def doctor_setup_two_factor(request):
+    """Setup two-factor authentication for doctors"""
+    if request.user.is_doctor:
+        doctor = Doctor_Information.objects.get(user=request.user)
+        
+        if request.method == 'POST':
+            action = request.POST.get('action')
+            
+            if action == 'enable':
+                # Generate backup codes
+                from hospital.utils import generate_backup_codes
+                backup_codes = generate_backup_codes()
+                request.user.backup_codes = backup_codes
+                request.user.two_factor_enabled = True
+                request.user.save()
+                
+                messages.success(request, 'Two-factor authentication has been enabled successfully!')
+                return render(request, 'doctor-setup-2fa.html', {
+                    'doctor': doctor,
+                    'backup_codes': backup_codes,
+                    'action_completed': True
+                })
+            
+            elif action == 'disable':
+                request.user.two_factor_enabled = False
+                request.user.backup_codes = []
+                request.user.save()
+                
+                messages.success(request, 'Two-factor authentication has been disabled.')
+                return redirect('doctor-profile-settings')
+        
+        context = {
+            'doctor': doctor,
+            'two_factor_enabled': request.user.two_factor_enabled
+        }
+        return render(request, 'doctor-setup-2fa.html', context)
+    else:
+        return redirect('doctor-logout')
+
+@csrf_exempt
+@login_required(login_url="doctor-login")
+def doctor_security_settings(request):
+    """Security settings page for doctors"""
+    if request.user.is_doctor:
+        doctor = Doctor_Information.objects.get(user=request.user)
+        
+        context = {
+            'doctor': doctor,
+            'two_factor_enabled': request.user.two_factor_enabled,
+            'failed_attempts': request.user.failed_login_attempts,
+            'last_password_change': request.user.last_password_change,
+        }
+        return render(request, 'doctor-security-settings.html', context)
+    else:
+        return redirect('doctor-logout')
+
+@csrf_exempt
 @receiver(user_logged_in)
 def got_online(sender, user, request, **kwargs):    
     user.login_status = True
