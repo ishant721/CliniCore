@@ -119,6 +119,14 @@
                       <li class="nav-item">
                         <a
                           class="nav-link"
+                          href="#pat_medicines"
+                          data-toggle="tab"
+                          >My Medicines</a
+                        >
+                      </li>
+                      <li class="nav-item">
+                        <a
+                          class="nav-link"
                           href="#pat_billing"
                           data-toggle="tab"
                           >Billing</a
@@ -366,6 +374,63 @@
                       </div>
                     </div>
                     <!-- /Medical Records Tab -->
+
+                    <!-- Prescribed Medicines Tab -->
+                    <div id="pat_medicines" class="tab-pane fade">
+                      <div class="card card-table mb-0">
+                        <div class="card-body">
+                          <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5>Recently Prescribed Medicines</h5>
+                            <a href="{% url 'patient-prescription-medicines' %}" class="btn btn-primary btn-sm">View All Medicines</a>
+                          </div>
+                          <div class="table-responsive">
+                            <table class="table table-hover table-center mb-0">
+                              <thead>
+                                <tr>
+                                  <th>Medicine Name</th>
+                                  <th>Prescribed By</th>
+                                  <th>Status</th>
+                                  <th>Action</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {% for medicine in prescription.0.prescription_medicine_set.all|slice:":5" %}
+                                <tr>
+                                  <td>
+                                    <h6 class="mb-0">{{ medicine.medicine_name }}</h6>
+                                    <small class="text-muted">{{ medicine.frequency }}</small>
+                                  </td>
+                                  <td>{{ medicine.prescription.doctor.name }}</td>
+                                  <td>
+                                    {% if medicine.order_status == 'pending' %}
+                                    <span class="badge badge-pill bg-warning-light">Not Ordered</span>
+                                    {% elif medicine.order_status == 'ordered' %}
+                                    <span class="badge badge-pill bg-info-light">Ordered</span>
+                                    {% elif medicine.order_status == 'delivered' %}
+                                    <span class="badge badge-pill bg-success-light">Delivered</span>
+                                    {% endif %}
+                                  </td>
+                                  <td>
+                                    <a href="{% url 'patient-prescription-medicines' %}" class="btn btn-sm bg-info-light">
+                                      <i class="fas fa-eye"></i> View
+                                    </a>
+                                  </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                  <td colspan="4" class="text-center">
+                                    <p class="text-muted">No prescribed medicines found.</p>
+                                    <a href="{% url 'patient-prescription-medicines' %}" class="btn btn-primary btn-sm">View All Medicines</a>
+                                  </td>
+                                </tr>
+                                {% endfor %}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- /Prescribed Medicines Tab -->
 
                     <!-- Billing Tab -->
                     <div id="pat_billing" class="tab-pane fade">

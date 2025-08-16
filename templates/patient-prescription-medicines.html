@@ -1,0 +1,213 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0" />
+    <title>My Prescribed Medicines - HealthStack</title>
+
+    <!-- Favicons -->
+    <link type="image/x-icon" href="{% static 'HealthStack-System/images/Normal/favicon.png' %}" rel="icon" />
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="{% static 'HealthStack-System/css/Normal/bootstrap.min.css' %}" />
+
+    <!-- Fontawesome CSS -->
+    <link rel="stylesheet" href="{% static 'HealthStack-System/plugins/Normal/fontawesome/css/fontawesome.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'HealthStack-System/plugins/Normal/fontawesome/css/all.min.css' %}" />
+
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="{% static 'HealthStack-System/css/Normal/style.css' %}" />
+</head>
+<body>
+    <!-- Main Wrapper -->
+    <div class="main-wrapper">
+        <!-- Header -->
+        <header class="header">{% include 'patient_navbar.html' %}</header>
+        <!-- /Header -->
+
+        <!-- Breadcrumb -->
+        <div class="breadcrumb-bar">
+            <div class="container-fluid">
+                <div class="row align-items-center">
+                    <div class="col-md-12 col-12">
+                        <nav aria-label="breadcrumb" class="page-breadcrumb">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item">
+                                    <a href="{% url 'patient-dashboard' %}">Home</a>
+                                </li>
+                                <li class="breadcrumb-item active" aria-current="page">
+                                    My Prescribed Medicines
+                                </li>
+                            </ol>
+                        </nav>
+                        <h2 class="breadcrumb-title">My Prescribed Medicines</h2>
+                        {% include 'message.html' %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /Breadcrumb -->
+
+        <!-- Page Content -->
+        <div class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <!-- Profile Sidebar -->
+                    <div class="col-md-5 col-lg-4 col-xl-3 theiaStickySidebar">
+                        {% include 'patient-sidebar.html' %}
+                    </div>
+                    <!-- / Profile Sidebar -->
+
+                    <div class="col-md-7 col-lg-8 col-xl-9">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="card-header">
+                                    <h4 class="card-title mb-0">Prescribed Medicines</h4>
+                                    <p class="text-muted">Medicines prescribed by your doctors that you can order</p>
+                                </div>
+
+                                <div class="card card-table mb-0">
+                                    <div class="card-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-hover table-center mb-0">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Medicine Name</th>
+                                                        <th>Prescribed By</th>
+                                                        <th>Quantity</th>
+                                                        <th>Duration</th>
+                                                        <th>Instructions</th>
+                                                        <th>Status</th>
+                                                        <th>Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for medicine in prescription_medicines %}
+                                                    <tr>
+                                                        <td>
+                                                            <h6 class="mb-0">{{ medicine.medicine_name }}</h6>
+                                                            <small class="text-muted">{{ medicine.frequency }} | {{ medicine.relation_with_meal }}</small>
+                                                        </td>
+                                                        <td>
+                                                            <h6 class="mb-0">{{ medicine.prescription.doctor.name }}</h6>
+                                                            <small class="text-muted">{{ medicine.prescription.create_date }}</small>
+                                                        </td>
+                                                        <td>{{ medicine.quantity }}</td>
+                                                        <td>{{ medicine.duration }}</td>
+                                                        <td>
+                                                            <small>{{ medicine.instruction|truncatechars:50 }}</small>
+                                                        </td>
+                                                        <td>
+                                                            {% if medicine.order_status == 'pending' %}
+                                                            <span class="badge badge-pill bg-warning-light">Not Ordered</span>
+                                                            {% elif medicine.order_status == 'ordered' %}
+                                                            <span class="badge badge-pill bg-info-light">Ordered</span>
+                                                            {% elif medicine.order_status == 'delivered' %}
+                                                            <span class="badge badge-pill bg-success-light">Delivered</span>
+                                                            {% elif medicine.order_status == 'cancelled' %}
+                                                            <span class="badge badge-pill bg-danger-light">Cancelled</span>
+                                                            {% endif %}
+                                                        </td>
+                                                        <td>
+                                                            {% if medicine.order_status == 'pending' %}
+                                                            <a href="{% url 'add-prescription-medicine-to-cart' medicine.medicine_id %}" 
+                                                               class="btn btn-sm bg-success-light"
+                                                               onclick="return confirm('Add {{ medicine.medicine_name }} to cart?');">
+                                                                <i class="fas fa-shopping-cart"></i> Add to Cart
+                                                            </a>
+                                                            {% elif medicine.order_status == 'ordered' %}
+                                                            <a href="{% url 'cart-view' %}" class="btn btn-sm bg-info-light">
+                                                                <i class="fas fa-eye"></i> View Cart
+                                                            </a>
+                                                            {% else %}
+                                                            <span class="text-muted">-</span>
+                                                            {% endif %}
+                                                            
+                                                            <a href="{% url 'prescription-view' medicine.prescription.prescription_id %}" 
+                                                               class="btn btn-sm bg-primary-light ml-1">
+                                                                <i class="fas fa-eye"></i> View Prescription
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                    {% empty %}
+                                                    <tr>
+                                                        <td colspan="7" class="text-center">
+                                                            <div class="empty-state">
+                                                                <i class="fas fa-pills fa-3x text-muted mb-3"></i>
+                                                                <h5>No Prescribed Medicines</h5>
+                                                                <p class="text-muted">You don't have any prescribed medicines yet. Visit a doctor to get prescriptions.</p>
+                                                                <a href="{% url 'index' %}" class="btn btn-primary">Find Doctors</a>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Quick Actions -->
+                                <div class="row mt-4">
+                                    <div class="col-md-6">
+                                        <div class="card bg-primary-light">
+                                            <div class="card-body text-center">
+                                                <i class="fas fa-shopping-cart fa-2x text-primary mb-2"></i>
+                                                <h6>View Cart</h6>
+                                                <p class="text-muted small">Check your medicine cart</p>
+                                                <a href="{% url 'cart-view' %}" class="btn btn-primary btn-sm">Go to Cart</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="card bg-success-light">
+                                            <div class="card-body text-center">
+                                                <i class="fas fa-store fa-2x text-success mb-2"></i>
+                                                <h6>Browse Pharmacy</h6>
+                                                <p class="text-muted small">Explore all medicines</p>
+                                                <a href="{% url 'pharmacy-shop' %}" class="btn btn-success btn-sm">Browse Now</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /Page Content -->
+
+        <!-- Footer -->
+        {% include 'footer.html' %}
+        <!-- /Footer -->
+    </div>
+    <!-- /Main Wrapper -->
+
+    <!-- jQuery -->
+    <script src="{% static 'HealthStack-System/js/Normal/jquery.min.js' %}"></script>
+
+    <!-- Bootstrap Core JS -->
+    <script src="{% static 'HealthStack-System/js/Normal/popper.min.js' %}"></script>
+    <script src="{% static 'HealthStack-System/js/Normal/bootstrap.min.js' %}"></script>
+
+    <!-- Sticky Sidebar JS -->
+    <script src="{% static 'HealthStack-System/plugins/Normal/theia-sticky-sidebar/ResizeSensor.js' %}"></script>
+    <script src="{% static 'HealthStack-System/plugins/Normal/theia-sticky-sidebar/theia-sticky-sidebar.js' %}"></script>
+
+    <!-- Custom JS -->
+    <script src="{% static 'HealthStack-System/Outside_assets/js/script.js' %}"></script>
+
+    {% if messages %}
+    <script>
+        {% for message in messages %}
+            $(document).ready(function () {
+                $('.toast').toast('show');
+            });
+        {% endfor %}
+    </script>
+    {% endif %}
+</body>
+</html>

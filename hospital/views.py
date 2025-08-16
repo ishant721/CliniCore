@@ -337,6 +337,77 @@ def password_reset_confirm_otp(request, user_id):
 
 @csrf_exempt
 @login_required(login_url="login")
+def patient_prescription_medicines(request):
+    """View for patients to see their prescribed medicines"""
+    if request.user.is_patient:
+        patient = Patient.objects.get(user=request.user)
+        
+        # Get all prescriptions for this patient
+        prescriptions = Prescription.objects.filter(patient=patient)
+        
+        # Get all prescribed medicines from all prescriptions
+        prescription_medicines = Prescription_medicine.objects.filter(
+            prescription__in=prescriptions
+        ).order_by('-prescription__create_date')
+        
+        context = {
+            'patient': patient,
+            'prescription_medicines': prescription_medicines
+        }
+        return render(request, 'patient-prescription-medicines.html', context)
+    else:
+        return redirect('logout')
+
+@csrf_exempt
+@login_required(login_url="login")
+def add_prescription_medicine_to_cart(request, medicine_id):
+    """Add prescribed medicine to pharmacy cart"""
+    if request.user.is_patient:
+        from pharmacy.models import Medicine, Cart, Order
+        
+        patient = Patient.objects.get(user=request.user)
+        prescription_medicine = get_object_or_404(Prescription_medicine, medicine_id=medicine_id)
+        
+        # Find matching medicine in pharmacy inventory
+        try:
+            medicine = Medicine.objects.get(name__icontains=prescription_medicine.medicine_name)
+            
+            # Add to cart
+            cart_item, created = Cart.objects.get_or_create(
+                item=medicine, 
+                user=request.user, 
+                purchased=False,
+                defaults={'quantity': 1}
+            )
+            
+            if not created:
+                cart_item.quantity += 1
+                cart_item.save()
+            
+            # Get or create order
+            order, created = Order.objects.get_or_create(
+                user=request.user, 
+                ordered=False
+            )
+            order.orderitems.add(cart_item)
+            
+            # Update prescription medicine status
+            prescription_medicine.is_ordered = True
+            prescription_medicine.order_status = 'ordered'
+            prescription_medicine.ordered_date = timezone.now()
+            prescription_medicine.save()
+            
+            messages.success(request, f'{medicine.name} added to cart successfully!')
+            
+        except Medicine.DoesNotExist:
+            messages.error(request, f'Medicine "{prescription_medicine.medicine_name}" not available in pharmacy.')
+            
+        return redirect('patient-prescription-medicines')
+    else:
+        return redirect('logout')
+
+@csrf_exempt
+@login_required(login_url="login")
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def patient_dashboard(request):
     if request.user.is_patient:

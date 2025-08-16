@@ -107,38 +107,39 @@
         <p class="contact-info-header">+880{{patient.phone_number}}</p>
       </div>
     </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{% url 'patient-prescription-medicines' %}">
+            <i class="fas fa-pills"></i> My Medicines
+        </a>
+    </li>
     <!-- User Menu -->
     <li class="nav-item dropdown has-arrow logged-item">
       <a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">
         <span class="user-img">
-          <img
-            class="rounded-circle"
-            src="{{patient.featured_image.url}}"
-            width="31"
-            alt="Richard Wilson"
-          />
+          {% if patient.featured_image %}
+          <img class="rounded-circle" src="{{ patient.featured_image.url }}" width="31" alt="{{ patient.name }}">
+          {% else %}
+          <img class="rounded-circle" src="{% static 'HealthStack-System/images/Normal/patients/user-default.png' %}" width="31" alt="User">
+          {% endif %}
         </span>
       </a>
       <div class="dropdown-menu dropdown-menu-right">
         <div class="user-header">
           <div class="avatar avatar-sm">
-            <img
-              src="{{patient.featured_image.url}}"
-              alt="User Image"
-              class="avatar-img rounded-circle"
-            />
+            {% if patient.featured_image %}
+            <img src="{{ patient.featured_image.url }}" alt="User Image" class="avatar-img rounded-circle">
+            {% else %}
+            <img src="{% static 'HealthStack-System/images/Normal/patients/user-default.png' %}" alt="User Image" class="avatar-img rounded-circle">
+            {% endif %}
           </div>
           <div class="user-text">
-            <h6>{{patient.name}}</h6>
+            <h6>{{ patient.name }}</h6>
             <p class="text-muted mb-0">Patient</p>
           </div>
         </div>
-        <a class="dropdown-item" href="{% url 'patient-dashboard' %}"
-          >Dashboard</a
-        >
-        <a class="dropdown-item" href="{% url 'profile-settings' %}"
-          >Profile Settings</a
-        >
+        <a class="dropdown-item" href="{% url 'patient-dashboard' %}">Dashboard</a>
+        <a class="dropdown-item" href="{% url 'patient-prescription-medicines' %}">My Prescribed Medicines</a>
+        <a class="dropdown-item" href="{% url 'profile-settings' %}">Profile Settings</a>
         <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
       </div>
     </li>

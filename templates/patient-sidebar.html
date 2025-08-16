@@ -26,12 +26,18 @@
       <div class="dashboard-widget">
         <nav class="dashboard-menu sidebar">
           <ul>
-            <li class="active">
+            <li>
               <a href="{% url 'patient-dashboard' %}">
                 <i class="fas fa-columns"></i>
                 <span>Dashboard</span>
               </a>
             </li>
+            <li>
+                                <a href="{% url 'patient-prescription-medicines' %}">
+                                    <i class="fas fa-pills"></i>
+                                    <span>My Prescribed Medicines</span>
+                                </a>
+                            </li>
 
             <li class="nav-item has-submenu">
               <a href="{% url 'search' %}">
@@ -39,7 +45,7 @@
                 <span>Search Doctor</span>
               </a>
             </li>
-            
+
             <li class="has-submenu">
               <a href="{% url 'pharmacy_shop' %}" class="nav-link">
                 <i class="fas fa-capsules"></i>
@@ -47,7 +53,7 @@
               </a>
 
             </li>
-            
+
             <li>
                 <a href="{% url 'multiple-hospital' %}">
                   <i class="fas fa-hospital"></i>
@@ -61,7 +67,7 @@
                 <span>Test Information</span>
               </a>
             </li>
-        
+
             <li>            
               <a href="{% url 'profile-settings' %}">
                 <i class="fas fa-user-cog"></i>
@@ -86,4 +92,3 @@
         </nav>
       </div>
     </div>
-

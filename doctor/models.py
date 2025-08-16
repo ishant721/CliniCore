@@ -212,6 +212,16 @@ class Prescription_medicine(models.Model):
     frequency = models.CharField(max_length=200, null=True, blank=True)
     relation_with_meal = models.CharField(max_length=200, null=True, blank=True)
     instruction = models.TextField(null=True, blank=True)
+    
+    # New fields for medicine ordering
+    is_ordered = models.BooleanField(default=False)
+    order_status = models.CharField(max_length=50, default='pending', choices=[
+        ('pending', 'Pending'),
+        ('ordered', 'Ordered'),
+        ('delivered', 'Delivered'),
+        ('cancelled', 'Cancelled'),
+    ])
+    ordered_date = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return str(self.prescription.prescription_id)
