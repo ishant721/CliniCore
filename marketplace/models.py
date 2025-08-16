@@ -2,8 +2,9 @@
 from django.db import models
 from django.conf import settings
 from hospital.models import Hospital_Information, User
-from doctor.models import Doctor_Information
-from pharmacy.models import Pharmacist
+# Use string references to avoid circular imports
+# from doctor.models import Doctor_Information
+# from pharmacy.models import Pharmacist
 
 class ServiceProvider(models.Model):
     SERVICE_TYPES = (
@@ -23,8 +24,8 @@ class ServiceProvider(models.Model):
     name = models.CharField(max_length=200)
     service_type = models.CharField(max_length=50, choices=SERVICE_TYPES)
     hospital = models.ForeignKey(Hospital_Information, on_delete=models.CASCADE, null=True, blank=True)
-    doctor = models.ForeignKey(Doctor_Information, on_delete=models.CASCADE, null=True, blank=True)
-    pharmacist = models.ForeignKey(Pharmacist, on_delete=models.CASCADE, null=True, blank=True)
+    doctor = models.ForeignKey('doctor.Doctor_Information', on_delete=models.CASCADE, null=True, blank=True)
+    pharmacist = models.ForeignKey('pharmacy.Pharmacist', on_delete=models.CASCADE, null=True, blank=True)
     
     # Location and delivery
     latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)

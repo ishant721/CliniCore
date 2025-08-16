@@ -36,7 +36,7 @@ urlpatterns = [
     path('login/', views.login_user, name='login'),
     path('', include('hospital.urls')),
     path('doctor/', include('doctor.urls')),
-    path('api/', include('api.urls')),
+    # path('api/', include('api.urls')),  # API not implemented yet
     path('hospital_admin/', include('hospital_admin.urls')),
     path('chat/', include('ChatApp.urls')),
     path('sslcommerz/', include('sslcommerz.urls')),
