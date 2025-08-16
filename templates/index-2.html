@@ -1,356 +1,239 @@
+
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}CliniCore - Modern Healthcare Management Platform{% endblock %}
+{% block title %}HealthStack - Hospital Management System{% endblock %}
 
 {% block content %}
 <!-- Header -->
 {% include 'navbar_home.html' %}
 
-<!-- Hero Section -->
-<section class="hero-section">
-    <div class="container">
-        <div class="row align-items-center min-vh-100">
-            <div class="col-lg-6">
-                <div class="hero-content">
-                    <h1 class="display-4 fw-bold mb-4">
-                        Welcome to <span class="text-warning">CliniCore</span>
-                    </h1>
-                    <p class="lead mb-4">
-                        Your modern healthcare management platform connecting patients, doctors, and hospitals with cutting-edge technology and seamless user experience.
-                    </p>
-                    <div class="hero-stats row mb-4">
-                        <div class="col-4 text-center">
-                            <h3 class="fw-bold">{{ total_hospitals|default:"50+" }}</h3>
-                            <p class="mb-0">Hospitals</p>
-                        </div>
-                        <div class="col-4 text-center">
-                            <h3 class="fw-bold">{{ total_doctors|default:"200+" }}</h3>
-                            <p class="mb-0">Doctors</p>
-                        </div>
-                        <div class="col-4 text-center">
-                            <h3 class="fw-bold">{{ total_patients|default:"1000+" }}</h3>
-                            <p class="mb-0">Patients</p>
+<!-- Home Banner -->
+<section class="section section-search">
+    <div class="container-fluid">
+        <div class="banner-wrapper">
+            <div class="banner-header text-center">
+                <h1>Search Doctor, Make an Appointment</h1>
+                <p>Discover the best doctors, clinic & hospital the city nearest to you.</p>
+            </div>
+
+            <!-- Search -->
+            <div class="search-box">
+                <form method="GET" action="{% url 'search' %}">
+                    <div class="form-group search-location">
+                        <input type="text" name="location" class="form-control" placeholder="Search Location">
+                        <span class="form-text">Based on your Location</span>
+                    </div>
+                    <div class="form-group search-info">
+                        <input type="text" name="search" class="form-control" placeholder="Search Doctors, Clinics, Hospitals, Diseases, etc">
+                        <span class="form-text">Ex : Dental or Sugar Check up etc</span>
+                    </div>
+                    <button type="submit" class="btn btn-primary search-btn"><i class="fas fa-search"></i> <span>Search</span></button>
+                </form>
+            </div>
+            <!-- /Search -->
+
+        </div>
+    </div>
+</section>
+<!-- /Home Banner -->
+
+<!-- Clinic and Specialities -->
+<section class="section section-specialities">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="section-header ">
+                    <h2>Clinic and Specialities</h2>
+                    <p>Find experienced Doctors across all specialities</p>
+                </div>   
+            </div>
+            <div class="col-md-8">
+                <div class="row">
+                    <div class="col-md-6 col-sm-12">
+                        <div class="speicality-item text-center">
+                            <div class="speicality-img">
+                                <img src="{% static 'HealthStack-System/images/Normal/specialities/specialities-01.png' %}" class="img-fluid" alt="Speciality">
+                                <span><i class="fa fa-circle" aria-hidden="true"></i></span>
+                            </div>
+                            <p>Urology</p>
                         </div>
                     </div>
-                    <div class="hero-buttons">
-                        <a href="/search/" class="btn btn-light btn-lg me-3">
-                            <i class="fas fa-search me-2"></i>Find Hospitals
-                        </a>
-                        <a href="/patient-register/" class="btn btn-outline-light btn-lg">
-                            <i class="fas fa-user-plus me-2"></i>Get Started
-                        </a>
+                    <div class="col-md-6 col-sm-12">
+                        <div class="speicality-item text-center">
+                            <div class="speicality-img">
+                                <img src="{% static 'HealthStack-System/images/Normal/specialities/specialities-02.png' %}" class="img-fluid" alt="Speciality">
+                                <span><i class="fa fa-circle" aria-hidden="true"></i></span>
+                            </div>
+                            <p>Neurology</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-sm-12">
+                        <div class="speicality-item text-center">
+                            <div class="speicality-img">
+                                <img src="{% static 'HealthStack-System/images/Normal/specialities/specialities-03.png' %}" class="img-fluid" alt="Speciality">
+                                <span><i class="fa fa-circle" aria-hidden="true"></i></span>
+                            </div>
+                            <p>Orthopedic</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-sm-12">
+                        <div class="speicality-item text-center">
+                            <div class="speicality-img">
+                                <img src="{% static 'HealthStack-System/images/Normal/specialities/specialities-04.png' %}" class="img-fluid" alt="Speciality">
+                                <span><i class="fa fa-circle" aria-hidden="true"></i></span>
+                            </div>
+                            <p>Cardiologist</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-sm-12">
+                        <div class="speicality-item text-center">
+                            <div class="speicality-img">
+                                <img src="{% static 'HealthStack-System/images/Normal/specialities/specialities-05.png' %}" class="img-fluid" alt="Speciality">
+                                <span><i class="fa fa-circle" aria-hidden="true"></i></span>
+                            </div>
+                            <p>Dentist</p>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="col-lg-6">
-                <div class="hero-image text-center">
-                    <div class="floating-card">
-                        <i class="fas fa-heartbeat fa-5x text-white mb-3"></i>
-                        <h4 class="text-white">24/7 Healthcare</h4>
-                        <p class="text-white-50">Available anytime, anywhere</p>
+        </div>
+    </div>   
+</section>
+<!-- /Clinic and Specialities -->
+
+<!-- Popular Section -->
+<section class="section section-doctor">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="section-header ">
+                    <h2>Book Our Doctor</h2>
+                    <p>Lorem Ipsum is simply dummy text </p>
+                </div>
+                <div class="about-content">
+                    <p>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum.</p>
+                    <p>web page editors now use Lorem Ipsum as their default model text, and a search for 'lorem ipsum' will uncover many web sites still in their infancy. Various versions have evolved over the years, sometimes</p>
+                    <a href="javascript:;">Read More..</a>
+                </div>
+            </div>
+            <div class="col-lg-8">
+                <div class="doctor-slider slider">
+                    {% for doctor in doctors %}
+                    <div class="profile-widget">
+                        <div class="doc-img">
+                            <a href="{% url 'doctor-profile' doctor.doctor_id %}">
+                                <img class="img-fluid" alt="User Image" src="{{ doctor.image.url }}">
+                            </a>
+                            <a href="javascript:void(0)" class="fav-btn">
+                                <i class="far fa-bookmark"></i>
+                            </a>
+                        </div>
+                        <div class="pro-content">
+                            <h3 class="title">
+                                <a href="{% url 'doctor-profile' doctor.doctor_id %}">Dr. {{ doctor.first_name }} {{ doctor.last_name }}</a> 
+                                <i class="fas fa-check-circle verified"></i>
+                            </h3>
+                            <p class="speciality">{{ doctor.specialization }}</p>
+                            <div class="rating">
+                                <i class="fas fa-star filled"></i>
+                                <i class="fas fa-star filled"></i>
+                                <i class="fas fa-star filled"></i>
+                                <i class="fas fa-star filled"></i>
+                                <i class="fas fa-star"></i>
+                                <span class="d-inline-block average-rating">(17)</span>
+                            </div>
+                            <ul class="available-info">
+                                <li>
+                                    <i class="fas fa-map-marker-alt"></i> {{ doctor.address }}
+                                </li>
+                                <li>
+                                    <i class="far fa-clock"></i> Available on {{ doctor.available_days }}
+                                </li>
+                                <li>
+                                    <i class="far fa-money-bill-alt"></i> ${{ doctor.fees }}
+                                    <i class="fas fa-info-circle" data-toggle="tooltip" title="Lorem Ipsum"></i>
+                                </li>
+                            </ul>
+                            <div class="row row-sm">
+                                <div class="col-6">
+                                    <a href="{% url 'doctor-profile' doctor.doctor_id %}" class="btn view-btn">View Profile</a>
+                                </div>
+                                <div class="col-6">
+                                    <a href="{% url 'booking' doctor.doctor_id %}" class="btn book-btn">Book Now</a>
+                                </div>
+                            </div>
+                        </div>
                     </div>
+                    {% endfor %}
                 </div>
             </div>
         </div>
     </div>
 </section>
+<!-- /Popular Section -->
 
 <!-- Features Section -->
-<section class="py-5">
-    <div class="container">
-        <div class="text-center mb-5">
-            <h2 class="display-5 fw-bold">Why Choose CliniCore?</h2>
-            <p class="lead text-muted">Advanced features designed for modern healthcare</p>
-        </div>
-
-        <div class="row g-4">
-            <div class="col-lg-4 col-md-6">
-                <div class="card h-100 text-center">
-                    <div class="card-body">
-                        <div class="feature-icon">
-                            <i class="fas fa-calendar-check fa-2x"></i>
-                        </div>
-                        <h5 class="card-title">Easy Appointments</h5>
-                        <p class="card-text">Book appointments with your preferred doctors instantly with our smart scheduling system.</p>
-                    </div>
-                </div>
+<section class="section section-features">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-5 features-img">
+                <img src="{% static 'HealthStack-System/images/Normal/features/feature.png' %}" class="img-fluid" alt="Feature">
             </div>
-
-            <div class="col-lg-4 col-md-6">
-                <div class="card h-100 text-center">
-                    <div class="card-body">
-                        <div class="feature-icon">
-                            <i class="fas fa-video fa-2x"></i>
-                        </div>
-                        <h5 class="card-title">Telemedicine</h5>
-                        <p class="card-text">Connect with healthcare professionals through secure video consultations from anywhere.</p>
-                    </div>
+            <div class="col-md-7">
+                <div class="section-header">
+                    <h2 class="mt-2">Availabe Features in Our Clinic.</h2>
+                    <p>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. </p>
                 </div>
-            </div>
-
-            <div class="col-lg-4 col-md-6">
-                <div class="card h-100 text-center">
-                    <div class="card-body">
-                        <div class="feature-icon">
-                            <i class="fas fa-file-medical fa-2x"></i>
-                        </div>
-                        <h5 class="card-title">Digital Records</h5>
-                        <p class="card-text">Access your complete medical history and records securely in one place.</p>
+                <div class="features-slider slider">
+                    <!-- Feature Item -->
+                    <div class="feature-item text-center">
+                        <img src="{% static 'HealthStack-System/images/Normal/features/feature-01.jpg' %}" class="img-fluid" alt="Feature">
+                        <p>Patient Ward</p>
                     </div>
-                </div>
-            </div>
-
-            <div class="col-lg-4 col-md-6">
-                <div class="card h-100 text-center">
-                    <div class="card-body">
-                        <div class="feature-icon">
-                            <i class="fas fa-pills fa-2x"></i>
-                        </div>
-                        <h5 class="card-title">Online Pharmacy</h5>
-                        <p class="card-text">Order medications online and get them delivered to your doorstep.</p>
+                    <!-- /Feature Item -->
+                    
+                    <!-- Feature Item -->
+                    <div class="feature-item text-center">
+                        <img src="{% static 'HealthStack-System/images/Normal/features/feature-02.jpg' %}" class="img-fluid" alt="Feature">
+                        <p>Test Room</p>
                     </div>
-                </div>
-            </div>
-
-            <div class="col-lg-4 col-md-6">
-                <div class="card h-100 text-center">
-                    <div class="card-body">
-                        <div class="feature-icon">
-                            <i class="fas fa-flask fa-2x"></i>
-                        </div>
-                        <h5 class="card-title">Lab Tests</h5>
-                        <p class="card-text">Schedule lab tests and receive results digitally with detailed reports.</p>
+                    <!-- /Feature Item -->
+                    
+                    <!-- Feature Item -->
+                    <div class="feature-item text-center">
+                        <img src="{% static 'HealthStack-System/images/Normal/features/feature-03.jpg' %}" class="img-fluid" alt="Feature">
+                        <p>ICU</p>
                     </div>
-                </div>
-            </div>
-
-            <div class="col-lg-4 col-md-6">
-                <div class="card h-100 text-center">
-                    <div class="card-body">
-                        <div class="feature-icon">
-                            <i class="fas fa-shield-alt fa-2x"></i>
-                        </div>
-                        <h5 class="card-title">Secure & Private</h5>
-                        <p class="card-text">Your health data is protected with enterprise-grade security and privacy.</p>
+                    <!-- /Feature Item -->
+                    
+                    <!-- Feature Item -->
+                    <div class="feature-item text-center">
+                        <img src="{% static 'HealthStack-System/images/Normal/features/feature-04.jpg' %}" class="img-fluid" alt="Feature">
+                        <p>Laboratory</p>
                     </div>
+                    <!-- /Feature Item -->
+                    
+                    <!-- Feature Item -->
+                    <div class="feature-item text-center">
+                        <img src="{% static 'HealthStack-System/images/Normal/features/feature-05.jpg' %}" class="img-fluid" alt="Feature">
+                        <p>Operation</p>
+                    </div>
+                    <!-- /Feature Item -->
+                    
+                    <!-- Feature Item -->
+                    <div class="feature-item text-center">
+                        <img src="{% static 'HealthStack-System/images/Normal/features/feature-06.jpg' %}" class="img-fluid" alt="Feature">
+                        <p>Medical</p>
+                    </div>
+                    <!-- /Feature Item -->
                 </div>
             </div>
         </div>
     </div>
 </section>
+<!-- /Features Section -->
 
-<!-- Hospital Search Section -->
-<section class="py-5 bg-light">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-lg-6">
-                <h2 class="display-6 fw-bold mb-4">Find the Best Hospitals Near You</h2>
-                <p class="lead mb-4">Search through our network of verified hospitals and healthcare providers to find the perfect match for your needs.</p>
+{% include 'footer.html' %}
 
-                <div class="search-form">
-                    <form method="GET" action="/search/" class="row g-3">
-                        <div class="col-md-8">
-                            <input type="text" name="location" class="form-control form-control-lg" placeholder="Enter your location">
-                        </div>
-                        <div class="col-md-4">
-                            <button type="submit" class="btn btn-primary btn-lg w-100">
-                                <i class="fas fa-search me-2"></i>Search
-                            </button>
-                        </div>
-                    </form>
-                </div>
-
-                <div class="popular-searches mt-3">
-                    <small class="text-muted">Popular searches:</small>
-                    <div class="mt-2">
-                        <a href="/search/?location=dhaka" class="badge bg-light text-dark me-2 text-decoration-none">Dhaka</a>
-                        <a href="/search/?location=chittagong" class="badge bg-light text-dark me-2 text-decoration-none">Chittagong</a>
-                        <a href="/search/?location=sylhet" class="badge bg-light text-dark text-decoration-none">Sylhet</a>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-6">
-                <div class="hospital-stats">
-                    <div class="row g-3">
-                        <div class="col-6">
-                            <div class="dashboard-card">
-                                <h3 class="fw-bold text-primary">{{ approved_hospitals_count|default:"45" }}</h3>
-                                <p class="mb-0">Verified Hospitals</p>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="dashboard-card">
-                                <h3 class="fw-bold text-success">{{ total_doctors|default:"180" }}</h3>
-                                <p class="mb-0">Expert Doctors</p>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="dashboard-card">
-                                <h3 class="fw-bold text-warning">{{ total_appointments|default:"500" }}</h3>
-                                <p class="mb-0">Appointments Booked</p>
-                            </div>
-                        </div>
-                        <div class="col-6">
-                            <div class="dashboard-card">
-                                <h3 class="fw-bold text-info">24/7</h3>
-                                <p class="mb-0">Support Available</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- Services Section -->
-<section class="py-5">
-    <div class="container">
-        <div class="text-center mb-5">
-            <h2 class="display-5 fw-bold">Our Services</h2>
-            <p class="lead text-muted">Comprehensive healthcare solutions for everyone</p>
-        </div>
-
-        <div class="row g-4">
-            <div class="col-lg-3 col-md-6">
-                <div class="card border-0 shadow-sm h-100">
-                    <div class="card-body text-center">
-                        <div class="service-icon mb-3">
-                            <i class="fas fa-user-md fa-3x text-primary"></i>
-                        </div>
-                        <h5>For Doctors</h5>
-                        <p class="text-muted">Manage your practice, appointments, and patients efficiently.</p>
-                        <a href="/doctor-register/" class="btn btn-outline-primary">Join as Doctor</a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-lg-3 col-md-6">
-                <div class="card border-0 shadow-sm h-100">
-                    <div class="card-body text-center">
-                        <div class="service-icon mb-3">
-                            <i class="fas fa-hospital fa-3x text-success"></i>
-                        </div>
-                        <h5>For Hospitals</h5>
-                        <p class="text-muted">Streamline hospital operations and patient management.</p>
-                        <a href="/hospital_admin/register/" class="btn btn-outline-success">Register Hospital</a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-lg-3 col-md-6">
-                <div class="card border-0 shadow-sm h-100">
-                    <div class="card-body text-center">
-                        <div class="service-icon mb-3">
-                            <i class="fas fa-users fa-3x text-info"></i>
-                        </div>
-                        <h5>For Patients</h5>
-                        <p class="text-muted">Book appointments, access records, and get healthcare.</p>
-                        <a href="/patient-register/" class="btn btn-outline-info">Register Now</a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-lg-3 col-md-6">
-                <div class="card border-0 shadow-sm h-100">
-                    <div class="card-body text-center">
-                        <div class="service-icon mb-3">
-                            <i class="fas fa-prescription-bottle-alt fa-3x text-warning"></i>
-                        </div>
-                        <h5>Pharmacy</h5>
-                        <p class="text-muted">Order medicines online with doorstep delivery.</p>
-                        <a href="/pharmacy/" class="btn btn-outline-warning">Explore Pharmacy</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- CTA Section -->
-<section class="py-5 bg-primary text-white">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-lg-8">
-                <h2 class="display-6 fw-bold mb-3">Ready to Transform Your Healthcare Experience?</h2>
-                <p class="lead mb-0">Join thousands of users who trust CliniCore for their healthcare needs.</p>
-            </div>
-            <div class="col-lg-4 text-lg-end">
-                <a href="/patient-register/" class="btn btn-light btn-lg">
-                    <i class="fas fa-rocket me-2"></i>Get Started Today
-                </a>
-            </div>
-        </div>
-    </div>
-</section>
-
-<style>
-.hero-section {
-    background: linear-gradient(135deg, #0066cc, #00b4d8);
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-}
-
-.floating-card {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    border-radius: 20px;
-    padding: 3rem;
-    animation: float 6s ease-in-out infinite;
-}
-
-@keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-20px); }
-}
-
-.feature-icon {
-    width: 80px;
-    height: 80px;
-    background: linear-gradient(135deg, #90e0ef, #caf0f8);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 1rem;
-    color: #0066cc;
-}
-
-.service-icon {
-    margin-bottom: 1rem;
-}
-
-.dashboard-card {
-    background: linear-gradient(135deg, #90e0ef, #caf0f8);
-    border-radius: 12px;
-    padding: 1.5rem;
-    text-align: center;
-    transition: all 0.3s ease;
-}
-
-.dashboard-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-}
-
-.hero-stats h3 {
-    color: #ffd166;
-}
-
-.popular-searches .badge:hover {
-    background: #0066cc !important;
-    color: white !important;
-}
-
-.card {
-    transition: all 0.3s ease;
-}
-
-.card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-}
-</style>
 {% endblock %}

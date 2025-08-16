@@ -1,162 +1,140 @@
 
+{% load static %}
+<!-- Footer -->
 <footer class="footer">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-4 col-md-6 mb-4">
-                <div class="footer-widget">
-                    <div class="clinicore-brand mb-3">
-                        <div class="clinicore-icon">
-                            <i class="fas fa-heartbeat"></i>
+    
+    <!-- Footer Top -->
+    <div class="footer-top">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-3 col-md-6">
+                
+                    <!-- Footer Widget -->
+                    <div class="footer-widget footer-about">
+                        <div class="footer-logo">
+                            <img src="{% static 'HealthStack-System/images/Normal/footer-logo.png' %}" alt="logo">
                         </div>
-                        <h4 class="text-white ms-2 mb-0">CliniCore</h4>
+                        <div class="footer-about-content">
+                            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. </p>
+                            <div class="social-icon">
+                                <ul>
+                                    <li>
+                                        <a href="#" target="_blank"><i class="fab fa-facebook-f"></i> </a>
+                                    </li>
+                                    <li>
+                                        <a href="#" target="_blank"><i class="fab fa-twitter"></i> </a>
+                                    </li>
+                                    <li>
+                                        <a href="#" target="_blank"><i class="fab fa-linkedin-in"></i></a>
+                                    </li>
+                                    <li>
+                                        <a href="#" target="_blank"><i class="fab fa-instagram"></i></a>
+                                    </li>
+                                    <li>
+                                        <a href="#" target="_blank"><i class="fab fa-dribbble"></i> </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
-                    <p class="text-light">
-                        Modern healthcare management platform connecting patients, doctors, and hospitals with advanced features and seamless experience.
-                    </p>
-                    <div class="social-links">
-                        <a href="#" class="text-light me-3"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#" class="text-light me-3"><i class="fab fa-twitter"></i></a>
-                        <a href="#" class="text-light me-3"><i class="fab fa-linkedin-in"></i></a>
-                        <a href="#" class="text-light"><i class="fab fa-instagram"></i></a>
+                    <!-- /Footer Widget -->
+                    
+                </div>
+                
+                <div class="col-lg-3 col-md-6">
+                
+                    <!-- Footer Widget -->
+                    <div class="footer-widget footer-menu">
+                        <h2 class="footer-title">For Patients</h2>
+                        <ul>
+                            <li><a href="{% url 'search' %}">Search for Doctors</a></li>
+                            <li><a href="{% url 'unified-login' %}">Login</a></li>
+                            <li><a href="{% url 'patient-register' %}">Register</a></li>
+                            <li><a href="{% url 'booking' %}">Booking</a></li>
+                            <li><a href="{% url 'patient-dashboard' %}">Patient Dashboard</a></li>
+                        </ul>
                     </div>
+                    <!-- /Footer Widget -->
+                    
                 </div>
-            </div>
-            
-            <div class="col-lg-2 col-md-6 mb-4">
-                <div class="footer-widget">
-                    <h5 class="text-white mb-3">Quick Links</h5>
-                    <ul class="list-unstyled">
-                        <li class="mb-2"><a href="/" class="text-light text-decoration-none">Home</a></li>
-                        <li class="mb-2"><a href="/about-us/" class="text-light text-decoration-none">About Us</a></li>
-                        <li class="mb-2"><a href="/search/" class="text-light text-decoration-none">Find Hospitals</a></li>
-                        <li class="mb-2"><a href="/pharmacy/" class="text-light text-decoration-none">Pharmacy</a></li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="col-lg-2 col-md-6 mb-4">
-                <div class="footer-widget">
-                    <h5 class="text-white mb-3">Services</h5>
-                    <ul class="list-unstyled">
-                        <li class="mb-2"><a href="#" class="text-light text-decoration-none">Online Consultation</a></li>
-                        <li class="mb-2"><a href="#" class="text-light text-decoration-none">Appointment Booking</a></li>
-                        <li class="mb-2"><a href="#" class="text-light text-decoration-none">Lab Tests</a></li>
-                        <li class="mb-2"><a href="#" class="text-light text-decoration-none">Medicine Delivery</a></li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="col-lg-2 col-md-6 mb-4">
-                <div class="footer-widget">
-                    <h5 class="text-white mb-3">Support</h5>
-                    <ul class="list-unstyled">
-                        <li class="mb-2"><a href="#" class="text-light text-decoration-none">Help Center</a></li>
-                        <li class="mb-2"><a href="#" class="text-light text-decoration-none">Contact Us</a></li>
-                        <li class="mb-2"><a href="/privacy-policy/" class="text-light text-decoration-none">Privacy Policy</a></li>
-                        <li class="mb-2"><a href="/term-condition/" class="text-light text-decoration-none">Terms & Conditions</a></li>
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="col-lg-2 col-md-6 mb-4">
-                <div class="footer-widget">
-                    <h5 class="text-white mb-3">Contact Info</h5>
-                    <div class="contact-info">
-                        <p class="text-light mb-2">
-                            <i class="fas fa-map-marker-alt me-2"></i>
-                            123 Healthcare St, Medical City
-                        </p>
-                        <p class="text-light mb-2">
-                            <i class="fas fa-phone me-2"></i>
-                            +1 (555) 123-4567
-                        </p>
-                        <p class="text-light mb-2">
-                            <i class="fas fa-envelope me-2"></i>
-                            info@clinicore.com
-                        </p>
+                
+                <div class="col-lg-3 col-md-6">
+                
+                    <!-- Footer Widget -->
+                    <div class="footer-widget footer-menu">
+                        <h2 class="footer-title">For Doctors</h2>
+                        <ul>
+                            <li><a href="{% url 'appointments' %}">Appointments</a></li>
+                            <li><a href="{% url 'chat' %}">Chat</a></li>
+                            <li><a href="{% url 'unified-login' %}">Login</a></li>
+                            <li><a href="{% url 'doctor-register' %}">Register</a></li>
+                            <li><a href="{% url 'doctor-dashboard' %}">Doctor Dashboard</a></li>
+                        </ul>
                     </div>
+                    <!-- /Footer Widget -->
+                    
                 </div>
-            </div>
-        </div>
-        
-        <hr class="border-light">
-        
-        <div class="row align-items-center">
-            <div class="col-md-6">
-                <p class="text-light mb-0">
-                    &copy; {{ current_year|default:"2024" }} CliniCore. All rights reserved.
-                </p>
-            </div>
-            <div class="col-md-6 text-end">
-                <p class="text-light mb-0">
-                    Powered by <strong>CliniCore Healthcare Platform</strong>
-                </p>
+                
+                <div class="col-lg-3 col-md-6">
+                
+                    <!-- Footer Widget -->
+                    <div class="footer-widget footer-contact">
+                        <h2 class="footer-title">Contact Us</h2>
+                        <div class="footer-contact-info">
+                            <div class="footer-address">
+                                <span><i class="fas fa-map-marker-alt"></i></span>
+                                <p> 3556  Beech Street, San Francisco,<br> California, CA 94108 </p>
+                            </div>
+                            <p>
+                                <i class="fas fa-phone-alt"></i>
+                                +1 315 369 5943
+                            </p>
+                            <p class="mb-0">
+                                <i class="fas fa-envelope"></i>
+                                healthstack@example.com
+                            </p>
+                        </div>
+                    </div>
+                    <!-- /Footer Widget -->
+                    
+                </div>
+                
             </div>
         </div>
     </div>
+    <!-- /Footer Top -->
+    
+    <!-- Footer Bottom -->
+    <div class="footer-bottom">
+        <div class="container-fluid">
+        
+            <!-- Copyright -->
+            <div class="copyright">
+                <div class="row">
+                    <div class="col-md-6 col-lg-6">
+                        <div class="copyright-text">
+                            <p class="mb-0">&copy; 2022 HealthStack. All rights reserved.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-6">
+                    
+                        <!-- Copyright Menu -->
+                        <div class="copyright-menu">
+                            <ul class="policy-menu">
+                                <li><a href="{% url 'term-condition' %}">Terms and Conditions</a></li>
+                                <li><a href="{% url 'privacy-policy' %}">Policy</a></li>
+                            </ul>
+                        </div>
+                        <!-- /Copyright Menu -->
+                        
+                    </div>
+                </div>
+            </div>
+            <!-- /Copyright -->
+            
+        </div>
+    </div>
+    <!-- /Footer Bottom -->
+    
 </footer>
-
-<style>
-.footer {
-    background: linear-gradient(135deg, #03045e, #0066cc);
-    margin-top: 3rem;
-}
-
-.clinicore-brand {
-    display: flex;
-    align-items: center;
-}
-
-.clinicore-icon {
-    width: 40px;
-    height: 40px;
-    background: white;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #0066cc;
-    font-size: 1.2rem;
-}
-
-.social-links a {
-    display: inline-block;
-    width: 40px;
-    height: 40px;
-    line-height: 40px;
-    text-align: center;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.1);
-    transition: all 0.3s ease;
-}
-
-.social-links a:hover {
-    background: white;
-    color: #0066cc !important;
-    transform: translateY(-2px);
-}
-
-.footer-widget h5 {
-    position: relative;
-    padding-bottom: 10px;
-}
-
-.footer-widget h5::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    width: 30px;
-    height: 2px;
-    background: #00b4d8;
-}
-
-.footer a:hover {
-    color: #90e0ef !important;
-    transition: all 0.3s ease;
-}
-
-.contact-info i {
-    color: #00b4d8;
-}
-</style>
+<!-- /Footer -->
