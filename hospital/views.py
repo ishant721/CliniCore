@@ -33,6 +33,7 @@ from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
+from datetime import datetime
 
 
 # Create your views here.
@@ -140,14 +141,19 @@ def login_user(request):
     if request.method == 'GET':
         return render(request, 'patient-login.html')
     elif request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
+        username = request.POST.get('username', '').strip()
+        password = request.POST.get('password', '')
         otp_code = request.POST.get('otp_code', '')
+
+        # Basic validation
+        if not username or not password:
+            messages.error(request, 'Please enter both username and password')
+            return render(request, 'patient-login.html')
 
         try:
             user = User.objects.get(username=username)
         except User.DoesNotExist:
-            messages.error(request, 'Username does not exist')
+            messages.error(request, 'Invalid username or password')
             return render(request, 'patient-login.html')
 
         # Check if account is locked
@@ -156,7 +162,7 @@ def login_user(request):
             return render(request, 'patient-login.html')
 
         # Authenticate user
-        authenticated_user = authenticate(username=username, password=password)
+        authenticated_user = authenticate(request, username=username, password=password)
 
         if authenticated_user is not None:
             # Reset failed attempts on successful password verification
@@ -187,7 +193,9 @@ def login_user(request):
                         return render(request, 'patient-login.html')
                 else:
                     # Verify 2FA OTP
-                    if user.otp_code == otp_code and user.otp_expires_at > timezone.now():
+                    if (user.otp_code == otp_code and 
+                        user.otp_expires_at and 
+                        user.otp_expires_at > timezone.now()):
                         user.otp_code = None
                         user.otp_expires_at = None
                         user.save()
@@ -200,13 +208,15 @@ def login_user(request):
                 messages.warning(request, 'You must change your password before continuing.')
                 return redirect('change-password', pk=user.id)
 
+            # Check if user is a patient
+            if not user.is_patient:
+                messages.error(request, 'Invalid credentials. Not a Patient account.')
+                return render(request, 'patient-login.html')
+
+            # Login successful
             login(request, user)
-            if user.is_patient:   
-                messages.success(request, 'User Logged in Successfully')    
-                return redirect('patient-dashboard')
-            else:
-                messages.error(request, 'Invalid credentials. Not a Patient')
-                return redirect('logout')
+            messages.success(request, 'User Logged in Successfully')    
+            return redirect('patient-dashboard')
         else:
             # Handle failed login attempt
             user.failed_login_attempts += 1

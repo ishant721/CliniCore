@@ -9,6 +9,7 @@ from django.core.mail import send_mail
 from django.conf import settings
 import secrets
 import string
+from django.utils import timezone
 
 
 def searchDoctors(request):
@@ -127,9 +128,9 @@ def send_otp_email(user, purpose="registration"):
 
         # Set OTP expiration time based on purpose
         if purpose == "two_factor_authentication":
-            otp_expires_at = datetime.now() + timedelta(minutes=5)  # Shorter for 2FA
+            otp_expires_at = timezone.now() + timedelta(minutes=5)  # Shorter for 2FA
         else:
-            otp_expires_at = datetime.now() + timedelta(minutes=15)
+            otp_expires_at = timezone.now() + timedelta(minutes=15)
 
         # Save OTP to user
         user.otp_code = otp_code
