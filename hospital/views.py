@@ -211,7 +211,7 @@ def login_user(request):
                 return render(request, 'patient-login.html')
 
             # Login successful
-            login(request, user)
+            login(request, user, backend='hospital.auth_backends.CustomAuthBackend')
             messages.success(request, 'User Logged in Successfully')    
             return redirect('patient-dashboard')
         else:
@@ -294,7 +294,7 @@ def otp_verify(request, user_id, purpose, reset_password=False):
                 messages.success(request, 'OTP verified successfully. You can now reset your password.')
                 return redirect('password_reset_confirm_otp', user_id=user.id)
             elif purpose == 'two_factor_authentication':
-                login(request, user) # Log in the user after 2FA
+                login(request, user, backend='hospital.auth_backends.CustomAuthBackend') # Log in the user after 2FA
                 messages.success(request, 'Two-factor authentication successful. You are now logged in.')
                 if user.is_patient:
                     return redirect('patient-dashboard')
@@ -306,7 +306,7 @@ def otp_verify(request, user_id, purpose, reset_password=False):
                 user.is_active = True # Activate user account
                 user.save()
                 
-                login(request, user) # Log in the user automatically
+                login(request, user, backend='hospital.auth_backends.CustomAuthBackend') # Log in the user automatically
                 messages.success(request, 'Account verified successfully! Welcome to HealthStack.')
                 if user.is_patient:
                     return redirect('patient-dashboard')
