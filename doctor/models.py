@@ -54,6 +54,10 @@ class Doctor_Information(models.Model):
     report_fee = models.IntegerField(null=True, blank=True)
     dob = models.CharField(max_length=200, null=True, blank=True)
     
+    # New fields for location
+    latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    
     # Education
     institute = models.CharField(max_length=200, null=True, blank=True)
     degree = models.CharField(max_length=200, null=True, blank=True)

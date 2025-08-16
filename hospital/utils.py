@@ -4,40 +4,86 @@ from doctor.models import Doctor_Information, Appointment,Report, Specimen, Test
 from hospital_admin.models import hospital_department, specialization, service
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 import random
-from datetime import datetime, timedelta
+
 from django.core.mail import send_mail
 from django.conf import settings
 import secrets
 import string
 from django.utils import timezone
+from datetime import timedelta
+from math import radians, sin, cos, sqrt, atan2
+
+def haversine(lat1, lon1, lat2, lon2):
+    R = 6371  # Radius of Earth in kilometers
+
+    lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])
+
+    dlon = lon2 - lon1
+    dlat = lat2 - lat1
+
+    a = sin(dlat / 2)**2 + cos(lat1) * cos(lat2) * sin(dlon / 2)**2
+    c = 2 * atan2(sqrt(a), sqrt(1 - a))
+
+    distance = R * c
+    return distance
 
 
-def searchDoctors(request):
-
+def searchDoctors(request, user_lat=None, user_lon=None, radius=None):
     search_query = ''
-
     if request.GET.get('search_query'):
         search_query = request.GET.get('search_query')
-
-    #skills = Skill.objects.filter(name__icontains=search_query)
 
     doctors = Doctor_Information.objects.filter(register_status='Accepted').distinct().filter(
         Q(name__icontains=search_query) |
         Q(hospital_name__name__icontains=search_query) |
-        Q(department__icontains=search_query))
+        Q(department__icontains=search_query)
+    )
+
+    if user_lat and user_lon and radius:
+        try:
+            user_lat = float(user_lat)
+            user_lon = float(user_lon)
+            radius = float(radius)
+            
+            doctors_with_distance = []
+            for doctor in doctors:
+                if doctor.latitude is not None and doctor.longitude is not None:
+                    distance = haversine(user_lat, user_lon, float(doctor.latitude), float(doctor.longitude))
+                    if distance <= radius:
+                        doctor.distance = round(distance, 2) # Attach distance to object
+                        doctors_with_distance.append(doctor)
+            doctors = sorted(doctors_with_distance, key=lambda x: x.distance) # Sort by distance
+        except ValueError:
+            pass
 
     return doctors, search_query
 
 
-def searchHospitals(request):
+def searchHospitals(request, user_lat=None, user_lon=None, radius=None):
 
     search_query = ''
 
     if request.GET.get('search_query'):
         search_query = request.GET.get('search_query')
 
-
     hospitals = Hospital_Information.objects.distinct().filter(Q(name__icontains=search_query))
+
+    if user_lat and user_lon and radius:
+        try:
+            user_lat = float(user_lat)
+            user_lon = float(user_lon)
+            radius = float(radius)
+
+            hospitals_with_distance = []
+            for hospital in hospitals:
+                if hospital.latitude is not None and hospital.longitude is not None:
+                    distance = haversine(user_lat, user_lon, float(hospital.latitude), float(hospital.longitude))
+                    if distance <= radius:
+                        hospital.distance = round(distance, 2) # Attach distance to object
+                        hospitals_with_distance.append(hospital)
+            hospitals = sorted(hospitals_with_distance, key=lambda x: x.distance) # Sort by distance
+        except ValueError:
+            pass
 
     return hospitals, search_query
 

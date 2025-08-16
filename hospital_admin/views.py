@@ -9,7 +9,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import csrf_exempt
-from datetime import datetime
+from django.utils import timezone
 from django.contrib.auth.models import User
 from hospital.models import Hospital_Information, User, Patient
 from hospital_admin.models import Admin_Information
@@ -24,8 +24,7 @@ from .models import Admin_Information,specialization,service,hospital_department
 import random,re
 import string
 from django.db.models import  Count
-from datetime import datetime
-import datetime
+from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 
 from django.core.mail import BadHeaderError, send_mail
@@ -55,31 +54,31 @@ def admin_dashboard(request):
         lab_workers = Clinical_Laboratory_Technician.objects.all()
         pharmacists = Pharmacist.objects.all()
 
-        sat_date = datetime.date.today()
+        sat_date = timezone.now().date()
         sat_date_str = str(sat_date)
         sat = sat_date.strftime("%A")
 
-        sun_date = sat_date + datetime.timedelta(days=1) 
+        sun_date = sat_date + timezone.timedelta(days=1) 
         sun_date_str = str(sun_date)
         sun = sun_date.strftime("%A")
 
-        mon_date = sat_date + datetime.timedelta(days=2) 
+        mon_date = sat_date + timezone.timedelta(days=2) 
         mon_date_str = str(mon_date)
         mon = mon_date.strftime("%A")
 
-        tues_date = sat_date + datetime.timedelta(days=3) 
+        tues_date = sat_date + timezone.timedelta(days=3) 
         tues_date_str = str(tues_date)
         tues = tues_date.strftime("%A")
 
-        wed_date = sat_date + datetime.timedelta(days=4) 
+        wed_date = sat_date + timezone.timedelta(days=4) 
         wed_date_str = str(wed_date)
         wed = wed_date.strftime("%A")
 
-        thurs_date = sat_date + datetime.timedelta(days=5) 
+        thurs_date = sat_date + timezone.timedelta(days=5) 
         thurs_date_str = str(thurs_date)
         thurs = thurs_date.strftime("%A")
 
-        fri_date = sat_date + datetime.timedelta(days=6) 
+        fri_date = sat_date + timezone.timedelta(days=6) 
         fri_date_str = str(fri_date)
         fri = fri_date.strftime("%A")
 
@@ -138,13 +137,13 @@ def admin_login(request):
             if not user.is_active:
                 # User is not active, redirect to OTP verification
                 messages.warning(request, 'Your account is not active. Please verify your email with OTP.')
-                if not user.otp_code or user.otp_expires_at < datetime.now():
+                if not user.otp_code or user.otp_expires_at < timezone.now():
                     from hospital.utils import send_otp_email
                     if send_otp_email(user, "account verification"):
                         messages.info(request, 'A new OTP has been sent to your email.')
                     else:
                         messages.error(request, 'Error sending OTP email. Please try again.')
-                return redirect('otp_verify', user_id=user.id)
+                return redirect('otp_verify', user_id=user.id, purpose='account_verification', reset_password='False')
 
             # Check if 2FA is enabled
             if user.two_factor_enabled:
@@ -153,13 +152,13 @@ def admin_login(request):
                     from hospital.utils import send_otp_email
                     if send_otp_email(user, "two_factor_authentication"):
                         messages.info(request, 'Please enter the 2FA code sent to your email.')
-                        return render(request, 'hospital_admin/login.html', {'require_2fa': True, 'username': username})
+                        return redirect('otp_verify', user_id=user.id, purpose='two_factor_authentication', reset_password='False')
                     else:
                         messages.error(request, 'Error sending 2FA code. Please try again.')
                         return render(request, 'hospital_admin/login.html')
                 else:
                     # Verify 2FA OTP
-                    if user.otp_code == otp_code and user.otp_expires_at > datetime.now():
+                    if user.otp_code == otp_code and user.otp_expires_at > timezone.now():
                         user.otp_code = None
                         user.otp_expires_at = None
                         user.save()
@@ -208,13 +207,17 @@ def admin_register(request):
             # commit=False --> don't save to database yet (we have a chance to modify object)
             user = form.save(commit=False)
             user.is_hospital_admin = True
+            user.is_active = False # Set to inactive until OTP verification
             user.save()
 
-            messages.success(request, 'User account was created!')
-
-            # After user is created, we can log them in
-            #login(request, user)
-            return redirect('admin_login')
+            # Send OTP for account activation
+            from hospital.utils import send_otp_email
+            if send_otp_email(user, "account verification"):
+                messages.success(request, 'Admin account was created! Please check your email for OTP to activate your account.')
+                return redirect('otp_verify', user_id=user.id, purpose='account_verification', reset_password='False')
+            else:
+                messages.error(request, 'Admin account created, but failed to send OTP. Please contact support.')
+                return redirect('admin_login')
 
         else:
             messages.error(request, 'An error has occurred during registration')

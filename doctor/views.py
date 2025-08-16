@@ -21,8 +21,8 @@ from django.contrib.auth.signals import user_logged_in, user_logged_out
 from django.dispatch import receiver
 import random
 import string
-from datetime import datetime, timedelta
-import datetime
+from datetime import timedelta
+from django.utils import timezone
 import re
 from django.core.mail import BadHeaderError, send_mail
 from django.template.loader import render_to_string
@@ -35,6 +35,8 @@ from django.template.loader import get_template
 from django.http import HttpResponse
 from .models import Report
 from django.views.decorators.csrf import csrf_exempt
+
+
 
 # Create your views here.
 
@@ -103,14 +105,18 @@ def doctor_register(request):
             # commit=False --> don't save to database yet (we have a chance to modify object)
             user = form.save(commit=False)
             user.is_doctor = True
-            # user.username = user.username.lower()  # lowercase username
+            user.is_active = False # Set to inactive until OTP verification
             user.save()
 
-            messages.success(request, 'Doctor account was created!')
-
-            # After user is created, we can log them in
-            #login(request, user)
-            return redirect('doctor-login')
+            # Send OTP for account activation
+            
+            from hospital.utils import send_otp_email
+            if send_otp_email(user, "account verification"):
+                messages.success(request, 'Doctor account was created! Please check your email for OTP to activate your account.')
+                return redirect('otp_verify', user_id=user.id, purpose='account_verification', reset_password='False')
+            else:
+                messages.error(request, 'Doctor account created, but failed to send OTP. Please contact support.')
+                return redirect('doctor-login')
 
         else:
             messages.error(request, 'An error has occurred during registration')
@@ -139,6 +145,16 @@ def doctor_login(request):
             messages.error(request, 'Account is temporarily locked due to multiple failed login attempts. Please try again later.')
             return render(request, 'doctor-login.html')
 
+        # NEW: Check if user is not active BEFORE authentication
+        if not user.is_active:
+            messages.warning(request, 'Your account is not active. Please verify your email with OTP.')
+            from hospital.utils import send_otp_email
+            if send_otp_email(user, "account verification"):
+                messages.info(request, 'A new OTP has been sent to your email.')
+            else:
+                messages.error(request, 'Error sending OTP email. Please try again.')
+            return redirect('otp_verify', user_id=user.id, purpose='account_verification', reset_password='False')
+
         # Authenticate user
         authenticated_user = authenticate(username=username, password=password)
 
@@ -147,17 +163,6 @@ def doctor_login(request):
             user.failed_login_attempts = 0
             user.save()
 
-            if not user.is_active:
-                # User is not active, redirect to OTP verification
-                messages.warning(request, 'Your account is not active. Please verify your email with OTP.')
-                if not user.otp_code or user.otp_expires_at < datetime.now():
-                    from hospital.utils import send_otp_email
-                    if send_otp_email(user, "account verification"):
-                        messages.info(request, 'A new OTP has been sent to your email.')
-                    else:
-                        messages.error(request, 'Error sending OTP email. Please try again.')
-                return redirect('otp_verify', user_id=user.id)
-
             # Check if 2FA is enabled
             if user.two_factor_enabled:
                 if not otp_code:
@@ -165,13 +170,13 @@ def doctor_login(request):
                     from hospital.utils import send_otp_email
                     if send_otp_email(user, "two_factor_authentication"):
                         messages.info(request, 'Please enter the 2FA code sent to your email.')
-                        return render(request, 'doctor-login.html', {'require_2fa': True, 'username': username})
+                        return redirect('otp_verify', user_id=user.id, purpose='two_factor_authentication', reset_password='False')
                     else:
                         messages.error(request, 'Error sending 2FA code. Please try again.')
                         return render(request, 'doctor-login.html')
                 else:
                     # Verify 2FA OTP
-                    if user.otp_code == otp_code and user.otp_expires_at > datetime.now():
+                    if user.otp_code == otp_code and user.otp_expires_at > timezone.now():
                         user.otp_code = None
                         user.otp_expires_at = None
                         user.save()
@@ -216,11 +221,11 @@ def doctor_dashboard(request):
                 # doctor = Doctor_Information.objects.get(user_id=pk)
                 doctor = Doctor_Information.objects.get(user=request.user)
                 # appointments = Appointment.objects.filter(doctor=doctor).filter(Q(appointment_status='pending') | Q(appointment_status='confirmed'))
-                current_date = datetime.date.today()
+                current_date = timezone.now().date()
                 current_date_str = str(current_date)  
                 today_appointments = Appointment.objects.filter(date=current_date_str).filter(doctor=doctor).filter(appointment_status='confirmed')
 
-                next_date = current_date + datetime.timedelta(days=1) # next days date 
+                next_date = current_date + timezone.timedelta(days=1) # next days date 
                 next_date_str = str(next_date)  
                 next_days_appointment = Appointment.objects.filter(date=next_date_str).filter(doctor=doctor).filter(Q(appointment_status='pending') | Q(appointment_status='confirmed')).count()
 
@@ -468,7 +473,7 @@ def booking(request, pk):
         message = request.POST['message']
 
 
-        transformed_date = datetime.datetime.strptime(date, '%m/%d/%Y').strftime('%Y-%m-%d')
+        transformed_date = timezone.timezone.strptime(date, '%m/%d/%Y').strftime('%Y-%m-%d')
         transformed_date = str(transformed_date)
 
         appointment.date = transformed_date
@@ -553,7 +558,7 @@ def create_prescription(request,pk):
         if request.user.is_doctor:
             doctor = Doctor_Information.objects.get(user=request.user)
             patient = Patient.objects.get(patient_id=pk) 
-            create_date = datetime.date.today()
+            create_date = timezone.date.today()
 
 
             if request.method == 'POST':
@@ -617,7 +622,7 @@ def report_pdf(request, pk):
     report = Report.objects.get(report_id=pk)
     specimen = Specimen.objects.filter(report=report)
     test = Test.objects.filter(report=report)
-    # current_date = datetime.date.today()
+    # current_date = timezone.date.today()
     context={'patient':patient,'report':report,'test':test,'specimen':specimen}
     html_report=render_to_pdf('report_pdf.html', context)
     if html_report:

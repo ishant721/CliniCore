@@ -34,7 +34,7 @@
                                 {% include 'message.html' %}
                                 
                                 <!-- OTP Form -->
-                                <form method="POST" action="{% url 'otp_verify' user_id=user_id reset_password=reset_password %}">
+                                <form method="POST" action="{% url 'otp_verify' user_id=user_id purpose=purpose reset_password=reset_password %}">
                                     {% csrf_token %}
                                     
                                     <div class="form-floating mt-3 mb-3">
@@ -43,8 +43,8 @@
                                         <small class="text-muted">Enter the 6-digit code sent to your email</small>
                                     </div>
                                     
-                                    <div class="text-right">
-                                        <a class="forgot-link" href="{% url 'patient-register' %}">Didn't receive the code? Try again</a>
+                                    <div class="text-right mt-2">
+                                        <button type="submit" name="action" value="resend_otp" class="btn btn-link forgot-link">Didn't receive the code? Resend OTP</button>
                                     </div>
                                     
                                     <button class="btn btn-primary btn-block btn-lg login-btn" type="submit">Verify OTP</button>

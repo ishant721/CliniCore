@@ -73,7 +73,14 @@
 							<div class="top-nav-search">
 								<form action="{% url 'multiple-hospital' %}" method="GET">
 									<input type="text" class="form-control" placeholder="Search hospital" name="search_query" value="{{search_query}}">
+									
+                                    <!-- New fields for location search -->
+                                    <input type="hidden" id="hospital_latitude" name="latitude">
+                                    <input type="hidden" id="hospital_longitude" name="longitude">
+                                    <input type="hidden" id="hospital_radius" name="radius" value="10"> <!-- Default radius of 10 km -->
+
 									<button class="btn" type="submit"><i class="fa fa-search"></i></button>
+                                    <button type="button" class="btn btn-info" id="use-my-hospital-location-btn">Use My Current Location</button>
 								</form>
 							</div>
 						</div>
@@ -126,6 +133,11 @@
 																<a href="#"> {{hospital.name}}
 															  </a>
 															</h4>   
+                                                            {% if hospital.distance %}
+                                                            <p class="doc-location">
+                                                                <i class="fas fa-route"></i> Distance: {{ hospital.distance }} km
+                                                            </p>
+                                                            {% endif %}
 														</div>
 														<div class="card-read-more">
 															<a href="{% url 'hospital-profile' pk=hospital.hospital_id %}" class="btn btn-link btn-block">
@@ -179,6 +191,22 @@
 		<!-- Searchbar JS -->
 		<script src="{% static 'HealthStack-System/js/Normal/sidebar.js' %}"></script>
 		
+	<script>
+        document.getElementById('use-my-hospital-location-btn').addEventListener('click', function() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    document.getElementById('hospital_latitude').value = position.coords.latitude;
+                    document.getElementById('hospital_longitude').value = position.coords.longitude;
+                    alert('Location obtained! Now click Search to find hospitals near you.');
+                }, function(error) {
+                    console.error('Error getting location:', error);
+                    alert('Unable to retrieve your location. Please allow location access or enter coordinates manually.');
+                });
+            } else {
+                alert('Geolocation is not supported by your browser.');
+            }
+        });
+    </script>
 	</body>
 
 <!-- doccure/change-password.html  30 Nov 2019 04:12:18 GMT -->

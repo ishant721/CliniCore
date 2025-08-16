@@ -78,6 +78,10 @@ class Hospital_Information(models.Model):
     regular_cabin_no = models.IntegerField(null=True, blank=True)
     emergency_cabin_no = models.IntegerField(null=True, blank=True)
     vip_cabin_no = models.IntegerField(null=True, blank=True)
+    
+    # New fields for location
+    latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
 
     # String representation of object
     def __str__(self):

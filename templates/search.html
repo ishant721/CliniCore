@@ -93,7 +93,14 @@
 							<div class="top-nav-search">
 								<form action="{% url 'search' %}" method="GET">
 									<input type="text" class="form-control" placeholder="Search doctor" name="search_query" value="{{search_query}}">
+									
+                                    <!-- New fields for location search -->
+                                    <input type="hidden" id="latitude" name="latitude">
+                                    <input type="hidden" id="longitude" name="longitude">
+                                    <input type="hidden" id="radius" name="radius" value="10"> <!-- Default radius of 10 km -->
+
 									<button class="btn" type="submit"><i class="fa fa-search"></i></button>
+                                    <button type="button" class="btn btn-info" id="use-my-location-btn">Use My Current Location</button>
 								</form>
 							</div>
 						</div>
@@ -143,6 +150,11 @@
                             <i class="fas fa-map-marker-alt"></i> <b>Hospital: </b>
                             {{doctor.hospital_name}}
                           </p>
+                          {% if doctor.distance %}
+                          <p class="doc-location">
+                            <i class="fas fa-route"></i> Distance: {{ doctor.distance }} km
+                          </p>
+                          {% endif %}
                           <ul class="clinic-gallery">
                             <li>
                               <a
@@ -248,6 +260,25 @@
 
     <!-- Custom JS -->
     <script src="{% static 'HealthStack-System/Outside_assets/js/script.js' %}"></script>
+
+    <script>
+        document.getElementById('use-my-location-btn').addEventListener('click', function() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    document.getElementById('latitude').value = position.coords.latitude;
+                    document.getElementById('longitude').value = position.coords.longitude;
+                    // Optionally, you can make the radius input visible or allow user to change it
+                    // document.getElementById('radius').value = 10; // Set a default radius
+                    alert('Location obtained! Now click Search to find doctors near you.');
+                }, function(error) {
+                    console.error('Error getting location:', error);
+                    alert('Unable to retrieve your location. Please allow location access or enter coordinates manually.');
+                });
+            } else {
+                alert('Geolocation is not supported by your browser.');
+            }
+        });
+    </script>
   </body>
 
   <!-- doccure/search.html  30 Nov 2019 04:12:16 GMT -->

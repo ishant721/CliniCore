@@ -161,6 +161,15 @@ def login_user(request):
             messages.error(request, 'Account is temporarily locked due to multiple failed login attempts. Please try again later.')
             return render(request, 'patient-login.html')
 
+        # NEW: Check if user is not active BEFORE authentication
+        if not user.is_active:
+            messages.warning(request, 'Your account is not active. Please verify your email with OTP.')
+            if send_otp_email(user, "account verification"):
+                messages.info(request, 'A new OTP has been sent to your email.')
+            else:
+                messages.error(request, 'Error sending OTP email. Please try again.')
+            return redirect('otp_verify', user_id=user.id, purpose='account_verification', reset_password='False')
+
         # Authenticate user
         authenticated_user = authenticate(request, username=username, password=password)
 
@@ -169,19 +178,7 @@ def login_user(request):
             user.failed_login_attempts = 0
             user.save()
 
-            # Check if user is not active (not verified)
-            if not user.is_active:
-                # User is registered but not verified, send OTP for verification
-                messages.warning(request, 'Your account is not verified. Please verify your email with the OTP sent to your email.')
-                
-                # Always send a new OTP for unverified users trying to login
-                if send_otp_email(user, "account verification"):
-                    messages.info(request, 'A new OTP has been sent to your email address for verification.')
-                else:
-                    messages.error(request, 'Error sending OTP email. Please try again.')
-                return redirect('otp_verify', user_id=user.id, reset_password='False')
-
-            # Check if 2FA is enabled for active users
+            # Check if 2FA is enabled
             if user.two_factor_enabled:
                 if not otp_code:
                     # Send 2FA OTP
@@ -250,12 +247,13 @@ def patient_register(request):
         if form.is_valid():
             user = form.save(commit=False)
             user.is_patient = True
+            user.is_active = False # Set to inactive until OTP verification
             user.save()
 
             # Send OTP email
             if send_otp_email(user, "registration"):
                 messages.success(request, 'Patient account created! Please check your email for OTP verification.')
-                return redirect('otp_verify', user_id=user.id, reset_password='False') # Redirect to OTP verification page
+                return redirect('otp_verify', user_id=user.id, purpose='registration', reset_password='False') # Redirect to OTP verification page
             else:
                 messages.error(request, 'Error sending OTP email. Please try again.')
                 user.delete() # Delete user if OTP email fails
@@ -268,34 +266,58 @@ def patient_register(request):
     return render(request, 'patient-register.html', context)
 
 @csrf_exempt
-def otp_verify(request, user_id, reset_password=False):
+def otp_verify(request, user_id, purpose, reset_password=False):
     user = get_object_or_404(User, id=user_id)
+
     if request.method == 'POST':
+        action = request.POST.get('action')
+        if action == 'resend_otp':
+            from .utils import send_otp_email
+            if send_otp_email(user, purpose):
+                messages.info(request, f'A new OTP has been sent to your email for {purpose.replace("_", " ")}.')
+            else:
+                messages.error(request, 'Error sending OTP. Please try again.')
+            return render(request, 'otp_verify.html', {'user_id': user_id, 'purpose': purpose, 'reset_password': reset_password})
+
         otp_code = request.POST.get('otp_code')
+        print(f"DEBUG: User OTP from DB: {user.otp_code}")
+        print(f"DEBUG: Submitted OTP: {otp_code}")
+        print(f"DEBUG: OTP Expires At: {user.otp_expires_at}")
+        print(f"DEBUG: Current Time: {timezone.now()}")
+        print(f"DEBUG: OTP Expired?: {user.otp_expires_at <= timezone.now()}")
         if user.otp_code == otp_code and user.otp_expires_at > timezone.now():
             user.otp_code = None # Clear OTP
             user.otp_expires_at = None # Clear OTP expiration
             user.save()
 
-            if reset_password == 'True':
+            if purpose == 'password_reset':
                 messages.success(request, 'OTP verified successfully. You can now reset your password.')
-                return redirect('password_reset_confirm_otp', user_id=user.id) # Redirect to new password reset confirm page
-            else:
+                return redirect('password_reset_confirm_otp', user_id=user.id)
+            elif purpose == 'two_factor_authentication':
+                login(request, user) # Log in the user after 2FA
+                messages.success(request, 'Two-factor authentication successful. You are now logged in.')
+                if user.is_patient:
+                    return redirect('patient-dashboard')
+                elif user.is_doctor:
+                    return redirect('doctor-dashboard')
+                else:
+                    return redirect('login') # Fallback for other user types
+            else: # Default to account verification
                 user.is_active = True # Activate user account
                 user.save()
                 
-                # If this was during login flow, log the user in automatically
-                login(request, user)
+                login(request, user) # Log in the user automatically
+                messages.success(request, 'Account verified successfully! Welcome to HealthStack.')
                 if user.is_patient:
-                    messages.success(request, 'Account verified successfully! Welcome to HealthStack.')
                     return redirect('patient-dashboard')
+                elif user.is_doctor:
+                    return redirect('doctor-dashboard')
                 else:
-                    messages.success(request, 'Account verified successfully! You can now log in.')
-                    return redirect('login')
+                    return redirect('login') # Fallback for other user types
         else:
             messages.error(request, 'Invalid or expired OTP. Please try again.')
-            return render(request, 'otp_verify.html', {'user_id': user_id, 'reset_password': reset_password})
-    return render(request, 'otp_verify.html', {'user_id': user_id, 'reset_password': reset_password})
+            return render(request, 'otp_verify.html', {'user_id': user_id, 'purpose': purpose, 'reset_password': reset_password})
+    return render(request, 'otp_verify.html', {'user_id': user_id, 'purpose': purpose, 'reset_password': reset_password})
 
 @csrf_exempt
 def password_reset_confirm_otp(request, user_id):
@@ -400,9 +422,12 @@ def search(request):
     if request.user.is_authenticated and request.user.is_patient:
         # patient = Patient.objects.get(user_id=pk)
         patient = Patient.objects.get(user=request.user)
-        doctors = Doctor_Information.objects.filter(register_status='Accepted')
+        
+        user_lat = request.GET.get('latitude')
+        user_lon = request.GET.get('longitude')
+        radius = request.GET.get('radius')
 
-        doctors, search_query = searchDoctors(request)
+        doctors, search_query = searchDoctors(request, user_lat, user_lon, radius)
         context = {'patient': patient, 'doctors': doctors, 'search_query': search_query}
         return render(request, 'search.html', context)
     else:
@@ -419,14 +444,15 @@ def checkout_payment(request):
 def multiple_hospital(request):
 
     if request.user.is_authenticated: 
+        user_lat = request.GET.get('latitude')
+        user_lon = request.GET.get('longitude')
+        radius = request.GET.get('radius')
 
         if request.user.is_patient:
-            # patient = Patient.objects.get(user_id=pk)
             patient = Patient.objects.get(user=request.user)
             doctors = Doctor_Information.objects.all()
-            hospitals = Hospital_Information.objects.all()
 
-            hospitals, search_query = searchHospitals(request)
+            hospitals, search_query = searchHospitals(request, user_lat, user_lon, radius)
 
             # PAGINATION ADDED TO MULTIPLE HOSPITALS
             custom_range, hospitals = paginateHospitals(request, hospitals, 3)
@@ -436,9 +462,8 @@ def multiple_hospital(request):
 
         elif request.user.is_doctor:
             doctor = Doctor_Information.objects.get(user=request.user)
-            hospitals = Hospital_Information.objects.all()
-
-            hospitals, search_query = searchHospitals(request)
+            
+            hospitals, search_query = searchHospitals(request, user_lat, user_lon, radius)
 
             context = {'doctor': doctor, 'hospitals': hospitals, 'search_query': search_query}
             return render(request, 'multiple-hospital.html', context)
