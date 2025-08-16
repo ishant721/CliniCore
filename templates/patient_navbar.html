@@ -68,10 +68,10 @@
       <li class="has-submenu">
         <a href="#">Marketplace <i class="fas fa-chevron-down"></i></a>
         <ul class="submenu">
-          <li><a href="{% url 'marketplace_home' %}">Dashboard</a></li>
-          <li><a href="{% url 'marketplace_doctors' %}">Find Doctors</a></li>
-          <li><a href="{% url 'marketplace_medicine' %}">Medicine Delivery</a></li>
-          <li><a href="{% url 'marketplace_orders' %}">My Orders</a></li>
+          <li><a href="{% url 'marketplace:home' %}">Dashboard</a></li>
+          <li><a href="{% url 'marketplace:providers_list' %}?type=consultation">Find Doctors</a></li>
+          <li><a href="{% url 'marketplace:providers_list' %}?type=medicine_delivery">Medicine Delivery</a></li>
+          <li><a href="{% url 'marketplace:my_orders' %}">My Orders</a></li>
         </ul>
       </li>
       <!-- <li class="has-submenu">
