@@ -23,7 +23,7 @@ from django.views.decorators.csrf import csrf_exempt
 # function to return views for the urls
 
 @csrf_exempt
-@login_required(login_url="login")
+@login_required(login_url="unified-login")
 def pharmacy_single_product(request,pk):
      if request.user.is_authenticated and request.user.is_patient:
          
@@ -44,7 +44,7 @@ def pharmacy_single_product(request,pk):
         return render(request, 'patient-login.html')  
 
 @csrf_exempt
-@login_required(login_url="login")
+@login_required(login_url="unified-login")
 def pharmacy_shop(request):
     if request.user.is_authenticated and request.user.is_patient:
         
@@ -69,12 +69,12 @@ def pharmacy_shop(request):
         return render(request, 'patient-login.html')  
 
 @csrf_exempt
-@login_required(login_url="login")
+@login_required(login_url="unified-login")
 def checkout(request):
     return render(request, 'pharmacy/checkout.html')
 
 @csrf_exempt
-@login_required(login_url="login")
+@login_required(login_url="unified-login")
 def add_to_cart(request, pk):
     if request.user.is_authenticated and request.user.is_patient:
          
@@ -111,7 +111,7 @@ def add_to_cart(request, pk):
         return render(request, 'patient-login.html')  
 
 @csrf_exempt
-@login_required(login_url="login")
+@login_required(login_url="unified-login")
 def cart_view(request):
     if request.user.is_authenticated and request.user.is_patient:
          
@@ -134,7 +134,7 @@ def cart_view(request):
         return render(request, 'patient-login.html') 
 
 @csrf_exempt
-@login_required(login_url="login")
+@login_required(login_url="unified-login")
 def remove_from_cart(request, pk):
     if request.user.is_authenticated and request.user.is_patient:
          
@@ -168,7 +168,7 @@ def remove_from_cart(request, pk):
 
 
 @csrf_exempt
-@login_required(login_url="login")
+@login_required(login_url="unified-login")
 def increase_cart(request, pk):
     if request.user.is_authenticated and request.user.is_patient:
          
@@ -202,7 +202,7 @@ def increase_cart(request, pk):
 
 
 @csrf_exempt
-@login_required(login_url="login")
+@login_required(login_url="unified-login")
 def decrease_cart(request, pk):
     if request.user.is_authenticated and request.user.is_patient:
          

@@ -33,7 +33,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('login/', views.login_user, name='login'),
+    path('login/', views.unified_login, name='unified-login'),
     path('', include('hospital.urls')),
     path('doctor/', include('doctor.urls')),
     # path('api/', include('api.urls')),  # API not implemented yet

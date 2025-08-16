@@ -57,7 +57,7 @@ def hospital_home(request):
     return render(request, 'index-2.html', context)
 
 @csrf_exempt
-@login_required(login_url="login")
+@login_required(login_url="unified-login")
 def change_password(request,pk):
     patient = Patient.objects.get(user_id=pk)
     context={"patient":patient}
@@ -123,7 +123,7 @@ def about_us(request):
     return render(request, 'about-us.html')
 
 @csrf_exempt
-@login_required(login_url="login")
+@login_required(login_url="unified-login")
 def chat(request, pk):
     patient = Patient.objects.get(user_id=pk)
     doctors = Doctor_Information.objects.all()
@@ -132,7 +132,7 @@ def chat(request, pk):
     return render(request, 'chat.html', context)
 
 @csrf_exempt
-@login_required(login_url="login")
+@login_required(login_url="unified-login")
 def chat_doctor(request):
     if request.user.is_doctor:
         doctor = Doctor_Information.objects.get(user=request.user)
@@ -142,7 +142,7 @@ def chat_doctor(request):
     return render(request, 'chat-doctor.html', context)
 
 @csrf_exempt     
-@login_required(login_url="login")
+@login_required(login_url="unified-login")
 def pharmacy_shop(request):
     return render(request, 'pharmacy/shop.html')
 
@@ -347,7 +347,7 @@ def password_reset_confirm_otp(request, user_id):
     return render(request, 'password_reset_confirm_otp.html', {'user_id': user_id})
 
 @csrf_exempt
-@login_required(login_url="login")
+@login_required(login_url="unified-login")
 def patient_prescription_medicines(request):
     """View for patients to see their prescribed medicines"""
     if request.user.is_patient:
@@ -370,7 +370,7 @@ def patient_prescription_medicines(request):
         return redirect('logout')
 
 @csrf_exempt
-@login_required(login_url="login")
+@login_required(login_url="unified-login")
 def add_prescription_medicine_to_cart(request, medicine_id):
     """Add prescribed medicine to pharmacy cart"""
     if request.user.is_patient:
@@ -418,7 +418,7 @@ def add_prescription_medicine_to_cart(request, medicine_id):
         return redirect('logout')
 
 @csrf_exempt
-@login_required(login_url="login")
+@login_required(login_url="unified-login")
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def patient_dashboard(request):
     if request.user.is_patient:
@@ -455,7 +455,7 @@ def patient_dashboard(request):
 #     return render(request, 'profile-settings.html', context)
 
 @csrf_exempt
-@login_required(login_url="login")
+@login_required(login_url="unified-login")
 def profile_settings(request):
     if request.user.is_patient:
         # patient = Patient.objects.get(user_id=pk)
@@ -499,7 +499,7 @@ def profile_settings(request):
         redirect('logout')  
 
 @csrf_exempt
-@login_required(login_url="login")
+@login_required(login_url="unified-login")
 def search(request):
     if request.user.is_authenticated and request.user.is_patient:
         # patient = Patient.objects.get(user_id=pk)
@@ -522,7 +522,7 @@ def checkout_payment(request):
     return render(request, 'checkout.html')
 
 @csrf_exempt
-@login_required(login_url="login")
+@login_required(login_url="unified-login")
 def multiple_hospital(request):
 
     if request.user.is_authenticated: 
@@ -555,7 +555,7 @@ def multiple_hospital(request):
         return render(request, 'patient-login.html') 
 
 @csrf_exempt    
-@login_required(login_url="login")
+@login_required(login_url="unified-login")
 def hospital_profile(request, pk):
 
     if request.user.is_authenticated: 
@@ -602,7 +602,7 @@ def data_table(request):
     return render(request, 'data-table.html')
 
 @csrf_exempt
-@login_required(login_url="login")
+@login_required(login_url="unified-login")
 def hospital_department_list(request, pk):
     if request.user.is_authenticated: 
 
@@ -630,7 +630,7 @@ def hospital_department_list(request, pk):
         return render(request, 'patient-login.html')
 
 @csrf_exempt
-@login_required(login_url="login")
+@login_required(login_url="unified-login")
 def hospital_doctor_list(request, pk):
     if request.user.is_authenticated and request.user.is_patient:
         # patient = Patient.objects.get(user_id=pk)
@@ -662,7 +662,7 @@ def hospital_doctor_list(request, pk):
 
 
 @csrf_exempt
-@login_required(login_url="login")
+@login_required(login_url="unified-login")
 def hospital_doctor_register(request, pk):
     if request.user.is_authenticated: 
 
@@ -712,7 +712,7 @@ def testing(request):
     return render(request, 'testing.html', context)
 
 @csrf_exempt
-@login_required(login_url="login")
+@login_required(login_url="unified-login")
 def view_report(request,pk):
     if request.user.is_patient:
         patient = Patient.objects.get(user=request.user)
@@ -731,7 +731,7 @@ def test_cart(request):
     return render(request, 'test-cart.html')
 
 @csrf_exempt
-@login_required(login_url="login")
+@login_required(login_url="unified-login")
 def test_single(request,pk):
      if request.user.is_authenticated and request.user.is_patient:
 
@@ -747,7 +747,7 @@ def test_single(request,pk):
         return render(request, 'patient-login.html')  
 
 @csrf_exempt
-@login_required(login_url="login")
+@login_required(login_url="unified-login")
 def test_add_to_cart(request, pk, pk2):
     if request.user.is_authenticated and request.user.is_patient:
 
@@ -778,7 +778,7 @@ def test_add_to_cart(request, pk, pk2):
         return render(request, 'patient-login.html')  
 
 @csrf_exempt
-@login_required(login_url="login")
+@login_required(login_url="unified-login")
 def test_cart(request, pk):
     if request.user.is_authenticated and request.user.is_patient:
         # prescription = Prescription.objects.filter(prescription_id=pk)
@@ -805,7 +805,7 @@ def test_cart(request, pk):
         return render(request, 'patient-login.html') 
 
 @csrf_exempt
-@login_required(login_url="login")
+@login_required(login_url="unified-login")
 def test_remove_cart(request, pk):
     if request.user.is_authenticated and request.user.is_patient:
         item = Prescription_test.objects.get(test_id=pk)
@@ -892,7 +892,7 @@ def prescription_pdf(request,pk):
     return HttpResponse("Not Found")
 
 @csrf_exempt
-@login_required(login_url="login")
+@login_required(login_url="unified-login")
 def delete_prescription(request,pk):
     if request.user.is_authenticated and request.user.is_patient:
         prescription = Prescription.objects.get(prescription_id=pk)
@@ -905,7 +905,7 @@ def delete_prescription(request,pk):
         return render(request, 'patient-login.html')
 
 @csrf_exempt
-@login_required(login_url="login")
+@login_required(login_url="unified-login")
 def delete_report(request,pk):
     if request.user.is_authenticated and request.user.is_patient:
         report = Report.objects.get(report_id=pk)
@@ -920,7 +920,7 @@ def delete_report(request,pk):
 
 
 @csrf_exempt
-@login_required(login_url="login")
+@login_required(login_url="unified-login")
 def setup_two_factor(request):
     """Setup two-factor authentication"""
     if request.user.is_patient:
@@ -960,7 +960,7 @@ def setup_two_factor(request):
         return redirect('logout')
 
 @csrf_exempt
-@login_required(login_url="login")
+@login_required(login_url="unified-login")
 def security_settings(request):
     """Security settings page"""
     if request.user.is_patient:
@@ -980,11 +980,35 @@ def security_settings(request):
 @csrf_exempt
 @receiver(user_logged_in)
 def got_online(sender, user, request, **kwargs):    
-    user.login_status = True
-    user.save()
+    if user:
+        user.login_status = True
+        user.save()
 
 @csrf_exempt
 @receiver(user_logged_out)
 def got_offline(sender, user, request, **kwargs):   
-    user.login_status = False
-    user.save()
+    if user:
+        user.login_status = False
+        user.save()
+
+@csrf_exempt
+def unified_login(request):
+    if request.method == 'GET':
+        return render(request, 'unified_login.html')
+    elif request.method == 'POST':
+        username = request.POST.get('username', '').strip()
+        password = request.POST.get('password', '')
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            if user.is_patient:
+                return redirect('patient-dashboard')
+            elif user.is_doctor:
+                return redirect('doctor-dashboard')
+            elif user.is_hospital_admin:
+                return redirect('admin-dashboard')
+            else:
+                return redirect('hospital-home')
+        else:
+            messages.error(request, 'Invalid username or password')
+            return render(request, 'unified_login.html')

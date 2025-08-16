@@ -36,7 +36,7 @@ from .utils import searchMedicines
 # Create your views here.
 
 @csrf_exempt
-@login_required(login_url='admin_login')
+@login_required(login_url='unified-login')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def admin_dashboard(request):
     # admin = Admin_Information.objects.get(user_id=pk)
@@ -172,7 +172,7 @@ def admin_login(request):
                 return redirect('admin-change-password', pk=user.id)
 
             if user.is_hospital_admin:
-                login(request, user)
+                login(request, user, backend='hospital.auth_backends.CustomAuthBackend')
                 messages.success(request, 'User Logged in Successfully')
                 return redirect('admin-dashboard')
             else:
@@ -226,26 +226,26 @@ def admin_register(request):
     return render(request, 'hospital_admin/register.html', context)
 
 @csrf_exempt
-@login_required(login_url='admin_login')
+@login_required(login_url='unified-login')
 def admin_forgot_password(request):
     return render(request, 'hospital_admin/forgot-password.html')
 
 @csrf_exempt
-@login_required(login_url='admin_login')
+@login_required(login_url='unified-login')
 def invoice(request):
     return render(request, 'hospital_admin/invoice.html')
 
 @csrf_exempt
-@login_required(login_url='admin_login')
+@login_required(login_url='unified-login')
 def invoice_report(request):
     return render(request, 'hospital_admin/invoice-report.html')
 
-@login_required(login_url='admin_login')
+@login_required(login_url='unified-login')
 def lock_screen(request):
     return render(request, 'hospital_admin/lock-screen.html')
 
 @csrf_exempt
-@login_required(login_url='admin_login')
+@login_required(login_url='unified-login')
 def patient_list(request):
     if request.user.is_hospital_admin:
         user = Admin_Information.objects.get(user=request.user)
@@ -253,21 +253,21 @@ def patient_list(request):
     return render(request, 'hospital_admin/patient-list.html', {'all': patients, 'admin': user})
 
 @csrf_exempt
-@login_required(login_url='admin_login')
+@login_required(login_url='unified-login')
 def specialitites(request):
     return render(request, 'hospital_admin/specialities.html')
 
 @csrf_exempt
-@login_required(login_url='admin_login')
+@login_required(login_url='unified-login')
 def appointment_list(request):
     return render(request, 'hospital_admin/appointment-list.html')
 
-@login_required(login_url='admin_login')
+@login_required(login_url='unified-login')
 def transactions_list(request):
     return render(request, 'hospital_admin/transactions-list.html')
 
 @csrf_exempt
-@login_required(login_url='admin_login')
+@login_required(login_url='unified-login')
 def emergency_details(request):
     user = Admin_Information.objects.get(user=request.user)
     hospitals = Hospital_Information.objects.all()
@@ -275,7 +275,7 @@ def emergency_details(request):
     return render(request, 'hospital_admin/emergency.html', context)
 
 @csrf_exempt
-@login_required(login_url='admin_login')
+@login_required(login_url='unified-login')
 def hospital_list(request):
     user = Admin_Information.objects.get(user=request.user)
     hospitals = Hospital_Information.objects.all()
@@ -283,17 +283,17 @@ def hospital_list(request):
     return render(request, 'hospital_admin/hospital-list.html', context)
 
 @csrf_exempt
-@login_required(login_url='admin_login')
+@login_required(login_url='unified-login')
 def appointment_list(request):
     return render(request, 'hospital_admin/appointment-list.html')
 
 @csrf_exempt
-@login_required(login_url='admin_login')
+@login_required(login_url='unified-login')
 def hospital_profile(request):
     return render(request, 'hospital-profile.html')
 
 @csrf_exempt
-@login_required(login_url='admin_login')
+@login_required(login_url='unified-login')
 def hospital_admin_profile(request, pk):
 
     # profile = request.user.profile
@@ -315,7 +315,7 @@ def hospital_admin_profile(request, pk):
     return render(request, 'hospital_admin/hospital-admin-profile.html', context)
 
 @csrf_exempt
-@login_required(login_url='admin_login')
+@login_required(login_url='unified-login')
 def add_hospital(request):
     if  request.user.is_hospital_admin:
         user = Admin_Information.objects.get(user=request.user)
@@ -379,7 +379,7 @@ def add_hospital(request):
 #     return render(request, 'hospital_admin/edit-hospital.html')
 
 @csrf_exempt
-@login_required(login_url='admin_login')
+@login_required(login_url='unified-login')
 def edit_hospital(request, pk):
     if  request.user.is_hospital_admin:
         user = Admin_Information.objects.get(user=request.user)
@@ -445,7 +445,7 @@ def edit_hospital(request, pk):
             return redirect('hospital-list')
 
 @csrf_exempt
-@login_required(login_url='admin_login')
+@login_required(login_url='unified-login')
 def delete_specialization(request, pk, pk2):
     specializations = specialization.objects.get(specialization_id=pk)
     specializations.delete()
@@ -453,7 +453,7 @@ def delete_specialization(request, pk, pk2):
     return redirect('edit-hospital', pk2)
 
 @csrf_exempt
-@login_required(login_url='admin_login')
+@login_required(login_url='unified-login')
 def delete_service(request, pk, pk2):
     services = service.objects.get(service_id=pk)
     services.delete()
@@ -461,7 +461,7 @@ def delete_service(request, pk, pk2):
     return redirect('edit-hospital', pk2)
 
 @csrf_exempt
-@login_required(login_url='admin_login')
+@login_required(login_url='unified-login')
 def edit_emergency_information(request, pk):
 
     hospital = Hospital_Information.objects.get(hospital_id=pk)
@@ -481,14 +481,14 @@ def edit_emergency_information(request, pk):
     return render(request, 'hospital_admin/edit-emergency-information.html', context)
 
 @csrf_exempt
-@login_required(login_url='admin_login')
+@login_required(login_url='unified-login')
 def delete_hospital(request, pk):
 	hospital = Hospital_Information.objects.get(hospital_id=pk)
 	hospital.delete()
 	return redirect('hospital-list')
 
 
-@login_required(login_url='admin_login')
+@login_required(login_url='unified-login')
 def generate_random_invoice():
     N = 4
     string_var = ""
@@ -497,7 +497,7 @@ def generate_random_invoice():
     return string_var
 
 @csrf_exempt
-@login_required(login_url='admin_login')
+@login_required(login_url='unified-login')
 def create_invoice(request, pk):
     if  request.user.is_hospital_admin:
         user = Admin_Information.objects.get(user=request.user)
@@ -524,7 +524,7 @@ def create_invoice(request, pk):
     return render(request, 'hospital_admin/create-invoice.html', context)
 
 
-@login_required(login_url='admin_login')
+@login_required(login_url='unified-login')
 def generate_random_specimen():
     N = 4
     string_var = ""
@@ -617,7 +617,7 @@ def create_report(request, pk):
         return render(request, 'hospital_admin/create-report.html',context)
 
 @csrf_exempt
-@login_required(login_url='admin_login')
+@login_required(login_url='unified-login')
 def add_pharmacist(request):
     if request.user.is_hospital_admin:
         user = Admin_Information.objects.get(user=request.user)
@@ -643,7 +643,7 @@ def add_pharmacist(request):
     return render(request, 'hospital_admin/add-pharmacist.html', context)
 
 @csrf_exempt
-@login_required(login_url='admin_login')
+@login_required(login_url='unified-login')
 def medicine_list(request):
     if request.user.is_authenticated:
         if request.user.is_pharmacist:
@@ -671,7 +671,7 @@ def medicine_list(request):
                 return render(request, 'hospital_admin/medicine-list.html',context)
 
 
-@login_required(login_url='admin_login')
+@login_required(login_url='unified-login')
 def generate_random_medicine_ID():
     N = 4
     string_var = ""
@@ -680,7 +680,7 @@ def generate_random_medicine_ID():
     return string_var
 
 @csrf_exempt
-@login_required(login_url='admin_login')
+@login_required(login_url='unified-login')
 def add_medicine(request):
     if request.user.is_pharmacist:
      user = Pharmacist.objects.get(user=request.user)
@@ -721,7 +721,7 @@ def add_medicine(request):
     return render(request, 'hospital_admin/add-medicine.html',{'admin': user})
 
 @csrf_exempt
-@login_required(login_url='admin_login')
+@login_required(login_url='unified-login')
 def edit_medicine(request, pk):
     if request.user.is_pharmacist:
         user = Pharmacist.objects.get(user=request.user)
@@ -763,7 +763,7 @@ def edit_medicine(request, pk):
 
 
 @csrf_exempt
-@login_required(login_url='admin_login')
+@login_required(login_url='unified-login')
 def delete_medicine(request, pk):
     if request.user.is_pharmacist:
         user = Pharmacist.objects.get(user=request.user)
@@ -772,7 +772,7 @@ def delete_medicine(request, pk):
         return redirect('medicine-list')
 
 @csrf_exempt
-@login_required(login_url='admin_login')
+@login_required(login_url='unified-login')
 def add_lab_worker(request):
     if request.user.is_hospital_admin:
         user = Admin_Information.objects.get(user=request.user)
@@ -799,7 +799,7 @@ def add_lab_worker(request):
     return render(request, 'hospital_admin/add-lab-worker.html', context)  
 
 @csrf_exempt
-@login_required(login_url='admin_login')
+@login_required(login_url='unified-login')
 def view_lab_worker(request):
     if request.user.is_hospital_admin:
         user = Admin_Information.objects.get(user=request.user)
@@ -808,7 +808,7 @@ def view_lab_worker(request):
     return render(request, 'hospital_admin/lab-worker-list.html', {'lab_workers': lab_workers, 'admin': user})
 
 @csrf_exempt
-@login_required(login_url='admin_login')
+@login_required(login_url='unified-login')
 def view_pharmacist(request):
     if request.user.is_hospital_admin:
         user = Admin_Information.objects.get(user=request.user)
@@ -817,7 +817,7 @@ def view_pharmacist(request):
     return render(request, 'hospital_admin/pharmacist-list.html', {'pharmacist': pharmcists, 'admin': user})
 
 @csrf_exempt
-@login_required(login_url='admin_login')
+@login_required(login_url='unified-login')
 def edit_lab_worker(request, pk):
     if request.user.is_hospital_admin:
         user = Admin_Information.objects.get(user=request.user)
@@ -848,7 +848,7 @@ def edit_lab_worker(request, pk):
     return render(request, 'hospital_admin/edit-lab-worker.html', {'lab_worker': lab_worker, 'admin': user})
 
 @csrf_exempt
-@login_required(login_url='admin_login')
+@login_required(login_url='unified-login')
 def edit_pharmacist(request, pk):
     if request.user.is_hospital_admin:
         user = Admin_Information.objects.get(user=request.user)
@@ -878,7 +878,7 @@ def edit_pharmacist(request, pk):
     return render(request, 'hospital_admin/edit-pharmacist.html', {'pharmacist': pharmacist, 'admin': user})
 
 @csrf_exempt
-@login_required(login_url='admin_login')
+@login_required(login_url='unified-login')
 def department_image_list(request,pk):
     departments = hospital_department.objects.filter(hospital_id=pk)
     #departments = hospital_department.objects.all()
@@ -886,7 +886,7 @@ def department_image_list(request,pk):
     return render(request, 'hospital_admin/department-image-list.html',context)
 
 @csrf_exempt
-@login_required(login_url='admin_login')
+@login_required(login_url='unified-login')
 def register_doctor_list(request):
     if request.user.is_hospital_admin:
         user = Admin_Information.objects.get(user=request.user)
@@ -894,7 +894,7 @@ def register_doctor_list(request):
     return render(request, 'hospital_admin/register-doctor-list.html', {'doctors': doctors, 'admin': user})
 
 @csrf_exempt
-@login_required(login_url='admin_login')
+@login_required(login_url='unified-login')
 def pending_doctor_list(request):
     if request.user.is_hospital_admin:
         user = Admin_Information.objects.get(user=request.user)
@@ -902,7 +902,7 @@ def pending_doctor_list(request):
     return render(request, 'hospital_admin/Pending-doctor-list.html', {'all': doctors, 'admin': user})
 
 @csrf_exempt
-@login_required(login_url='admin_login')
+@login_required(login_url='unified-login')
 def admin_doctor_profile(request,pk):
     doctor = Doctor_Information.objects.get(doctor_id=pk)
     admin = Admin_Information.objects.get(user=request.user)
@@ -914,7 +914,7 @@ def admin_doctor_profile(request,pk):
 
 
 @csrf_exempt
-@login_required(login_url='admin_login')
+@login_required(login_url='unified-login')
 def accept_doctor(request,pk):
     doctor = Doctor_Information.objects.get(doctor_id=pk)
     doctor.register_status = 'Accepted'
@@ -953,7 +953,7 @@ def accept_doctor(request,pk):
 
 
 @csrf_exempt
-@login_required(login_url='admin_login')
+@login_required(login_url='unified-login')
 def reject_doctor(request,pk):
     doctor = Doctor_Information.objects.get(doctor_id=pk)
     doctor.register_status = 'Rejected'
@@ -988,7 +988,7 @@ def reject_doctor(request,pk):
     return redirect('register-doctor-list')
 
 @csrf_exempt
-@login_required(login_url='admin_login')
+@login_required(login_url='unified-login')
 def delete_department(request,pk):
     if request.user.is_authenticated:
         if request.user.is_hospital_admin:
@@ -997,7 +997,7 @@ def delete_department(request,pk):
             messages.success(request, 'Department Deleted!')
             return redirect('hospital-list')
 
-@login_required(login_url='admin_login')
+@login_required(login_url='unified-login')
 @csrf_exempt
 def edit_department(request,pk):
     if request.user.is_authenticated:
@@ -1023,15 +1023,26 @@ def edit_department(request,pk):
             return render(request, 'hospital_admin/edit-hospital.html',context)
 
 @csrf_exempt
-@login_required(login_url='admin_login')
+@login_required(login_url='unified-login')
 def labworker_dashboard(request):
     if request.user.is_authenticated:
         if request.user.is_labworker:
-
-            lab_workers = Clinical_Laboratory_Technician.objects.get(user=request.user)
-            doctor = Doctor_Information.objects.all()
-            context = {'doctor': doctor,'lab_workers':lab_workers}
-            return render(request, 'hospital_admin/labworker-dashboard.html',context)
+            lab_worker = Clinical_Laboratory_Technician.objects.get(user=request.user)
+            
+            # Get appointments that are confirmed
+            confirmed_appointments = Appointment.objects.filter(appointment_status='confirmed')
+            
+            # We can further enhance this by adding a status to the report
+            # to check if it's already created or not.
+            # For now, we will list all confirmed appointments.
+            
+            context = {
+                'lab_worker': lab_worker,
+                'appointments': confirmed_appointments
+            }
+            return render(request, 'hospital_admin/labworker-dashboard.html', context)
+    # Add a fallback redirect if the user is not a lab worker
+    return redirect('admin_login')
 
 @csrf_exempt
 @login_required(login_url='admin-login')

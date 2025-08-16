@@ -21,7 +21,7 @@ from django.contrib.auth.signals import user_logged_in, user_logged_out
 from django.dispatch import receiver
 import random
 import string
-from datetime import timedelta
+from datetime import timedelta, datetime
 from django.utils import timezone
 import re
 from django.core.mail import BadHeaderError, send_mail
@@ -218,23 +218,33 @@ def doctor_login(request):
 def doctor_dashboard(request):
         if request.user.is_authenticated:    
             if request.user.is_doctor:
-                # doctor = Doctor_Information.objects.get(user_id=pk)
                 doctor = Doctor_Information.objects.get(user=request.user)
-                # appointments = Appointment.objects.filter(doctor=doctor).filter(Q(appointment_status='pending') | Q(appointment_status='confirmed'))
                 current_date = timezone.now().date()
                 current_date_str = str(current_date)  
-                today_appointments = Appointment.objects.filter(date=current_date_str).filter(doctor=doctor).filter(appointment_status='confirmed')
+                today_appointments = Appointment.objects.filter(date=current_date_str, doctor=doctor, appointment_status='confirmed')
 
-                next_date = current_date + timezone.timedelta(days=1) # next days date 
+                next_date = current_date + timezone.timedelta(days=1)
                 next_date_str = str(next_date)  
-                next_days_appointment = Appointment.objects.filter(date=next_date_str).filter(doctor=doctor).filter(Q(appointment_status='pending') | Q(appointment_status='confirmed')).count()
+                next_days_appointment = Appointment.objects.filter(date=next_date_str, doctor=doctor).filter(Q(appointment_status='pending') | Q(appointment_status='confirmed')).count()
 
-                today_patient_count = Appointment.objects.filter(date=current_date_str).filter(doctor=doctor).annotate(count=Count('patient'))
-                total_appointments_count = Appointment.objects.filter(doctor=doctor).annotate(count=Count('id'))
+                today_patient_count = today_appointments.count()
+                total_appointments_count = Appointment.objects.filter(doctor=doctor).count()
+                
+                reports = Report.objects.filter(doctor=doctor)
+
             else:
                 return redirect('doctor-logout')
 
-            context = {'doctor': doctor, 'today_appointments': today_appointments, 'today_patient_count': today_patient_count, 'total_appointments_count': total_appointments_count, 'next_days_appointment': next_days_appointment, 'current_date': current_date_str, 'next_date': next_date_str}
+            context = {
+                'doctor': doctor, 
+                'today_appointments': today_appointments, 
+                'today_patient_count': today_patient_count, 
+                'total_appointments_count': total_appointments_count, 
+                'next_days_appointment': next_days_appointment, 
+                'current_date': current_date_str, 
+                'next_date': next_date_str,
+                'reports': reports
+            }
             return render(request, 'doctor-dashboard.html', context)
         else:
             return redirect('doctor-login')
@@ -473,7 +483,7 @@ def booking(request, pk):
         message = request.POST['message']
 
 
-        transformed_date = timezone.timezone.strptime(date, '%m/%d/%Y').strftime('%Y-%m-%d')
+        transformed_date = datetime.strptime(date, '%m/%d/%Y').strftime('%Y-%m-%d')
         transformed_date = str(transformed_date)
 
         appointment.date = transformed_date
@@ -647,7 +657,7 @@ def report_pdf(request, pk):
 #     return render(request, 'testing.html', context)
 
 @csrf_exempt
-@login_required(login_url="login")
+@login_required(login_url="unified-login")
 def patient_search(request, pk):
     if request.user.is_authenticated and request.user.is_doctor:
         doctor = Doctor_Information.objects.get(doctor_id=pk)
@@ -662,7 +672,7 @@ def patient_search(request, pk):
         return render(request, 'doctor-login.html')
 
 @csrf_exempt
-@login_required(login_url="login")
+@login_required(login_url="unified-login")
 def doctor_test_list(request):
     if request.user.is_authenticated and request.user.is_doctor:
         doctor = Doctor_Information.objects.get(user=request.user)
@@ -683,7 +693,7 @@ def doctor_test_list(request):
 
 
 @csrf_exempt
-@login_required(login_url="login")
+@login_required(login_url="unified-login")
 def doctor_view_prescription(request, pk):
     if request.user.is_authenticated and request.user.is_doctor:
         doctor = Doctor_Information.objects.get(user=request.user)
@@ -694,7 +704,7 @@ def doctor_view_prescription(request, pk):
         return render(request, 'doctor-view-prescription.html', context)
 
 @csrf_exempt
-@login_required(login_url="login")
+@login_required(login_url="unified-login")
 def doctor_view_report(request, pk):
     if request.user.is_authenticated and request.user.is_doctor:
         doctor = Doctor_Information.objects.get(user=request.user)
@@ -770,17 +780,19 @@ def doctor_security_settings(request):
 @csrf_exempt
 @receiver(user_logged_in)
 def got_online(sender, user, request, **kwargs):    
-    user.login_status = True
-    user.save()
+    if user:
+        user.login_status = True
+        user.save()
 
 @csrf_exempt
 @receiver(user_logged_out)
 def got_offline(sender, user, request, **kwargs):   
-    user.login_status = False
-    user.save()
+    if user:
+        user.login_status = False
+        user.save()
 
 @csrf_exempt
-@login_required(login_url="login")
+@login_required(login_url="unified-login")
 def doctor_review(request, pk):
     if request.user.is_doctor:
         # doctor = Doctor_Information.objects.get(user_id=pk)

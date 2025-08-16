@@ -19,7 +19,7 @@ from django.views.decorators.csrf import csrf_exempt
 # Create your views here.
 
 @csrf_exempt
-@login_required(login_url='login')
+@login_required(login_url='unified-login')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def home(request,pk):
     if request.user.is_patient:
@@ -143,7 +143,7 @@ def profile(request):
     return render(request,"chat/profile.html",context)
 
 @csrf_exempt
-@login_required(login_url='login')
+@login_required(login_url='unified-login')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def get_messages(request):
     chats = chatMessages.objects.filter(Q(id__gt=request.POST['last_id']),Q(user_from=request.user.id, user_to=request.POST['chat_id']) | Q(user_from=request.POST['chat_id'], user_to=request.user.id))
@@ -160,7 +160,7 @@ def get_messages(request):
     return HttpResponse(json.dumps(new_msgs), content_type="application/json")
 
 @csrf_exempt
-@login_required(login_url='login')
+@login_required(login_url='unified-login')
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def send_chat(request):
     resp = {}

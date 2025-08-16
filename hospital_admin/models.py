@@ -19,7 +19,7 @@ class Admin_Information(models.Model):
     username = models.CharField(null=True, blank=True, max_length=200)
     name = models.CharField(max_length=200, null=True, blank=True)
     featured_image = models.ImageField(upload_to='admin/', default='admin/user-default.png', null=True, blank=True)
-    phone_number = models.IntegerField(null=True, blank=True)
+    phone_number = models.CharField(max_length=20, null=True, blank=True)
     email = models.CharField(max_length=200, null=True, blank=True)
     role = models.CharField(max_length=200, choices=ADMIN_TYPE, null=True, blank=True)
     hospital = models.ForeignKey(Hospital_Information, on_delete=models.SET_NULL, null=True, blank=True)
@@ -35,7 +35,7 @@ class Clinical_Laboratory_Technician(models.Model):
     username = models.CharField(max_length=200, null=True, blank=True)
     age = models.IntegerField(null=True, blank=True)
     email = models.EmailField(max_length=200, null=True, blank=True)
-    phone_number = models.IntegerField(null=True, blank=True)
+    phone_number = models.CharField(max_length=20, null=True, blank=True)
     featured_image = models.ImageField(upload_to='technician/', default='technician/user-default.png', null=True, blank=True)
     hospital = models.ForeignKey(Hospital_Information, on_delete=models.SET_NULL, null=True, blank=True)
     

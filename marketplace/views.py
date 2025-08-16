@@ -87,7 +87,7 @@ def provider_detail(request, provider_id):
     }
     return render(request, 'marketplace/provider_detail.html', context)
 
-@login_required
+@login_required(login_url="unified-login")
 def create_order(request):
     """Create a new marketplace order"""
     if request.method == 'POST':
@@ -142,7 +142,7 @@ def create_order(request):
     
     return JsonResponse({'success': False, 'message': 'Invalid request method'})
 
-@login_required
+@login_required(login_url="unified-login")
 def my_orders(request):
     """View user's marketplace orders"""
     orders = MarketplaceOrder.objects.filter(user=request.user).order_by('-created_at')
@@ -157,7 +157,7 @@ def my_orders(request):
     }
     return render(request, 'marketplace/my_orders.html', context)
 
-@login_required
+@login_required(login_url="unified-login")
 def order_detail(request, order_id):
     """Detailed view of an order"""
     order = get_object_or_404(MarketplaceOrder, order_id=order_id, user=request.user)
@@ -167,7 +167,7 @@ def order_detail(request, order_id):
     }
     return render(request, 'marketplace/order_detail.html', context)
 
-@login_required
+@login_required(login_url="unified-login")
 def track_order(request, order_id):
     """Track order status"""
     order = get_object_or_404(MarketplaceOrder, order_id=order_id, user=request.user)
@@ -186,7 +186,7 @@ def track_order(request, order_id):
     }
     return render(request, 'marketplace/track_order.html', context)
 
-@login_required
+@login_required(login_url="unified-login")
 def cancel_order(request, order_id):
     """Cancel an order"""
     order = get_object_or_404(MarketplaceOrder, order_id=order_id, user=request.user)
@@ -201,7 +201,7 @@ def cancel_order(request, order_id):
     return redirect('marketplace:order_detail', order_id=order_id)
 
 # Provider Dashboard Views
-@login_required
+@login_required(login_url="unified-login")
 def provider_dashboard(request):
     """Dashboard for service providers"""
     try:
@@ -242,7 +242,7 @@ def provider_dashboard(request):
         messages.error(request, 'Provider profile not found.')
         return redirect('marketplace:home')
 
-@login_required
+@login_required(login_url="unified-login")
 def update_provider_status(request):
     """Update provider availability status"""
     if request.method == 'POST':
@@ -268,7 +268,7 @@ def update_provider_status(request):
     
     return JsonResponse({'success': False, 'message': 'Invalid request'})
 
-@login_required
+@login_required(login_url="unified-login")
 def manage_order(request, order_id):
     """Manage order status by provider"""
     order = get_object_or_404(MarketplaceOrder, order_id=order_id)

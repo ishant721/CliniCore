@@ -16,7 +16,7 @@ class Pharmacist(models.Model):
     degree = models.CharField(max_length=200, null=True, blank=True)
     featured_image = models.ImageField(upload_to='doctors/', default='pharmacist/user-default.png', null=True, blank=True)
     email = models.EmailField(max_length=200, null=True, blank=True)
-    phone_number = models.IntegerField(null=True, blank=True)
+    phone_number = models.CharField(max_length=20, null=True, blank=True)
     age = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
