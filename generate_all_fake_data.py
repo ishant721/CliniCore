@@ -1,8 +1,22 @@
+#!/usr/bin/env python3
+import os
+import sys
+import django
 
-import random
-from datetime import timedelta, datetime
-from django.utils import timezone
+# Add the project directory to Python path
+project_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(project_dir)
+
+# Configure Django settings FIRST
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'healthstack.settings')
+django.setup()
+
+# Import Django modules AFTER setup
+from django.contrib.auth import get_user_model
 from faker import Faker
+import random
+from datetime import datetime, timedelta, date, time
+from decimal import Decimal
 
 # Import all models from your apps
 from hospital.models import User, Hospital_Information, Patient
@@ -112,7 +126,7 @@ def generate_all_fake_data(num_users=50, num_hospitals=8, num_doctors_per_hospit
     print("👥 Generating Users...")
     users = []
     user_types = ['patient', 'doctor', 'hospital_admin', 'labworker', 'pharmacist', 'delivery_partner']
-    
+
     for i in range(num_users):
         username = f"user{i+1}_{fake.user_name()}"[:30]
         email = f"user{i+1}@{fake.domain_name()}"
@@ -125,7 +139,7 @@ def generate_all_fake_data(num_users=50, num_hospitals=8, num_doctors_per_hospit
             first_name=fake.first_name(),
             last_name=fake.last_name()
         )
-        
+
         # Assign random user types
         user_type_choice = random.choice(user_types)
         if user_type_choice == 'patient':
@@ -140,7 +154,7 @@ def generate_all_fake_data(num_users=50, num_hospitals=8, num_doctors_per_hospit
             user.is_pharmacist = True
         elif user_type_choice == 'delivery_partner':
             user.is_delivery_partner = True
-        
+
         user.is_active = True
         user.login_status = fake.boolean()
         user.save()
@@ -155,11 +169,11 @@ def generate_all_fake_data(num_users=50, num_hospitals=8, num_doctors_per_hospit
         "St. Mary's Medical Complex", "Regional Health Center", "University Hospital",
         "Children's Hospital", "Heart & Vascular Institute"
     ]
-    
+
     for i in range(num_hospitals):
         lat = round(random.uniform(23.7, 23.9), 6)
         lon = round(random.uniform(90.3, 90.5), 6)
-        
+
         hospital = Hospital_Information.objects.create(
             name=hospital_names[i % len(hospital_names)] if i < len(hospital_names) else f"{fake.company()} Hospital",
             address=fake.address(),
@@ -213,7 +227,7 @@ def generate_all_fake_data(num_users=50, num_hospitals=8, num_doctors_per_hospit
                 featured_image='departments/default.png'
             )
             departments.append(dept)
-        
+
         # Create specializations
         for spec_name in random.sample(spec_names, random.randint(4, 7)):
             spec = specialization.objects.create(
@@ -241,7 +255,7 @@ def generate_all_fake_data(num_users=50, num_hospitals=8, num_doctors_per_hospit
         'ECG', 'Echocardiogram', 'CT Scan Head', 'MRI Brain', 'Ultrasound Abdomen',
         'Urine Analysis', 'Stool Analysis'
     ]
-    
+
     for test_name in test_names:
         test_info = Test_Information.objects.create(
             test_name=test_name,
@@ -270,7 +284,7 @@ def generate_all_fake_data(num_users=50, num_hospitals=8, num_doctors_per_hospit
     print("👨‍⚕️ Generating Doctors...")
     doctors = []
     doctor_users = User.objects.filter(is_doctor=True)
-    
+
     for user in doctor_users:
         hospital = random.choice(hospitals) if hospitals else None
         department = random.choice(departments) if departments else None
@@ -326,12 +340,12 @@ def generate_all_fake_data(num_users=50, num_hospitals=8, num_doctors_per_hospit
         "MBBS", "MBBS, MD", "MBBS, FCPS", "MBBS, MS", "MBBS, PhD",
         "BDS", "BAMS", "BHMS", "MBBS, DM", "MBBS, MCh"
     ]
-    
+
     institute_list = [
         "Dhaka Medical College", "Chittagong Medical College", "Sylhet MAG Osmani Medical College",
         "Rajshahi Medical College", "Mymensingh Medical College", "Rangpur Medical College"
     ]
-    
+
     for doctor in doctors:
         # Education
         for _ in range(random.randint(1, 3)):
@@ -341,7 +355,7 @@ def generate_all_fake_data(num_users=50, num_hospitals=8, num_doctors_per_hospit
                 institute=random.choice(institute_list),
                 year_of_completion=str(random.randint(2000, 2020))
             )
-        
+
         # Experience
         for _ in range(random.randint(1, 4)):
             start_year = random.randint(2010, 2020)
@@ -359,7 +373,7 @@ def generate_all_fake_data(num_users=50, num_hospitals=8, num_doctors_per_hospit
     print("💊 Generating Pharmacists...")
     pharmacists = []
     pharmacist_users = User.objects.filter(is_pharmacist=True)
-    
+
     for user in pharmacist_users:
         pharmacist = Pharmacist.objects.create(
             user=user,
@@ -378,13 +392,13 @@ def generate_all_fake_data(num_users=50, num_hospitals=8, num_doctors_per_hospit
     print("🔬 Generating Lab Workers...")
     lab_workers = []
     labworker_users = User.objects.filter(is_labworker=True)
-    
+
     for user in labworker_users:
         hospital = random.choice(hospitals) if hospitals else None
         if not hospital:
             print(f"  ⚠️ Skipping lab worker creation for {user.username}: No hospitals available.")
             continue
-            
+
         lab_worker = Clinical_Laboratory_Technician.objects.create(
             user=user,
             name=f"{user.first_name} {user.last_name}",
@@ -402,7 +416,7 @@ def generate_all_fake_data(num_users=50, num_hospitals=8, num_doctors_per_hospit
     print("🚚 Generating Delivery Partners...")
     delivery_partners = []
     delivery_partner_users = User.objects.filter(is_delivery_partner=True)
-    
+
     for user in delivery_partner_users:
         delivery_partner = DeliveryPartner.objects.create(
             user=user,
@@ -429,7 +443,7 @@ def generate_all_fake_data(num_users=50, num_hospitals=8, num_doctors_per_hospit
         'Prednisolone', 'Diclofenac', 'Ranitidine', 'Ciprofloxacin', 'Azithromycin',
         'Cough Syrup', 'Vitamin D3', 'Calcium Tablets', 'Iron Tablets', 'Multivitamin'
     ]
-    
+
     for medicine_name in medicine_names:
         medicine = Medicine.objects.create(
             medicine_id=f"MED{random.randint(1000, 9999)}",
@@ -463,15 +477,15 @@ def generate_all_fake_data(num_users=50, num_hospitals=8, num_doctors_per_hospit
     print("🏪 Generating Service Providers...")
     service_providers = []
     service_types = ['consultation', 'medicine_delivery', 'lab_service', 'home_visit']
-    
+
     for _ in range(20):
         provider_type = random.choice(service_types)
-        
+
         hospital_obj = None
         doctor_obj = None
         pharmacist_obj = None
         name = ""
-        
+
         if provider_type == 'consultation' and doctors:
             doctor_obj = random.choice(doctors)
             name = f"Dr. {doctor_obj.name} Consultation"
@@ -523,7 +537,7 @@ def generate_all_fake_data(num_users=50, num_hospitals=8, num_doctors_per_hospit
     print("🤒 Generating Patients...")
     patients = []
     patient_users = User.objects.filter(is_patient=True)
-    
+
     for user in patient_users:
         for _ in range(num_patients_per_user):
             patient = Patient.objects.create(
@@ -554,13 +568,13 @@ def generate_all_fake_data(num_users=50, num_hospitals=8, num_doctors_per_hospit
     for _ in range(num_appointments_per_patient * len(patients)):
         patient = random.choice(patients) if patients else None
         doctor = random.choice(doctors) if doctors else None
-        
+
         if not patient or not doctor:
             continue
-        
+
         appointment_date = fake.date_between(start_date="-60d", end_date="+60d")
         appointment_time = f"{random.randint(9, 17)}:{random.choice(['00', '30'])}"
-        
+
         appointment = Appointment.objects.create(
             date=appointment_date,
             time=appointment_time,
@@ -586,10 +600,10 @@ def generate_all_fake_data(num_users=50, num_hospitals=8, num_doctors_per_hospit
         patient = random.choice(patients) if patients else None
         doctor = random.choice(doctors) if doctors else None
         lab_worker = random.choice(lab_workers) if lab_workers else None
-        
+
         if not patient or not doctor:
             continue
-        
+
         report = Report.objects.create(
             doctor=doctor,
             patient=patient,
@@ -617,7 +631,7 @@ def generate_all_fake_data(num_users=50, num_hospitals=8, num_doctors_per_hospit
                 collection_date=fake.date_this_year().strftime('%Y-%m-%d'),
                 receiving_date=fake.date_this_year().strftime('%Y-%m-%d')
             )
-        
+
         for _ in range(random.randint(1, 5)):
             Test.objects.create(
                 report=report,
@@ -634,10 +648,10 @@ def generate_all_fake_data(num_users=50, num_hospitals=8, num_doctors_per_hospit
     for _ in range(num_prescriptions_per_patient * len(patients)):
         patient = random.choice(patients) if patients else None
         doctor = random.choice(doctors) if doctors else None
-        
+
         if not patient or not doctor:
             continue
-        
+
         prescription = Prescription.objects.create(
             doctor=doctor,
             patient=patient,
@@ -668,7 +682,7 @@ def generate_all_fake_data(num_users=50, num_hospitals=8, num_doctors_per_hospit
                 order_status=random.choice(['pending', 'ordered', 'delivered', 'cancelled']),
                 ordered_date=timezone.now() if fake.boolean() else None
             )
-        
+
         # Create prescription tests
         for _ in range(random.randint(0, 2)):
             test_info = random.choice(test_info_list) if test_info_list else None
@@ -699,7 +713,7 @@ def generate_all_fake_data(num_users=50, num_hospitals=8, num_doctors_per_hospit
                         purchased=True
                     )
                     cart_items.append(cart_item)
-            
+
             if cart_items:
                 order = Order.objects.create(
                     user=patient.user,
@@ -726,7 +740,7 @@ def generate_all_fake_data(num_users=50, num_hospitals=8, num_doctors_per_hospit
                         purchased=True
                     )
                     test_cart_items.append(test_cart_item)
-            
+
             if test_cart_items:
                 test_order = testOrder.objects.create(
                     user=patient.user,
@@ -744,9 +758,9 @@ def generate_all_fake_data(num_users=50, num_hospitals=8, num_doctors_per_hospit
         patient = random.choice(patients) if patients else None
         if not patient:
             continue
-        
+
         payment_type = random.choice(['appointment', 'medicine', 'lab_test'])
-        
+
         appointment_obj = None
         order_obj = None
         test_order_obj = None
@@ -758,7 +772,7 @@ def generate_all_fake_data(num_users=50, num_hospitals=8, num_doctors_per_hospit
             order_obj = Order.objects.filter(user=patient.user).order_by('?').first()
         elif payment_type == 'lab_test':
             test_order_obj = testOrder.objects.filter(user=patient.user).order_by('?').first()
-        
+
         prescription_obj = Prescription.objects.filter(patient=patient).order_by('?').first()
 
         Payment.objects.create(
@@ -797,7 +811,7 @@ def generate_all_fake_data(num_users=50, num_hospitals=8, num_doctors_per_hospit
         user = random.choice(users) if users else None
         service_provider = random.choice(service_providers) if service_providers else None
         delivery_partner = random.choice(delivery_partners) if delivery_partners and fake.boolean() else None
-        
+
         if not user or not service_provider:
             continue
 
@@ -830,7 +844,7 @@ def generate_all_fake_data(num_users=50, num_hospitals=8, num_doctors_per_hospit
             user2 = random.choice(all_users)
             while user1 == user2:
                 user2 = random.choice(all_users)
-            
+
             chatMessages.objects.create(
                 user_from=user1,
                 user_to=user2,
@@ -844,10 +858,10 @@ def generate_all_fake_data(num_users=50, num_hospitals=8, num_doctors_per_hospit
     for _ in range(num_doctor_reviews):
         doctor = random.choice(doctors) if doctors else None
         patient = random.choice(patients) if patients else None
-        
+
         if not doctor or not patient:
             continue
-        
+
         Doctor_review.objects.create(
             doctor=doctor,
             patient=patient,
