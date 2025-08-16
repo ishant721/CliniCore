@@ -867,6 +867,17 @@ def edit_medicine(request, pk):
 
 @csrf_exempt
 @login_required(login_url='unified-login')
+def medicine_detail(request, pk):
+    if request.user.is_pharmacist:
+        user = Pharmacist.objects.get(user=request.user)
+        medicine = Medicine.objects.get(serial_number=pk)
+        context = {'medicine': medicine, 'pharmacist': user}
+        return render(request, 'hospital_admin/medicine-detail.html', context)
+    else:
+        return redirect('logout')
+
+@csrf_exempt
+@login_required(login_url='unified-login')
 def delete_medicine(request, pk):
     if request.user.is_pharmacist:
         user = Pharmacist.objects.get(user=request.user)

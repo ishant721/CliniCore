@@ -173,3 +173,196 @@
     </script>
 </body>
 </html>
+{% extends 'base_authenticated.html' %}
+{% load static %}
+
+{% block title %}Medicine Details{% endblock %}
+
+{% block content %}
+<div class="main-wrapper">
+    <!-- Header -->
+    <header class="header">
+        {% include 'hospital_admin/pharmacist-navbar.html' %}
+    </header>
+    
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        {% include 'hospital_admin/pharmacist-sidebar.html' %}
+    </aside>
+    
+    <!-- Page Wrapper -->
+    <div class="page-wrapper">
+        <div class="content container-fluid">
+            
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="row">
+                    <div class="col-sm-7 col-auto">
+                        <h3 class="page-title">Medicine Details</h3>
+                        <ul class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="{% url 'pharmacist-dashboard' %}">Dashboard</a></li>
+                            <li class="breadcrumb-item"><a href="{% url 'medicine-list' %}">Medicines</a></li>
+                            <li class="breadcrumb-item active">Medicine Details</li>
+                        </ul>
+                    </div>
+                    <div class="col-sm-5 col">
+                        <a href="{% url 'edit-medicine' medicine.serial_number %}" class="btn btn-primary float-right mt-2">Edit Medicine</a>
+                    </div>
+                </div>
+            </div>
+            <!-- /Page Header -->
+            
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="profile-header">
+                        <div class="row align-items-center">
+                            <div class="col-auto profile-image">
+                                <a href="#">
+                                    <img class="rounded-circle" alt="Medicine Image" src="{{ medicine.featured_image.url }}" style="width: 100px; height: 100px; object-fit: cover;">
+                                </a>
+                            </div>
+                            <div class="col ml-md-n2 profile-user-info">
+                                <h4 class="user-name mb-0">{{ medicine.name }}</h4>
+                                <h6 class="text-muted">{{ medicine.medicine_type }} - {{ medicine.medicine_category }}</h6>
+                                <div class="user-Location">
+                                    <i class="fa fa-map-marker"></i> 
+                                    Weight: {{ medicine.weight }}
+                                </div>
+                                <div class="about-text">{{ medicine.description|truncatewords:20 }}</div>
+                            </div>
+                            <div class="col-auto profile-btn">
+                                <h3 class="text-primary">${{ medicine.price }}</h3>
+                                {% if medicine.stock_quantity > 0 %}
+                                    <span class="badge badge-success">In Stock ({{ medicine.stock_quantity }})</span>
+                                {% else %}
+                                    <span class="badge badge-danger">Out of Stock</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="profile-menu">
+                        <ul class="nav nav-tabs nav-tabs-solid">
+                            <li class="nav-item">
+                                <a class="nav-link active" data-toggle="tab" href="#overview_tab">Overview</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" data-toggle="tab" href="#inventory_tab">Inventory</a>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="tab-content profile-tab-cont">
+                        
+                        <!-- Overview Tab -->
+                        <div class="tab-pane fade show active" id="overview_tab">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h5 class="card-title">Medicine Information</h5>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label>Medicine Name</label>
+                                                        <p>{{ medicine.name }}</p>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label>Category</label>
+                                                        <p>{{ medicine.medicine_category }}</p>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label>Type</label>
+                                                        <p>{{ medicine.medicine_type }}</p>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label>Weight/Strength</label>
+                                                        <p>{{ medicine.weight }}</p>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label>Price</label>
+                                                        <p class="text-primary font-weight-bold">${{ medicine.price }}</p>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label>Prescription Required</label>
+                                                        <p>
+                                                            {% if medicine.Prescription_reqiuired == 'yes' %}
+                                                                <span class="badge badge-warning">Yes</span>
+                                                            {% else %}
+                                                                <span class="badge badge-success">No</span>
+                                                            {% endif %}
+                                                        </p>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label>Available Quantity</label>
+                                                        <p>{{ medicine.quantity }} units</p>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label>Stock Quantity</label>
+                                                        <p>{{ medicine.stock_quantity }} units</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="row mt-3">
+                                                <div class="col-md-12">
+                                                    <div class="form-group">
+                                                        <label>Description</label>
+                                                        <p>{{ medicine.description|linebreaks }}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /Overview Tab -->
+                        
+                        <!-- Inventory Tab -->
+                        <div class="tab-pane fade" id="inventory_tab">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h5 class="card-title">Stock Management</h5>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="card bg-info text-white">
+                                                        <div class="card-body">
+                                                            <h4>{{ medicine.stock_quantity }}</h4>
+                                                            <p>Current Stock</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="card bg-warning text-white">
+                                                        <div class="card-body">
+                                                            <h4>{{ medicine.quantity }}</h4>
+                                                            <p>Available Units</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            {% if medicine.stock_quantity < 10 %}
+                                            <div class="alert alert-danger mt-3">
+                                                <strong>Low Stock Alert!</strong> This medicine is running low on stock. Please reorder soon.
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /Inventory Tab -->
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

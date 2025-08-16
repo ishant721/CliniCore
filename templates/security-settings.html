@@ -160,3 +160,206 @@
     <script src="{% static 'HealthStack-System/js/Normal/script.js' %}"></script>
 </body>
 </html>
+{% extends 'base_authenticated.html' %}
+{% load static %}
+
+{% block title %}Security Settings{% endblock %}
+
+{% block content %}
+<div class="main-wrapper">
+    <!-- Header -->
+    <header class="header">
+        {% include 'patient_navbar.html' %}
+    </header>
+    
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        {% include 'patient-sidebar.html' %}
+    </aside>
+    
+    <!-- Page Wrapper -->
+    <div class="page-wrapper">
+        <div class="content container-fluid">
+            
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <h3 class="page-title">Security Settings</h3>
+                        <ul class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="{% url 'patient-dashboard' %}">Dashboard</a></li>
+                            <li class="breadcrumb-item"><a href="{% url 'profile-settings' %}">Profile Settings</a></li>
+                            <li class="breadcrumb-item active">Security Settings</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <!-- /Page Header -->
+            
+            <div class="row">
+                <div class="col-md-12">
+                    
+                    <!-- Two-Factor Authentication -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title">Two-Factor Authentication</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <h6>Secure your account with 2FA</h6>
+                                    <p class="text-muted">Add an extra layer of security to your account by requiring a verification code in addition to your password.</p>
+                                    {% if two_factor_enabled %}
+                                        <span class="badge badge-success">Enabled</span>
+                                    {% else %}
+                                        <span class="badge badge-secondary">Disabled</span>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-4 text-right">
+                                    {% if two_factor_enabled %}
+                                        <a href="{% url 'setup-2fa' %}" class="btn btn-warning">Manage 2FA</a>
+                                    {% else %}
+                                        <a href="{% url 'setup-2fa' %}" class="btn btn-primary">Enable 2FA</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Password Security -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title">Password Security</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Last Password Change</label>
+                                        <p class="text-muted">
+                                            {% if last_password_change %}
+                                                {{ last_password_change|date:"M d, Y H:i" }}
+                                            {% else %}
+                                                Never changed
+                                            {% endif %}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 text-right">
+                                    <a href="{% url 'change-password' patient.user.id %}" class="btn btn-outline-primary">Change Password</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Login Security -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title">Login Security</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <h6>Failed Login Attempts</h6>
+                                    <p class="text-muted">Number of failed login attempts</p>
+                                </div>
+                                <div class="col-md-6 text-right">
+                                    {% if failed_attempts > 0 %}
+                                        <span class="badge badge-warning">{{ failed_attempts }} attempts</span>
+                                    {% else %}
+                                        <span class="badge badge-success">No failed attempts</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="alert alert-info">
+                                        <strong>Account Security:</strong>
+                                        <ul class="mb-0 mt-2">
+                                            <li>Your account will be locked for 30 minutes after 5 failed login attempts</li>
+                                            <li>Always logout when using shared computers</li>
+                                            <li>Never share your login credentials with anyone</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Account Deactivation -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="card-title">Account Management</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <h6 class="text-danger">Deactivate Account</h6>
+                                    <p class="text-muted">Once you deactivate your account, you will lose access to all your medical records and appointments.</p>
+                                </div>
+                                <div class="col-md-4 text-right">
+                                    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#deactivateModal">
+                                        Deactivate Account
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Deactivate Account Modal -->
+<div class="modal fade" id="deactivateModal" tabindex="-1" role="dialog" aria-labelledby="deactivateModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deactivateModalLabel">Deactivate Account</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-danger">
+                    <strong>Warning!</strong> This action cannot be undone.
+                </div>
+                <p>Are you sure you want to deactivate your account? This will:</p>
+                <ul>
+                    <li>Remove access to all medical records</li>
+                    <li>Cancel all upcoming appointments</li>
+                    <li>Delete all personal information</li>
+                </ul>
+                <p>Type <strong>DEACTIVATE</strong> to confirm:</p>
+                <input type="text" class="form-control" id="confirmDeactivate" placeholder="Type DEACTIVATE">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmDeactivateBtn" disabled>Deactivate Account</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+$(document).ready(function() {
+    // Enable deactivate button only when correct text is entered
+    $('#confirmDeactivate').on('input', function() {
+        if ($(this).val() === 'DEACTIVATE') {
+            $('#confirmDeactivateBtn').prop('disabled', false);
+        } else {
+            $('#confirmDeactivateBtn').prop('disabled', true);
+        }
+    });
+    
+    // Handle deactivation
+    $('#confirmDeactivateBtn').click(function() {
+        // Add deactivation logic here
+        alert('Account deactivation functionality would be implemented here');
+    });
+});
+</script>
+{% endblock %}
