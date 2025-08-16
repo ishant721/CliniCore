@@ -1,0 +1,311 @@
+
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}My Orders - HealthStack Marketplace{% endblock %}
+
+{% block content %}
+<div class="content">
+    <div class="container-fluid">
+        
+        <!-- Page Header -->
+        <div class="row mb-4">
+            <div class="col-lg-12">
+                <div class="page-header">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h3 class="page-title">My Orders</h3>
+                            <ul class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="{% url 'marketplace:home' %}">Marketplace</a></li>
+                                <li class="breadcrumb-item active">My Orders</li>
+                            </ul>
+                        </div>
+                        <div class="col-auto">
+                            <a href="{% url 'marketplace:providers_list' %}" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> New Order
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Orders Filter -->
+        <div class="row mb-4">
+            <div class="col-lg-12">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <select class="form-select" id="statusFilter">
+                                    <option value="">All Status</option>
+                                    <option value="pending">Pending</option>
+                                    <option value="confirmed">Confirmed</option>
+                                    <option value="preparing">Preparing</option>
+                                    <option value="out_for_delivery">Out for Delivery</option>
+                                    <option value="delivered">Delivered</option>
+                                    <option value="cancelled">Cancelled</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-select" id="typeFilter">
+                                    <option value="">All Types</option>
+                                    <option value="consultation">Consultation</option>
+                                    <option value="medicine">Medicine</option>
+                                    <option value="lab_test">Lab Test</option>
+                                    <option value="home_visit">Home Visit</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <input type="date" class="form-control" id="dateFilter">
+                            </div>
+                            <div class="col-md-3">
+                                <button class="btn btn-outline-primary w-100" onclick="filterOrders()">
+                                    <i class="fas fa-filter"></i> Filter
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Orders List -->
+        <div class="row">
+            <div class="col-lg-12">
+                {% if orders %}
+                    {% for order in orders %}
+                    <div class="card mb-3 shadow-sm order-card" data-status="{{ order.status }}" data-type="{{ order.order_type }}" data-date="{{ order.created_at|date:'Y-m-d' }}">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+                                <div class="col-md-2">
+                                    <div class="order-info">
+                                        <h6 class="mb-1">Order #{{ order.order_id }}</h6>
+                                        <small class="text-muted">{{ order.created_at|date:"M d, Y H:i" }}</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="provider-info">
+                                        <h6 class="mb-1">{{ order.service_provider.name }}</h6>
+                                        <small class="text-muted">{{ order.order_type|title }}</small>
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="amount-info">
+                                        <h6 class="mb-1 text-primary">৳{{ order.total_amount }}</h6>
+                                        {% if order.priority == 'emergency' %}
+                                            <span class="badge bg-danger">Emergency</span>
+                                        {% elif order.priority == 'urgent' %}
+                                            <span class="badge bg-warning">Urgent</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Normal</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="status-info">
+                                        {% if order.status == 'pending' %}
+                                            <span class="badge bg-warning">Pending</span>
+                                        {% elif order.status == 'confirmed' %}
+                                            <span class="badge bg-info">Confirmed</span>
+                                        {% elif order.status == 'preparing' %}
+                                            <span class="badge bg-primary">Preparing</span>
+                                        {% elif order.status == 'out_for_delivery' %}
+                                            <span class="badge bg-purple">Out for Delivery</span>
+                                        {% elif order.status == 'delivered' %}
+                                            <span class="badge bg-success">Delivered</span>
+                                        {% elif order.status == 'cancelled' %}
+                                            <span class="badge bg-danger">Cancelled</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="order-actions text-end">
+                                        <a href="{% url 'marketplace:order_detail' order.order_id %}" class="btn btn-sm btn-outline-primary me-2">
+                                            <i class="fas fa-eye"></i> View
+                                        </a>
+                                        {% if order.status not in 'delivered,cancelled' %}
+                                            <a href="{% url 'marketplace:track_order' order.order_id %}" class="btn btn-sm btn-outline-success me-2">
+                                                <i class="fas fa-map-marker-alt"></i> Track
+                                            </a>
+                                        {% endif %}
+                                        {% if order.status in 'pending,confirmed' %}
+                                            <button class="btn btn-sm btn-outline-danger" onclick="cancelOrder({{ order.order_id }})">
+                                                <i class="fas fa-times"></i> Cancel
+                                            </button>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Delivery Address -->
+                            <div class="row mt-3">
+                                <div class="col-12">
+                                    <small class="text-muted">
+                                        <i class="fas fa-map-marker-alt"></i> {{ order.delivery_address }}
+                                    </small>
+                                </div>
+                            </div>
+                            
+                            <!-- Estimated Delivery Time -->
+                            {% if order.status not in 'delivered,cancelled' %}
+                            <div class="row mt-2">
+                                <div class="col-12">
+                                    <small class="text-info">
+                                        <i class="fas fa-clock"></i> 
+                                        {% if order.status == 'delivered' %}
+                                            Delivered on {{ order.actual_delivery_time|date:"M d, Y H:i" }}
+                                        {% else %}
+                                            Estimated delivery: {{ order.estimated_delivery_time|date:"M d, Y H:i" }}
+                                        {% endif %}
+                                    </small>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                    
+                    <!-- Pagination -->
+                    {% if orders.has_other_pages %}
+                    <div class="row mt-4">
+                        <div class="col-lg-12">
+                            <nav aria-label="Orders pagination">
+                                <ul class="pagination justify-content-center">
+                                    {% if orders.has_previous %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ orders.previous_page_number }}">Previous</a>
+                                        </li>
+                                    {% endif %}
+                                    
+                                    {% for num in orders.paginator.page_range %}
+                                        {% if orders.number == num %}
+                                            <li class="page-item active">
+                                                <span class="page-link">{{ num }}</span>
+                                            </li>
+                                        {% elif num > orders.number|add:'-3' and num < orders.number|add:'3' %}
+                                            <li class="page-item">
+                                                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                                            </li>
+                                        {% endif %}
+                                    {% endfor %}
+                                    
+                                    {% if orders.has_next %}
+                                        <li class="page-item">
+                                            <a class="page-link" href="?page={{ orders.next_page_number }}">Next</a>
+                                        </li>
+                                    {% endif %}
+                                </ul>
+                            </nav>
+                        </div>
+                    </div>
+                    {% endif %}
+                {% else %}
+                    <!-- Empty State -->
+                    <div class="card shadow-sm">
+                        <div class="card-body text-center py-5">
+                            <div class="empty-state">
+                                <i class="fas fa-shopping-bag fa-4x text-muted mb-4"></i>
+                                <h4 class="text-muted">No Orders Yet</h4>
+                                <p class="text-muted mb-4">You haven't placed any orders yet. Start exploring our marketplace!</p>
+                                <a href="{% url 'marketplace:providers_list' %}" class="btn btn-primary">
+                                    <i class="fas fa-shopping-cart"></i> Browse Services
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<style>
+.page-header {
+    background: #fff;
+    padding: 1.5rem 0;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 1rem;
+}
+
+.order-card {
+    border: 1px solid #e9ecef;
+    transition: all 0.3s ease;
+}
+
+.order-card:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1) !important;
+    transform: translateY(-2px);
+}
+
+.badge.bg-purple {
+    background-color: #6f42c1 !important;
+}
+
+.empty-state i {
+    opacity: 0.5;
+}
+
+.order-info h6, .provider-info h6, .amount-info h6 {
+    font-weight: 600;
+}
+
+.order-actions .btn {
+    font-size: 0.875rem;
+}
+
+@media (max-width: 768px) {
+    .order-actions {
+        text-align: left !important;
+        margin-top: 1rem;
+    }
+    
+    .order-actions .btn {
+        margin-bottom: 0.5rem;
+    }
+}
+</style>
+
+<script>
+function filterOrders() {
+    const statusFilter = document.getElementById('statusFilter').value;
+    const typeFilter = document.getElementById('typeFilter').value;
+    const dateFilter = document.getElementById('dateFilter').value;
+    
+    const orderCards = document.querySelectorAll('.order-card');
+    
+    orderCards.forEach(card => {
+        let showCard = true;
+        
+        if (statusFilter && card.dataset.status !== statusFilter) {
+            showCard = false;
+        }
+        
+        if (typeFilter && card.dataset.type !== typeFilter) {
+            showCard = false;
+        }
+        
+        if (dateFilter && card.dataset.date !== dateFilter) {
+            showCard = false;
+        }
+        
+        card.style.display = showCard ? 'block' : 'none';
+    });
+}
+
+function cancelOrder(orderId) {
+    if (confirm('Are you sure you want to cancel this order?')) {
+        window.location.href = `/marketplace/order/${orderId}/cancel/`;
+    }
+}
+
+// Reset filters
+document.addEventListener('DOMContentLoaded', function() {
+    const filterInputs = document.querySelectorAll('#statusFilter, #typeFilter, #dateFilter');
+    filterInputs.forEach(input => {
+        input.addEventListener('change', filterOrders);
+    });
+});
+</script>
+{% endblock %}

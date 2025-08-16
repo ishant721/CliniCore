@@ -1,0 +1,227 @@
+
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Order #{{ order.order_id }} - HealthStack Marketplace{% endblock %}
+
+{% block content %}
+<div class="content">
+    <div class="container-fluid">
+        
+        <!-- Page Header -->
+        <div class="row mb-4">
+            <div class="col-lg-12">
+                <div class="page-header">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h3 class="page-title">Order #{{ order.order_id }}</h3>
+                            <ul class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="{% url 'marketplace:home' %}">Marketplace</a></li>
+                                <li class="breadcrumb-item"><a href="{% url 'marketplace:my_orders' %}">My Orders</a></li>
+                                <li class="breadcrumb-item active">Order #{{ order.order_id }}</li>
+                            </ul>
+                        </div>
+                        <div class="col-auto">
+                            {% if order.status not in 'delivered,cancelled' %}
+                                <a href="{% url 'marketplace:track_order' order.order_id %}" class="btn btn-primary">
+                                    <i class="fas fa-map-marker-alt"></i> Track Order
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Order Details -->
+            <div class="col-lg-8">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Order Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Service Provider</label>
+                                    <p class="mb-1">{{ order.service_provider.name }}</p>
+                                    <small class="text-muted">{{ order.order_type|title }} Service</small>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Order Type</label>
+                                    <p>{{ order.get_order_type_display }}</p>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Priority</label>
+                                    <p>
+                                        {% if order.priority == 'emergency' %}
+                                            <span class="badge bg-danger">Emergency</span>
+                                        {% elif order.priority == 'urgent' %}
+                                            <span class="badge bg-warning">Urgent</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Normal</span>
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Order Date</label>
+                                    <p>{{ order.created_at|date:"F d, Y \a\t H:i" }}</p>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Status</label>
+                                    <p>
+                                        {% if order.status == 'pending' %}
+                                            <span class="badge bg-warning">Pending</span>
+                                        {% elif order.status == 'confirmed' %}
+                                            <span class="badge bg-info">Confirmed</span>
+                                        {% elif order.status == 'preparing' %}
+                                            <span class="badge bg-primary">Preparing</span>
+                                        {% elif order.status == 'out_for_delivery' %}
+                                            <span class="badge bg-purple">Out for Delivery</span>
+                                        {% elif order.status == 'delivered' %}
+                                            <span class="badge bg-success">Delivered</span>
+                                        {% elif order.status == 'cancelled' %}
+                                            <span class="badge bg-danger">Cancelled</span>
+                                        {% endif %}
+                                    </p>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Payment Status</label>
+                                    <p>
+                                        <span class="badge bg-{{ order.payment_status == 'completed' and 'success' or 'warning' }}">
+                                            {{ order.payment_status|title }}
+                                        </span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Delivery Information -->
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Delivery Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Delivery Address</label>
+                                    <p>{{ order.delivery_address }}</p>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Estimated Delivery</label>
+                                    <p>{{ order.estimated_delivery_time|date:"F d, Y \a\t H:i" }}</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                {% if order.delivery_partner %}
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Delivery Partner</label>
+                                    <p>{{ order.delivery_partner.name }}</p>
+                                    <small class="text-muted">{{ order.delivery_partner.phone }}</small>
+                                </div>
+                                {% endif %}
+                                {% if order.actual_delivery_time %}
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Actual Delivery</label>
+                                    <p>{{ order.actual_delivery_time|date:"F d, Y \a\t H:i" }}</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Summary -->
+            <div class="col-lg-4">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Order Summary</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Subtotal:</span>
+                            <span>৳{{ order.subtotal }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Delivery Fee:</span>
+                            <span>৳{{ order.delivery_fee }}</span>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between fw-bold">
+                            <span>Total:</span>
+                            <span class="text-primary">৳{{ order.total_amount }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Order Actions -->
+                <div class="card shadow-sm">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Actions</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if order.status not in 'delivered,cancelled' %}
+                            <a href="{% url 'marketplace:track_order' order.order_id %}" class="btn btn-primary w-100 mb-2">
+                                <i class="fas fa-map-marker-alt"></i> Track Order
+                            </a>
+                        {% endif %}
+                        
+                        {% if order.status in 'pending,confirmed' %}
+                            <button class="btn btn-outline-danger w-100 mb-2" onclick="cancelOrder()">
+                                <i class="fas fa-times"></i> Cancel Order
+                            </button>
+                        {% endif %}
+                        
+                        <a href="{% url 'marketplace:my_orders' %}" class="btn btn-outline-secondary w-100">
+                            <i class="fas fa-arrow-left"></i> Back to Orders
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<style>
+.page-header {
+    background: #fff;
+    padding: 1.5rem 0;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 1rem;
+}
+
+.badge.bg-purple {
+    background-color: #6f42c1 !important;
+}
+
+.card {
+    border: 1px solid #e9ecef;
+}
+
+.card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.form-label.fw-bold {
+    font-weight: 600 !important;
+    color: #495057;
+}
+</style>
+
+<script>
+function cancelOrder() {
+    if (confirm('Are you sure you want to cancel this order? This action cannot be undone.')) {
+        window.location.href = "{% url 'marketplace:cancel_order' order.order_id %}";
+    }
+}
+</script>
+{% endblock %}

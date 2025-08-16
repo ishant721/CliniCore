@@ -1,0 +1,303 @@
+
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Track Order #{{ order.order_id }} - HealthStack Marketplace{% endblock %}
+
+{% block content %}
+<div class="content">
+    <div class="container-fluid">
+        
+        <!-- Page Header -->
+        <div class="row mb-4">
+            <div class="col-lg-12">
+                <div class="page-header">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h3 class="page-title">Track Order #{{ order.order_id }}</h3>
+                            <ul class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="{% url 'marketplace:home' %}">Marketplace</a></li>
+                                <li class="breadcrumb-item"><a href="{% url 'marketplace:my_orders' %}">My Orders</a></li>
+                                <li class="breadcrumb-item active">Track Order</li>
+                            </ul>
+                        </div>
+                        <div class="col-auto">
+                            <a href="{% url 'marketplace:order_detail' order.order_id %}" class="btn btn-outline-primary">
+                                <i class="fas fa-eye"></i> View Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Order Tracking -->
+            <div class="col-lg-8">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Order Progress</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="order-timeline">
+                            <div class="timeline-item {{ order.status == 'pending' and 'active' or order.status != 'pending' and 'completed' or '' }}">
+                                <div class="timeline-icon">
+                                    <i class="fas fa-shopping-cart"></i>
+                                </div>
+                                <div class="timeline-content">
+                                    <h6>Order Placed</h6>
+                                    <p class="text-muted mb-0">{{ order.created_at|date:"M d, Y H:i" }}</p>
+                                </div>
+                            </div>
+                            
+                            <div class="timeline-item {{ order.status == 'confirmed' and 'active' or order.status in 'preparing,out_for_delivery,delivered' and 'completed' or '' }}">
+                                <div class="timeline-icon">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                                <div class="timeline-content">
+                                    <h6>Order Confirmed</h6>
+                                    <p class="text-muted mb-0">Your order has been confirmed by the provider</p>
+                                </div>
+                            </div>
+                            
+                            <div class="timeline-item {{ order.status == 'preparing' and 'active' or order.status in 'out_for_delivery,delivered' and 'completed' or '' }}">
+                                <div class="timeline-icon">
+                                    <i class="fas fa-cog"></i>
+                                </div>
+                                <div class="timeline-content">
+                                    <h6>Preparing</h6>
+                                    <p class="text-muted mb-0">Your order is being prepared</p>
+                                </div>
+                            </div>
+                            
+                            <div class="timeline-item {{ order.status == 'out_for_delivery' and 'active' or order.status == 'delivered' and 'completed' or '' }}">
+                                <div class="timeline-icon">
+                                    <i class="fas fa-truck"></i>
+                                </div>
+                                <div class="timeline-content">
+                                    <h6>Out for Delivery</h6>
+                                    <p class="text-muted mb-0">Your order is on the way</p>
+                                    {% if order.delivery_partner %}
+                                        <small class="text-info">Delivery Partner: {{ order.delivery_partner.name }}</small>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <div class="timeline-item {{ order.status == 'delivered' and 'completed' or '' }}">
+                                <div class="timeline-icon">
+                                    <i class="fas fa-home"></i>
+                                </div>
+                                <div class="timeline-content">
+                                    <h6>Delivered</h6>
+                                    {% if order.actual_delivery_time %}
+                                        <p class="text-muted mb-0">{{ order.actual_delivery_time|date:"M d, Y H:i" }}</p>
+                                    {% else %}
+                                        <p class="text-muted mb-0">Estimated: {{ order.estimated_delivery_time|date:"M d, Y H:i" }}</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Map (Placeholder) -->
+                {% if order.status == 'out_for_delivery' and partner_location %}
+                <div class="card shadow-sm">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Live Tracking</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="trackingMap" style="height: 400px; background: #f8f9fa; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                            <div class="text-center">
+                                <i class="fas fa-map-marked-alt fa-3x text-muted mb-3"></i>
+                                <h5 class="text-muted">Live Tracking Map</h5>
+                                <p class="text-muted">Real-time location tracking will be displayed here</p>
+                                {% if partner_location.latitude and partner_location.longitude %}
+                                    <small class="text-info">
+                                        Delivery partner location: {{ partner_location.latitude }}, {{ partner_location.longitude }}
+                                    </small>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Order Info Sidebar -->
+            <div class="col-lg-4">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Order Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Service Provider</label>
+                            <p class="mb-0">{{ order.service_provider.name }}</p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Order Type</label>
+                            <p class="mb-0">{{ order.get_order_type_display }}</p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Priority</label>
+                            <p class="mb-0">
+                                {% if order.priority == 'emergency' %}
+                                    <span class="badge bg-danger">Emergency</span>
+                                {% elif order.priority == 'urgent' %}
+                                    <span class="badge bg-warning">Urgent</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Normal</span>
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Total Amount</label>
+                            <p class="mb-0 text-primary fw-bold">৳{{ order.total_amount }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Delivery Address</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-0">{{ order.delivery_address }}</p>
+                    </div>
+                </div>
+
+                {% if order.delivery_partner %}
+                <div class="card shadow-sm">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Delivery Partner</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="avatar-sm me-3">
+                                <div class="avatar-title bg-primary rounded-circle">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                            </div>
+                            <div>
+                                <h6 class="mb-0">{{ order.delivery_partner.name }}</h6>
+                                <small class="text-muted">{{ order.delivery_partner.phone }}</small>
+                            </div>
+                        </div>
+                        <a href="tel:{{ order.delivery_partner.phone }}" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-phone"></i> Call Partner
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<style>
+.page-header {
+    background: #fff;
+    padding: 1.5rem 0;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 1rem;
+}
+
+.order-timeline {
+    position: relative;
+    padding-left: 2rem;
+}
+
+.order-timeline::before {
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: 0;
+    height: 100%;
+    width: 2px;
+    background: #e9ecef;
+}
+
+.timeline-item {
+    position: relative;
+    padding-bottom: 2rem;
+}
+
+.timeline-item:last-child {
+    padding-bottom: 0;
+}
+
+.timeline-icon {
+    position: absolute;
+    left: -2rem;
+    top: 0;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: #e9ecef;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6c757d;
+    font-size: 12px;
+    z-index: 1;
+}
+
+.timeline-item.active .timeline-icon {
+    background: #007bff;
+    color: white;
+    animation: pulse 2s infinite;
+}
+
+.timeline-item.completed .timeline-icon {
+    background: #28a745;
+    color: white;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(0, 123, 255, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 10px rgba(0, 123, 255, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(0, 123, 255, 0);
+    }
+}
+
+.timeline-content h6 {
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.avatar-sm {
+    width: 40px;
+    height: 40px;
+}
+
+.avatar-title {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+}
+
+.form-label.fw-bold {
+    font-weight: 600 !important;
+    color: #495057;
+}
+</style>
+
+<script>
+// Auto-refresh page every 30 seconds for live updates
+{% if order.status not in 'delivered,cancelled' %}
+setTimeout(function() {
+    location.reload();
+}, 30000);
+{% endif %}
+</script>
+{% endblock %}
