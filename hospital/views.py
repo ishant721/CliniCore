@@ -246,7 +246,7 @@ def login_user(request):
 def logoutUser(request):
     logout(request)
     messages.success(request, 'User Logged out')
-    return redirect('login')
+    return redirect('unified-login')
 
 @csrf_exempt
 def patient_register(request):
