@@ -1132,7 +1132,7 @@ def labworker_dashboard(request):
     return redirect('admin_login')
 
 @csrf_exempt
-@login_required(login_url='admin-login')
+@login_required(login_url="admin-login")
 def mypatient_list(request):
     if request.user.is_authenticated:
         if request.user.is_labworker:
@@ -1143,7 +1143,7 @@ def mypatient_list(request):
             return render(request, 'hospital_admin/mypatient-list.html',context)
 
 @csrf_exempt
-@login_required(login_url='admin-login')
+@login_required(login_url="admin-login")
 def prescription_list(request,pk):
     if request.user.is_authenticated:
         if request.user.is_labworker:
@@ -1154,7 +1154,7 @@ def prescription_list(request,pk):
             return render(request, 'hospital_admin/prescription-list.html',context)
 
 @csrf_exempt
-@login_required(login_url='admin-login')
+@login_required(login_url="admin-login")
 def add_test(request):
     if request.user.is_labworker:
         lab_workers = Clinical_Laboratory_Technician.objects.get(user=request.user)
@@ -1174,7 +1174,7 @@ def add_test(request):
     return render(request, 'hospital_admin/add-test.html', context)
 
 @csrf_exempt
-@login_required(login_url='admin-login')
+@login_required(login_url="admin-login")
 def test_list(request):
     if request.user.is_labworker:
         lab_workers = Clinical_Laboratory_Technician.objects.get(user=request.user)
@@ -1184,7 +1184,7 @@ def test_list(request):
 
 
 @csrf_exempt
-@login_required(login_url='admin-login')
+@login_required(login_url="admin-login")
 def delete_test(request,pk):
     if request.user.is_authenticated:
         if request.user.is_labworker:

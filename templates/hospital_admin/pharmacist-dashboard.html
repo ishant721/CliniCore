@@ -158,6 +158,12 @@
                 <div class="row">
                   <div class="col-sm-12">
                     <div class="card">
+                      <div class="card-header">
+                        <h4 class="card-title float-left">Medicine Inventory</h4>
+                        <a href="{% url 'add-medicine' %}" class="btn btn-primary float-right">
+                          <i class="fa fa-plus"></i> Add Medicine
+                        </a>
+                      </div>
                       <div class="card-body">
                         <div class="table-responsive">
                          <table class="datatable table table-hover table-center mb-0">
@@ -168,8 +174,11 @@
                                <th>Medicine Type</th>
                                <th>Medicine Category</th>
                                <th>Price</th>
+                               <th>Status</th>
+                               <th>Action</th>
                              </tr>
                             </thead>
+                            <tbody>
                             {% for medicine in medicine %}
                              <tr>
                                <td>
@@ -178,16 +187,98 @@
                                    <a href="">{{medicine.name}}</a>
                                  </h2>
                                </td>
-                               <td>{{medicine.stock_quantity}}</td>
+                               <td>
+                                 {{medicine.stock_quantity}}
+                                 {% if medicine.stock_quantity <= 10 %}
+                                   <span class="badge badge-danger ml-1">Low Stock</span>
+                                 {% endif %}
+                               </td>
                                <td>{{medicine.medicine_type}}</td>
                                <td>{{medicine.medicine_category}}</td>
-                               <td>{{medicine.price}}</td>
+                               <td>${{medicine.price}}</td>
+                               <td>
+                                 {% if medicine.stock_quantity > 0 %}
+                                   <span class="badge badge-success">Available</span>
+                                 {% else %}
+                                   <span class="badge badge-danger">Out of Stock</span>
+                                 {% endif %}
+                               </td>
+                               <td>
+                                 <div class="table-action">
+                                   <a href="{% url 'edit-medicine' pk=medicine.serial_number %}" class="btn btn-sm btn-outline-primary">
+                                     <i class="fe fe-edit"></i>
+                                   </a>
+                                   <a href="#" class="btn btn-sm btn-outline-danger" onclick="confirmDelete('{{medicine.serial_number}}')">
+                                     <i class="fe fe-trash"></i>
+                                   </a>
+                                 </div>
+                               </td>
+                             </tr>
+                             {% empty %}
+                             <tr>
+                               <td colspan="7" class="text-center">No medicines available</td>
                              </tr>
                              {% endfor %}
+                             </tbody>
                          </table>
                        </div>
                      </div>
                    </div>	
+                   </div>
+
+                   <!-- Recent Orders Section -->
+                   <div class="row mt-4">
+                     <div class="col-sm-12">
+                       <div class="card">
+                         <div class="card-header">
+                           <h4 class="card-title">Recent Orders</h4>
+                         </div>
+                         <div class="card-body">
+                           <div class="table-responsive">
+                             <table class="table table-hover table-center mb-0">
+                               <thead>
+                                 <tr>
+                                   <th>Order ID</th>
+                                   <th>Patient</th>
+                                   <th>Items</th>
+                                   <th>Total Amount</th>
+                                   <th>Status</th>
+                                   <th>Date</th>
+                                   <th>Action</th>
+                                 </tr>
+                               </thead>
+                               <tbody>
+                                 {% for order in recent_orders %}
+                                 <tr>
+                                   <td>#{{order.id}}</td>
+                                   <td>{{order.user.patient.name}}</td>
+                                   <td>{{order.orderitems.count}} items</td>
+                                   <td>${{order.get_total_cost}}</td>
+                                   <td>
+                                     {% if order.ordered %}
+                                       <span class="badge badge-success">Completed</span>
+                                     {% else %}
+                                       <span class="badge badge-warning">Pending</span>
+                                     {% endif %}
+                                   </td>
+                                   <td>{{order.created_at|date:"M d, Y"}}</td>
+                                   <td>
+                                     <a href="#" class="btn btn-sm btn-outline-primary">
+                                       <i class="fe fe-eye"></i> View
+                                     </a>
+                                   </td>
+                                 </tr>
+                                 {% empty %}
+                                 <tr>
+                                   <td colspan="7" class="text-center">No recent orders</td>
+                                 </tr>
+                                 {% endfor %}
+                               </tbody>
+                             </table>
+                           </div>
+                         </div>
+                       </div>
+                     </div>
                    </div>
                </div>
               </div>
@@ -227,6 +318,14 @@
   <script src="{% static 'HealthStack-System/js/admin/morris.min.js'%}"></script>
 
   <script src="{% static 'HealthStack-System/js/admin/morris_init.js'%}"></script>
+
+  <script>
+    function confirmDelete(medicineId) {
+      if (confirm('Are you sure you want to delete this medicine?')) {
+        window.location.href = '/admin/delete-medicine/' + medicineId + '/';
+      }
+    }
+  </script>
 
 </body>
 </html>

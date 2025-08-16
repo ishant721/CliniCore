@@ -1,3 +1,4 @@
+
 {% load static %}
 
 <!DOCTYPE html>
@@ -71,7 +72,7 @@
 					<div class="page-header">
 						<div class="row">
 							<div class="col-sm-12">
-								<h3 class="page-title">Welcome Admin!</h3>
+								<h3 class="page-title">Welcome Lab Worker!</h3>
 								<ul class="breadcrumb">
 									<li class="breadcrumb-item active">Dashboard</li>
 								</ul>
@@ -80,78 +81,165 @@
 					</div>
 					<!-- /Page Header -->
 
+					<!-- Statistics Cards -->
+					<div class="row">
+						<div class="col-xl-3 col-sm-6 col-12">
+							<div class="card">
+								<div class="card-body">
+									<div class="dash-widget-header">
+										<span class="dash-widget-icon text-primary border-primary">
+											<i class="fe fe-users"></i>
+										</span>
+										<div class="dash-count">
+											<h3>{{total_patient_count.count}}</h3>
+										</div>
+									</div>
+									<div class="dash-widget-info">
+										<h6 class="text-muted">Total Patients</h6>
+										<div class="progress progress-sm">
+											<div class="progress-bar bg-primary w-50"></div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-xl-3 col-sm-6 col-12">
+							<div class="card">
+								<div class="card-body">
+									<div class="dash-widget-header">
+										<span class="dash-widget-icon text-success">
+											<i class="fe fe-credit-card"></i>
+										</span>
+										<div class="dash-count">
+											<h3>{{total_test_count.count}}</h3>
+										</div>
+									</div>
+									<div class="dash-widget-info">
+										<h6 class="text-muted">Total Tests</h6>
+										<div class="progress progress-sm">
+											<div class="progress-bar bg-success w-50"></div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-xl-3 col-sm-6 col-12">
+							<div class="card">
+								<div class="card-body">
+									<div class="dash-widget-header">
+										<span class="dash-widget-icon text-danger border-danger">
+											<i class="fe fe-money"></i>
+										</span>
+										<div class="dash-count">
+											<h3>{{total_report_count.count}}</h3>
+										</div>
+									</div>
+									<div class="dash-widget-info">
+										<h6 class="text-muted">Total Reports</h6>
+										<div class="progress progress-sm">
+											<div class="progress-bar bg-danger w-50"></div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="col-xl-3 col-sm-6 col-12">
+							<div class="card">
+								<div class="card-body">
+									<div class="dash-widget-header">
+										<span class="dash-widget-icon text-warning border-warning">
+											<i class="fe fe-folder"></i>
+										</span>
+										<div class="dash-count">
+											<h3>{{pending_reports_count.count}}</h3>
+										</div>
+									</div>
+									<div class="dash-widget-info">
+										<h6 class="text-muted">Pending Reports</h6>
+										<div class="progress progress-sm">
+											<div class="progress-bar bg-warning w-50"></div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
                     <div class="row">
                         <div class="col-md-12 d-flex">
 						
 							<!-- Feed Activity -->
-							<!-- <div class="card  card-table flex-fill">
+							<div class="card  card-table flex-fill">
 								<div class="card-header">
-									<h4 class="card-title"></h4>
+									<h4 class="card-title">Recent Patient Tests</h4>
 								</div>
 								<div class="card-body">
 									<div class="table-responsive">
 										<table class="table table-hover table-center mb-0">
 											<thead>
 												<tr>													
-													<th>Doctor Id</th>
-                          <th>Doctor Name</th>
-													<th>Phone</th>
-													<th>Email</th>
-                          <th>Status</th>													
+													<th>Patient Name</th>
+													<th>Test Type</th>
+													<th>Status</th>
+													<th>Date</th>
+													<th>Action</th>													
 												</tr>
 											</thead>
 											<tbody>
-                     {% for doctor in doctor%}
+												{% for test in recent_tests %}
 												<tr>
-                          <td>{{doctor.doctor_id}}</td>
-
 													<td>
 														<h2 class="table-avatar">
-															<a href="#" class="avatar avatar-sm mr-2"><img class="avatar-img rounded-circle" src="{{doctor.featured_image.url}}" alt="User Image"></a>
-															<a href="#">{{doctor.name}}</a>
+															<a href="#" class="avatar avatar-sm mr-2">
+																<img class="avatar-img rounded-circle" src="{{test.patient.featured_image.url}}" alt="Patient Image">
+															</a>
+															<a href="#">{{test.patient.name}}</a>
 														</h2>
 													</td>
-                          
-													<td>{{doctor.phone_number}}</td>
-													<td>{{doctor.email}}</td>
-													
-                          <td>
-                            <div class="table-action">
-                              <a
-                                href="{% url 'create-report' pk=doctor.doctor_id %}"
-                                class="btn btn-outline-info btn-rounded" 
-                                >
-                                <i class="fas fa-file-alt"></i> Create Report 
-                              </a>
-                
-                              </div>
-                          </td>
+													<td>{{test.test_name}}</td>
+													<td>
+														{% if test.status == 'pending' %}
+															<span class="badge badge-warning">Pending</span>
+														{% elif test.status == 'completed' %}
+															<span class="badge badge-success">Completed</span>
+														{% else %}
+															<span class="badge badge-primary">In Progress</span>
+														{% endif %}
+													</td>
+													<td>{{test.created_at|date:"M d, Y"}}</td>
+													<td>
+														<div class="table-action">
+															{% if test.status == 'pending' %}
+																<a href="{% url 'create-report' pk=test.test_id %}" class="btn btn-outline-info btn-rounded">
+																	<i class="fas fa-file-alt"></i> Create Report 
+																</a>
+															{% else %}
+																<a href="{% url 'view-report' pk=test.report.report_id %}" class="btn btn-outline-primary btn-rounded">
+																	<i class="fas fa-eye"></i> View Report
+																</a>
+															{% endif %}
+														</div>
+													</td>
 												</tr>
-                      {% endfor %}
-												
-												
+												{% empty %}
+												<tr>
+													<td colspan="5" class="text-center">No tests available</td>
+												</tr>
+												{% endfor %}
 											</tbody>
 										</table>
 									</div>
 								</div>
-							</div> -->
+							</div>
 							<!-- /Feed Activity -->
 							
 						</div>
                     </div>
-
-
-          
-          
                 </div>
             </div>
       <!-- /Page Wrapper -->
     </div>
     <!-- /Main Wrapper -->
-
-    <!-- jQuery -->
-
-    </body>
 
     <!-- jQuery -->
     <script src="{% static 'HealthStack-System/js/admin/jquery-3.2.1.min.js'%}"></script>
@@ -161,7 +249,6 @@
     <script src="{% static 'HealthStack-System/js/admin/bootstrap.min.js'%}"></script>
 
     <!-- Slimscroll JS -->
-
     <script src="{% static 'HealthStack-System/plugins/admin/slimscroll/jquery.slimscroll.min.js'%}"></script>
 
     <script src="{% static 'HealthStack-System/plugins/admin/raphael/raphael.min.js'%}"></script>
@@ -173,35 +260,6 @@
     <script src="{% static 'HealthStack-System/js/admin/script.js'%}"></script>
 
     <!-- Chart JS -->
-
-    <script>
-      var total_patient_count = "{{total_patient_count.count}}";
-      var total_labworker_count= "{{total_labworker_count.count}}";
-      var total_hospital_count= "{{total_hospital_count.count}}";
-      var total_pharmacist_count= "{{total_pharmacist_count.count}}";
-
-      var sat= "{{sat}}";
-      var sat_count= "{{sat_count}}";
-
-      var sun= "{{sun}}";
-      var sun_count= "{{sun_count}}";
-
-      var mon= "{{mon}}";
-      var mon_count= "{{mon_count}}";
-
-      var tues= "{{tues}}";
-      var tues_count= "{{tues_count}}";
-
-      var wed= "{{wed}}";
-      var wed_count= "{{wed_count}}";
-
-      var thurs= "{{thurs}}";
-      var thurs_count= "{{thurs_count}}";
-
-      var fri= "{{fri}}";
-      var fri_count= "{{fri_count}}";
-    </script>
-
     <script src="{% static 'HealthStack-System/js/admin/Chart.bundle.min.js'%}"></script>
 
     <script src="{% static 'HealthStack-System/js/admin/raphael.min.js'%}"></script>
@@ -210,10 +268,5 @@
 
     <script src="{% static 'HealthStack-System/js/admin/morris_init.js'%}"></script>
 
-    
-
-  </body>
-
-
-  <!-- Mirrored from dreamguys.co.in/demo/doccure/admin/index.html by HTTrack Website Copier/3.x [XR&CO'2014], Sat, 30 Nov 2019 04:12:34 GMT -->
+    </body>
 </html>
