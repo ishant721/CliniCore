@@ -17,7 +17,6 @@ import random
 from django.contrib.auth.signals import user_logged_in, user_logged_out
 from django.dispatch import receiver
 from django.template.loader import get_template
-import weasyprint
 from .utils import searchDoctors, searchHospitals, searchDepartmentDoctors, paginateHospitals, send_otp_email
 from .models import Patient, User
 from doctor.models import Doctor_Information, Appointment,Report, Specimen, Test, Prescription, Prescription_medicine, Prescription_test
@@ -731,12 +730,8 @@ def prescription_view(request,pk):
 def render_to_pdf(template_src, context_dict={}):
     template = get_template(template_src)
     html = template.render(context_dict)
-    try:
-        pdf_file = weasyprint.HTML(string=html).write_pdf()
-        response = HttpResponse(pdf_file, content_type='application/pdf')
-        return response
-    except Exception as e:
-        return None
+    response = HttpResponse(html, content_type='text/html')
+    return response
 
 
 # def prescription_pdf(request,pk):
@@ -764,12 +759,9 @@ def prescription_pdf(request,pk):
     prescription_test = Prescription_test.objects.filter(prescription=prescription)
     # current_date = datetime.date.today()
     context={'patient':patient,'prescription':prescription,'prescription_test':prescription_test,'prescription_medicine':prescription_medicine}
-    pres_pdf=render_to_pdf('prescription_pdf.html', context)
-    if pres_pdf:
-        response=HttpResponse(pres_pdf, content_type='application/pdf')
-        content="inline; filename=prescription.pdf"
-        response['Content-Disposition']= content
-        return response
+    pres_html=render_to_pdf('prescription_pdf.html', context)
+    if pres_html:
+        return pres_html
     return HttpResponse("Not Found")
 
 @csrf_exempt

@@ -33,7 +33,6 @@ from urllib import response
 from django.shortcuts import render
 from django.template.loader import get_template
 from django.http import HttpResponse
-import weasyprint
 from .models import Report
 from django.views.decorators.csrf import csrf_exempt
 
@@ -551,12 +550,8 @@ def create_prescription(request,pk):
 def render_to_pdf(template_src, context_dict={}):
     template = get_template(template_src)
     html = template.render(context_dict)
-    try:
-        pdf_file = weasyprint.HTML(string=html).write_pdf()
-        response = HttpResponse(pdf_file, content_type='application/pdf')
-        return response
-    except Exception as e:
-        return None
+    response = HttpResponse(html, content_type='text/html')
+    return response
 
 @csrf_exempt
 def report_pdf(request, pk):
@@ -567,12 +562,9 @@ def report_pdf(request, pk):
     test = Test.objects.filter(report=report)
     # current_date = datetime.date.today()
     context={'patient':patient,'report':report,'test':test,'specimen':specimen}
-    pdf=render_to_pdf('report_pdf.html', context)
-    if pdf:
-        response=HttpResponse(pdf, content_type='application/pdf')
-        content="inline; filename=report.pdf"
-        # response['Content-Disposition']= content
-        return response
+    html_report=render_to_pdf('report_pdf.html', context)
+    if html_report:
+        return html_report
     return HttpResponse("Not Found")
 
 
