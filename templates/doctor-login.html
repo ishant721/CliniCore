@@ -90,7 +90,7 @@
                             </button>
                           </div>
                           {% endfor %}
-                      
+
                       {% endif %} {% endcomment %}
 
                       <div class="form-floating mt-3 mb-3">
@@ -101,10 +101,18 @@
                       <div class="form-floating mt-3 mb-3">
                         <input type="password" class="form-control" name='password' id="myInput" placeholder="Password"> 
                         <label for="floatingInput">Password</label>
-                        
+
                         <input type="checkbox" class="mt-2" onclick="myFunction11()">Show Password
-                        
+
                       </div>
+                      
+                      {% if require_2fa %}
+                      <div class="form-group mt-3 mb-3">
+                          <input type="text" class="form-control" placeholder="2FA Code" name="otp_code" required>
+                          <small class="text-muted">Enter the 6-digit code sent to your email</small>
+                      </div>
+                      <input type="hidden" name="username" value="{{ username }}">
+                      {% endif %}
 
                       <div class="text-right">
                         <a
@@ -142,7 +150,7 @@
                         <b>Want to login as 
                         <a href="{% url 'admin-login' %}" style="color: skyblue;text-decoration: none;"> Admin? </a></b>
                       </div>
- 
+
                     </form>
                   </div>
                 </div>

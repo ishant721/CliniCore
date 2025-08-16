@@ -2,14 +2,16 @@ import email
 from email.mime import image
 from multiprocessing import context
 from unicodedata import name
-from django.shortcuts import render, redirect
-from django.http import HttpResponse
-from django.contrib.auth.decorators import login_required
-from django.views.decorators.cache import cache_control
-from django.contrib.auth.models import User
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from hospital.models import Hospital_Information, User, Patient
+from django.views.decorators.cache import cache_control
+from django.views.decorators.csrf import csrf_exempt
+from datetime import datetime
+from django.contrib.auth.models import User
+from hospital.models import Hospital_Information, User, Patient, Admin_Information
 from django.db.models import Q
 from pharmacy.models import Medicine, Pharmacist
 from doctor.models import Doctor_Information, Prescription, Prescription_test, Report, Appointment, Experience , Education,Specimen,Test
@@ -51,7 +53,7 @@ def admin_dashboard(request):
         hospitals = Hospital_Information.objects.all()
         lab_workers = Clinical_Laboratory_Technician.objects.all()
         pharmacists = Pharmacist.objects.all()
-        
+
         sat_date = datetime.date.today()
         sat_date_str = str(sat_date)
         sat = sat_date.strftime("%A")
@@ -59,27 +61,27 @@ def admin_dashboard(request):
         sun_date = sat_date + datetime.timedelta(days=1) 
         sun_date_str = str(sun_date)
         sun = sun_date.strftime("%A")
-        
+
         mon_date = sat_date + datetime.timedelta(days=2) 
         mon_date_str = str(mon_date)
         mon = mon_date.strftime("%A")
-        
+
         tues_date = sat_date + datetime.timedelta(days=3) 
         tues_date_str = str(tues_date)
         tues = tues_date.strftime("%A")
-        
+
         wed_date = sat_date + datetime.timedelta(days=4) 
         wed_date_str = str(wed_date)
         wed = wed_date.strftime("%A")
-        
+
         thurs_date = sat_date + datetime.timedelta(days=5) 
         thurs_date_str = str(thurs_date)
         thurs = thurs_date.strftime("%A")
-        
+
         fri_date = sat_date + datetime.timedelta(days=6) 
         fri_date_str = str(fri_date)
         fri = fri_date.strftime("%A")
-        
+
         sat_count = Appointment.objects.filter(date=sat_date_str).filter(Q(appointment_status='pending') | Q(appointment_status='confirmed')).count()
         sun_count = Appointment.objects.filter(date=sun_date_str).filter(Q(appointment_status='pending') | Q(appointment_status='confirmed')).count()
         mon_count = Appointment.objects.filter(date=mon_date_str).filter(Q(appointment_status='pending') | Q(appointment_status='confirmed')).count()
@@ -101,39 +103,94 @@ def logoutAdmin(request):
     logout(request)
     messages.error(request, 'User Logged out')
     return redirect('admin_login')
-            
+
 @csrf_exempt
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def admin_login(request):
+    page = 'admin_login'
     if request.method == 'GET':
         return render(request, 'hospital_admin/login.html')
     elif request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
+        otp_code = request.POST.get('otp_code', '')
 
         try:
             user = User.objects.get(username=username)
-        except:
+        except User.DoesNotExist:
             messages.error(request, 'Username does not exist')
+            return render(request, 'hospital_admin/login.html')
 
-        user = authenticate(username=username, password=password)
+        # Check if account is locked
+        if user.is_account_locked():
+            messages.error(request, 'Account is temporarily locked due to multiple failed login attempts. Please try again later.')
+            return render(request, 'hospital_admin/login.html')
 
-        if user is not None:
-            login(request, user)
+        # Authenticate user
+        authenticated_user = authenticate(username=username, password=password)
+
+        if authenticated_user is not None:
+            # Reset failed attempts on successful password verification
+            user.failed_login_attempts = 0
+            user.save()
+
+            if not user.is_active:
+                # User is not active, redirect to OTP verification
+                messages.warning(request, 'Your account is not active. Please verify your email with OTP.')
+                if not user.otp_code or user.otp_expires_at < datetime.now():
+                    from hospital.utils import send_otp_email
+                    if send_otp_email(user, "account verification"):
+                        messages.info(request, 'A new OTP has been sent to your email.')
+                    else:
+                        messages.error(request, 'Error sending OTP email. Please try again.')
+                return redirect('otp_verify', user_id=user.id)
+
+            # Check if 2FA is enabled
+            if user.two_factor_enabled:
+                if not otp_code:
+                    # Send 2FA OTP
+                    from hospital.utils import send_otp_email
+                    if send_otp_email(user, "two_factor_authentication"):
+                        messages.info(request, 'Please enter the 2FA code sent to your email.')
+                        return render(request, 'hospital_admin/login.html', {'require_2fa': True, 'username': username})
+                    else:
+                        messages.error(request, 'Error sending 2FA code. Please try again.')
+                        return render(request, 'hospital_admin/login.html')
+                else:
+                    # Verify 2FA OTP
+                    if user.otp_code == otp_code and user.otp_expires_at > datetime.now():
+                        user.otp_code = None
+                        user.otp_expires_at = None
+                        user.save()
+                    else:
+                        messages.error(request, 'Invalid or expired 2FA code.')
+                        return render(request, 'hospital_admin/login.html', {'require_2fa': True, 'username': username})
+
+            # Check if password reset is required
+            if user.password_reset_required:
+                messages.warning(request, 'You must change your password before continuing.')
+                return redirect('admin-change-password', pk=user.id)
+
             if user.is_hospital_admin:
-                messages.success(request, 'User logged in')
+                login(request, user)
+                messages.success(request, 'User Logged in Successfully')
                 return redirect('admin-dashboard')
-            elif user.is_labworker:
-                messages.success(request, 'User logged in')
-                return redirect('labworker-dashboard')
-            elif user.is_pharmacist:
-                messages.success(request, 'User logged in')
-                return redirect('pharmacist-dashboard')
             else:
-                return redirect('admin-logout')
+                messages.error(request, 'Invalid credentials. Not an Admin')
+                return redirect('logout')
         else:
-            messages.error(request, 'Invalid username or password')
-        
+            # Handle failed login attempt
+            user.failed_login_attempts += 1
+
+            # Lock account after 5 failed attempts
+            if user.failed_login_attempts >= 5:
+                user.lock_account(duration_minutes=30)
+                messages.error(request, 'Account locked due to multiple failed login attempts. Please try again in 30 minutes.')
+            else:
+                remaining_attempts = 5 - user.failed_login_attempts
+                messages.error(request, f'Invalid username or password. {remaining_attempts} attempts remaining.')
+
+            user.save()
 
     return render(request, 'hospital_admin/login.html')
 
@@ -153,7 +210,7 @@ def admin_register(request):
             user.save()
 
             messages.success(request, 'User account was created!')
-            
+
             # After user is created, we can log them in
             #login(request, user)
             return redirect('admin_login')
@@ -261,12 +318,12 @@ def add_hospital(request):
 
         if request.method == 'POST':
             hospital = Hospital_Information()
-            
+
             if 'featured_image' in request.FILES:
                 featured_image = request.FILES['featured_image']
             else:
                 featured_image = "departments/default.png"
-            
+
             hospital_name = request.POST.get('hospital_name')
             address = request.POST.get('address')
             description = request.POST.get('description')
@@ -276,8 +333,8 @@ def add_hospital(request):
             specialization_name = request.POST.getlist('specialization')
             department_name = request.POST.getlist('department')
             service_name = request.POST.getlist('service')
-            
-        
+
+
             hospital.name = hospital_name
             hospital.description = description
             hospital.address = address
@@ -285,27 +342,27 @@ def add_hospital(request):
             hospital.phone_number =phone_number
             hospital.featured_image=featured_image 
             hospital.hospital_type=hospital_type
-            
+
             # print(department_name[0])
-         
+
             hospital.save()
-            
+
             for i in range(len(department_name)):
                 departments = hospital_department(hospital=hospital)
                 # print(department_name[i])
                 departments.hospital_department_name = department_name[i]
                 departments.save()
-                
+
             for i in range(len(specialization_name)):
                 specializations = specialization(hospital=hospital)
                 specializations.specialization_name=specialization_name[i]
                 specializations.save()
-                
+
             for i in range(len(service_name)):
                 services = service(hospital=hospital)
                 services.service_name = service_name[i]
                 services.save()
-            
+
             messages.success(request, 'Hospital Added')
             return redirect('hospital-list')
 
@@ -337,14 +394,14 @@ def edit_hospital(request, pk):
                 featured_image = request.FILES['featured_image']
             else:
                 featured_image = old_featured_image
-                               
+
             hospital_name = request.POST.get('hospital_name')
             address = request.POST.get('address')
             description = request.POST.get('description')
             email = request.POST.get('email')
             phone_number = request.POST.get('phone_number') 
             hospital_type = request.POST.get('type')
-            
+
             specialization_name = request.POST.getlist('specialization')
             department_name = request.POST.getlist('department')
             service_name = request.POST.getlist('service')
@@ -356,7 +413,7 @@ def edit_hospital(request, pk):
             hospital.phone_number =phone_number
             hospital.featured_image =featured_image 
             hospital.hospital_type =hospital_type
-            
+
             # specializations.specialization_name=specialization_name
             # services.service_name = service_name
             # departments.hospital_department_name = department_name 
@@ -374,7 +431,7 @@ def edit_hospital(request, pk):
                 services = service(hospital=hospital)
                 services.service_name = service_name[i]
                 services.save()
-                
+
             for i in range(len(department_name)):
                 departments = hospital_department(hospital=hospital)
                 departments.hospital_department_name = department_name[i]
@@ -445,7 +502,7 @@ def create_invoice(request, pk):
 
     if request.method == 'POST':
         invoice = Payment(patient=patient)
-        
+
         consulation_fee = request.POST['consulation_fee']
         report_fee = request.POST['report_fee']
         #total_ammount = request.POST['currency_amount']
@@ -455,7 +512,7 @@ def create_invoice(request, pk):
         invoice.invoice_number = generate_random_invoice()
         invoice.name = patient
         invoice.status = 'Pending'
-    
+
         invoice.save()
         return redirect('patient-list')
 
@@ -480,11 +537,11 @@ def create_report(request, pk):
         patient = Patient.objects.get(patient_id=prescription.patient_id)
         doctor = Doctor_Information.objects.get(doctor_id=prescription.doctor_id)
         tests = Prescription_test.objects.filter(prescription=prescription).filter(test_info_pay_status='Paid')
-        
+
 
         if request.method == 'POST':
             report = Report(doctor=doctor, patient=patient)
-            
+
             specimen_type = request.POST.getlist('specimen_type')
             collection_date  = request.POST.getlist('collection_date')
             receiving_date = request.POST.getlist('receiving_date')
@@ -515,7 +572,7 @@ def create_report(request, pk):
                 specimens.collection_date = collection_date[i]
                 specimens.receiving_date = receiving_date[i]
                 specimens.save()
-                
+
             for i in range(len(test_name)):
                 tests = Test(report=report)
                 tests.test_name=test_name[i]
@@ -523,7 +580,7 @@ def create_report(request, pk):
                 tests.unit=unit[i]
                 tests.referred_value=referred_value[i]
                 tests.save()
-            
+
             # mail
             doctor_name = doctor.name
             doctor_email = doctor.email
@@ -531,7 +588,7 @@ def create_report(request, pk):
             patient_email = patient.email
             report_id = report.report_id
             delivery_date = report.delivery_date
-            
+
             subject = "Report Delivery"
 
             values = {
@@ -561,7 +618,7 @@ def add_pharmacist(request):
     if request.user.is_hospital_admin:
         user = Admin_Information.objects.get(user=request.user)
         form = PharmacistCreationForm()
-     
+
         if request.method == 'POST':
             form = PharmacistCreationForm(request.POST)
             if form.is_valid():
@@ -577,10 +634,10 @@ def add_pharmacist(request):
                 return redirect('pharmacist-list')
             else:
                 messages.error(request, 'An error has occurred during registration')
-    
+
     context = {'form': form, 'admin': user}
     return render(request, 'hospital_admin/add-pharmacist.html', context)
-  
+
 @csrf_exempt
 @login_required(login_url='admin_login')
 def medicine_list(request):
@@ -590,9 +647,9 @@ def medicine_list(request):
             medicine = Medicine.objects.all()
             orders = Order.objects.filter(user=request.user, ordered=False)
             carts = Cart.objects.filter(user=request.user, purchased=False)
-            
+
             medicine, search_query = searchMedicines(request)
-            
+
             if carts.exists() and orders.exists():
                 order = orders[0]
                 context = {'medicine':medicine,
@@ -608,7 +665,7 @@ def medicine_list(request):
                             'orders': orders,
                             'carts': carts,}
                 return render(request, 'hospital_admin/medicine-list.html',context)
-                
+
 
 @login_required(login_url='admin_login')
 def generate_random_medicine_ID():
@@ -623,15 +680,15 @@ def generate_random_medicine_ID():
 def add_medicine(request):
     if request.user.is_pharmacist:
      user = Pharmacist.objects.get(user=request.user)
-     
+
     if request.method == 'POST':
        medicine = Medicine()
-       
+
        if 'featured_image' in request.FILES:
            featured_image = request.FILES['featured_image']
        else:
            featured_image = "medicines/default.png"
-       
+
        name = request.POST.get('name')
        Prescription_reqiuired = request.POST.get('requirement_type')     
        weight = request.POST.get('weight') 
@@ -640,7 +697,7 @@ def add_medicine(request):
        medicine_type = request.POST.get('medicine_type')
        description = request.POST.get('description')
        price = request.POST.get('price')
-       
+
        medicine.name = name
        medicine.Prescription_reqiuired = Prescription_reqiuired
        medicine.weight = weight
@@ -652,11 +709,11 @@ def add_medicine(request):
        medicine.featured_image = featured_image
        medicine.stock_quantity = 80
        #medicine.medicine_id = generate_random_medicine_ID()
-       
+
        medicine.save()
-       
+
        return redirect('medicine-list')
-   
+
     return render(request, 'hospital_admin/add-medicine.html',{'admin': user})
 
 @csrf_exempt
@@ -664,10 +721,10 @@ def add_medicine(request):
 def edit_medicine(request, pk):
     if request.user.is_pharmacist:
         user = Pharmacist.objects.get(user=request.user)
-        
+
         medicine = Medicine.objects.get(serial_number=pk)
         old_medicine_image = medicine.featured_image
-        
+
         if request.method == 'POST':
             if 'featured_image' in request.FILES:
                 featured_image = request.FILES['featured_image']
@@ -681,7 +738,7 @@ def edit_medicine(request, pk):
                 medicine_type = request.POST.get('medicine_type')
                 description = request.POST.get('description')
                 price = request.POST.get('price')
-                
+
                 medicine.name = name
                 medicine.Prescription_reqiuired = Prescription_reqiuired
                 medicine.weight = weight
@@ -693,11 +750,11 @@ def edit_medicine(request, pk):
                 medicine.featured_image = featured_image
                 medicine.stock_quantity = 80
                 #medicine.medicine_id = generate_random_medicine_ID()
-            
+
                 medicine.save()
-            
+
                 return redirect('medicine-list')
-   
+
     return render(request, 'hospital_admin/edit-medicine.html',{'medicine': medicine,'admin': user})
 
 
@@ -715,9 +772,9 @@ def delete_medicine(request, pk):
 def add_lab_worker(request):
     if request.user.is_hospital_admin:
         user = Admin_Information.objects.get(user=request.user)
-        
+
         form = LabWorkerCreationForm()
-     
+
         if request.method == 'POST':
             form = LabWorkerCreationForm(request.POST)
             if form.is_valid():
@@ -733,7 +790,7 @@ def add_lab_worker(request):
                 return redirect('lab-worker-list')
             else:
                 messages.error(request, 'An error has occurred during registration')
-    
+
     context = {'form': form, 'admin': user}
     return render(request, 'hospital_admin/add-lab-worker.html', context)  
 
@@ -743,7 +800,7 @@ def view_lab_worker(request):
     if request.user.is_hospital_admin:
         user = Admin_Information.objects.get(user=request.user)
         lab_workers = Clinical_Laboratory_Technician.objects.all()
-        
+
     return render(request, 'hospital_admin/lab-worker-list.html', {'lab_workers': lab_workers, 'admin': user})
 
 @csrf_exempt
@@ -752,7 +809,7 @@ def view_pharmacist(request):
     if request.user.is_hospital_admin:
         user = Admin_Information.objects.get(user=request.user)
         pharmcists = Pharmacist.objects.all()
-        
+
     return render(request, 'hospital_admin/pharmacist-list.html', {'pharmacist': pharmcists, 'admin': user})
 
 @csrf_exempt
@@ -761,29 +818,29 @@ def edit_lab_worker(request, pk):
     if request.user.is_hospital_admin:
         user = Admin_Information.objects.get(user=request.user)
         lab_worker = Clinical_Laboratory_Technician.objects.get(technician_id=pk)
-        
+
         if request.method == 'POST':
             if 'featured_image' in request.FILES:
                 featured_image = request.FILES['featured_image']
             else:
                 featured_image = "technician/user-default.png"
-                
+
             name = request.POST.get('name')
             email = request.POST.get('email')     
             phone_number = request.POST.get('phone_number')
             age = request.POST.get('age')  
-    
+
             lab_worker.name = name
             lab_worker.email = email
             lab_worker.phone_number = phone_number
             lab_worker.age = age
             lab_worker.featured_image = featured_image
-    
+
             lab_worker.save()
-            
+
             messages.success(request, 'Clinical Laboratory Technician account updated!')
             return redirect('lab-worker-list')
-        
+
     return render(request, 'hospital_admin/edit-lab-worker.html', {'lab_worker': lab_worker, 'admin': user})
 
 @csrf_exempt
@@ -792,28 +849,28 @@ def edit_pharmacist(request, pk):
     if request.user.is_hospital_admin:
         user = Admin_Information.objects.get(user=request.user)
         pharmacist = Pharmacist.objects.get(pharmacist_id=pk)
-        
+
         if request.method == 'POST':
             if 'featured_image' in request.FILES:
                 featured_image = request.FILES['featured_image']
             else:
                 featured_image = "technician/user-default.png"
-                
+
             name = request.POST.get('name')
             email = request.POST.get('email')     
             phone_number = request.POST.get('phone_number')
             age = request.POST.get('age')  
-    
+
             pharmacist.name = name
             pharmacist.email = email
             pharmacist.phone_number = phone_number
             pharmacist.age = age
             pharmacist.featured_image = featured_image
-    
+
             pharmacist.save()
             messages.success(request, 'Pharmacist updated!')
             return redirect('pharmacist-list')
-        
+
     return render(request, 'hospital_admin/edit-pharmacist.html', {'pharmacist': pharmacist, 'admin': user})
 
 @csrf_exempt
@@ -847,7 +904,7 @@ def admin_doctor_profile(request,pk):
     admin = Admin_Information.objects.get(user=request.user)
     experience= Experience.objects.filter(doctor_id=pk).order_by('-from_year','-to_year')
     education = Education.objects.filter(doctor_id=pk).order_by('-year_of_completion')
-    
+
     context = {'doctor': doctor, 'admin': admin, 'experiences': experience, 'educations': education}
     return render(request, 'hospital_admin/doctor-profile.html',context)
 
@@ -858,10 +915,10 @@ def accept_doctor(request,pk):
     doctor = Doctor_Information.objects.get(doctor_id=pk)
     doctor.register_status = 'Accepted'
     doctor.save()
-    
+
     experience= Experience.objects.filter(doctor_id=pk)
     education = Education.objects.filter(doctor_id=pk)
-    
+
     # Mailtrap
     doctor_name = doctor.name
     doctor_email = doctor.email
@@ -897,7 +954,7 @@ def reject_doctor(request,pk):
     doctor = Doctor_Information.objects.get(doctor_id=pk)
     doctor.register_status = 'Rejected'
     doctor.save()
-    
+
     # Mailtrap
     doctor_name = doctor.name
     doctor_email = doctor.email
@@ -922,7 +979,7 @@ def reject_doctor(request,pk):
         send_mail(subject, plain_message, 'hospital_admin@gmail.com',  [doctor_email], html_message=html_message, fail_silently=False)
     except BadHeaderError:
         return HttpResponse('Invalid header found')
-    
+
     messages.success(request, 'Doctor Rejected!')
     return redirect('register-doctor-list')
 
@@ -957,7 +1014,7 @@ def edit_department(request,pk):
                 department.save()
                 messages.success(request, 'Department Updated!')
                 return redirect('hospital-list')
-                
+
             context = {'department': department}
             return render(request, 'hospital_admin/edit-hospital.html',context)
 
@@ -966,7 +1023,7 @@ def edit_department(request,pk):
 def labworker_dashboard(request):
     if request.user.is_authenticated:
         if request.user.is_labworker:
-            
+
             lab_workers = Clinical_Laboratory_Technician.objects.get(user=request.user)
             doctor = Doctor_Information.objects.all()
             context = {'doctor': doctor,'lab_workers':lab_workers}
@@ -1010,7 +1067,7 @@ def add_test(request):
         tests.save()
 
         return redirect('test-list')
-        
+
     context = {'lab_workers': lab_workers}
     return render(request, 'hospital_admin/add-test.html', context)
 
@@ -1044,7 +1101,7 @@ def pharmacist_dashboard(request):
             total_cart_count = Cart.objects.annotate(count=Count('item'))
 
             medicine = Medicine.objects.all()
-            
+
             context = {'pharmacist':pharmacist, 'medicine':medicine,
                        'total_pharmacist_count':total_pharmacist_count, 
                        'total_medicine_count':total_medicine_count, 
@@ -1062,3 +1119,66 @@ def report_history(request):
             context = {'report':report,'lab_workers':lab_workers}
             return render(request, 'hospital_admin/report-list.html',context)
 
+@csrf_exempt
+@login_required(login_url="admin-login")
+def admin_setup_two_factor(request):
+    """Setup two-factor authentication for hospital admins"""
+    if request.user.is_hospital_admin:
+        admin = Admin_Information.objects.get(user=request.user)
+
+        if request.method == 'POST':
+            action = request.POST.get('action')
+
+            if action == 'enable':
+                # Generate backup codes
+                from hospital.utils import generate_backup_codes
+                backup_codes = generate_backup_codes()
+                request.user.backup_codes = backup_codes
+                request.user.two_factor_enabled = True
+                request.user.save()
+
+                messages.success(request, 'Two-factor authentication has been enabled successfully!')
+                return render(request, 'hospital_admin/admin-setup-2fa.html', {
+                    'admin': admin,
+                    'backup_codes': backup_codes,
+                    'action_completed': True
+                })
+
+            elif action == 'disable':
+                request.user.two_factor_enabled = False
+                request.user.backup_codes = []
+                request.user.save()
+
+                messages.success(request, 'Two-factor authentication has been disabled.')
+                return redirect('admin-profile')
+
+        context = {
+            'admin': admin,
+            'two_factor_enabled': request.user.two_factor_enabled
+        }
+        return render(request, 'hospital_admin/admin-setup-2fa.html', context)
+    else:
+        return redirect('logout')
+
+@csrf_exempt
+@login_required(login_url="admin-login")
+def admin_security_settings(request):
+    """Security settings page for hospital admins"""
+    if request.user.is_hospital_admin:
+        admin = Admin_Information.objects.get(user=request.user)
+
+        context = {
+            'admin': admin,
+            'two_factor_enabled': request.user.two_factor_enabled,
+            'failed_attempts': request.user.failed_login_attempts,
+            'last_password_change': request.user.last_password_change,
+        }
+        return render(request, 'hospital_admin/admin-security-settings.html', context)
+    else:
+        return redirect('logout')
+
+def testing(request):
+    # hospitals = Hospital_Information.objects.get(hospital_id=1)
+    test = "test"
+    context = {'test': test}
+    return render(request, 'testing.html', context)

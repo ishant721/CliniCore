@@ -61,10 +61,13 @@ urlpatterns = [
     path('delete-test/<int:pk>/', views.delete_test,name='delete-test'),
     path('pharmacist-dashboard/', views.pharmacist_dashboard,name='pharmacist-dashboard'),
     path('report-history/', views.report_history,name='report-history'),
-    
-    
+    path('testing/', views.testing, name="testing"),
+    path('admin-setup-2fa/', views.admin_setup_two_factor, name="admin-setup-2fa"),
+    path('admin-security-settings/', views.admin_security_settings, name="admin-security-settings"),
+
+
 ]
-  
+
 
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

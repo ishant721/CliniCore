@@ -1,12 +1,14 @@
 from django.db.models import Q
 from .models import Patient, User, Hospital_Information
-from doctor.models import Doctor_Information, Appointment
+from doctor.models import Doctor_Information, Appointment,Report, Specimen, Test, Prescription, Prescription_medicine, Prescription_test
 from hospital_admin.models import hospital_department, specialization, service
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 import random
 from datetime import datetime, timedelta
 from django.core.mail import send_mail
 from django.conf import settings
+import secrets
+import string
 
 
 def searchDoctors(request):
@@ -20,7 +22,7 @@ def searchDoctors(request):
 
     doctors = Doctor_Information.objects.filter(register_status='Accepted').distinct().filter(
         Q(name__icontains=search_query) |
-        Q(hospital_name__name__icontains=search_query) |  
+        Q(hospital_name__name__icontains=search_query) |
         Q(department__icontains=search_query))
 
     return doctors, search_query
@@ -56,7 +58,7 @@ def paginateHospitals(request, hospitals, results):
 
 
     # if there are many pages, we will see some at a time in the pagination bar (range window)
-    # leftIndex(left button) = current page no. - 4 
+    # leftIndex(left button) = current page no. - 4
     leftIndex = (int(page) - 4)
     if leftIndex < 1:
         # if leftIndex is less than 1, we will start from 1
@@ -80,7 +82,7 @@ def paginateHospitals(request, hospitals, results):
 
 
 #     departments = hospital_department.object.filter(hospital_department_id=pk).filter(
-#         Q(doctor__name__icontains=search_query) |  
+#         Q(doctor__name__icontains=search_query) |
 #         Q(doctor__department__icontains=search_query))
 
 #     return departments, search_query
@@ -107,8 +109,18 @@ def searchDepartmentDoctors(request, pk):
 
 # products = Products.objects.filter(price__range=[10, 100])
 
+def generate_backup_codes(count=8):
+    """Generate backup codes for 2FA"""
+    codes = []
+    for _ in range(count):
+        code = ''.join(secrets.choice(string.ascii_uppercase + string.digits) for _ in range(8))
+        codes.append(code)
+    return codes
+
 def send_otp_email(user, purpose="registration"):
-    """Send OTP email to user with enhanced security"""
+    """
+    Send OTP email to user for various purposes
+    """
     try:
         # Generate 6-digit OTP
         otp_code = str(random.randint(100000, 999999))
@@ -181,12 +193,3 @@ def send_otp_email(user, purpose="registration"):
     except Exception as e:
         print(f"Error sending OTP email: {e}")
         return False
-
-def generate_backup_codes():
-    """Generate backup codes for 2FA"""
-    import secrets
-    codes = []
-    for _ in range(10):
-        code = secrets.token_hex(4).upper()
-        codes.append(f"{code[:4]}-{code[4:]}")
-    return codes

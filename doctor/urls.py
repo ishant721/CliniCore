@@ -35,6 +35,8 @@ urlpatterns = [
     path('doctor-test-list/', views.doctor_test_list, name='doctor-test-list'),
     path('doctor-view-prescription/<int:pk>/', views.doctor_view_prescription, name='doctor-view-prescription'),
     path('doctor-view-report/<int:pk>/', views.doctor_view_report, name='doctor-view-report'),
+    path('doctor-setup-2fa/', views.doctor_setup_two_factor, name="doctor-setup-2fa"),
+    path('doctor-security-settings/', views.doctor_security_settings, name="doctor-security-settings"),
 
 ]
 

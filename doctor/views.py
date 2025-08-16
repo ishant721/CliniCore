@@ -51,16 +51,16 @@ def doctor_change_password(request,pk):
     doctor = Doctor_Information.objects.get(user_id=pk)
     context={'doctor':doctor}
     if request.method == "POST":
-        
+
         new_password = request.POST["new_password"]
         confirm_password = request.POST["confirm_password"]
         if new_password == confirm_password:
-            
+
             request.user.set_password(new_password)
             request.user.save()
             messages.success(request,"Password Changed Successfully")
             return redirect("doctor-dashboard")
-            
+
         else:
             messages.error(request,"New Password and Confirm Password is not same")
             return redirect("change-password",pk)
@@ -71,7 +71,7 @@ def doctor_change_password(request,pk):
 def schedule_timings(request):
     doctor = Doctor_Information.objects.get(user=request.user)
     context = {'doctor': doctor}
-    
+
     return render(request, 'schedule-timings.html', context)
 
 @csrf_exempt
@@ -87,7 +87,7 @@ def logoutDoctor(request):
         user.login_status == "offline"
         user.save()
         logout(request)
-    
+
     messages.success(request, 'User Logged out')
     return render(request,'doctor-login.html')
 
@@ -120,34 +120,91 @@ def doctor_register(request):
 
 @csrf_exempt
 def doctor_login(request):
-    # page = 'patient_login'
+    page = 'doctor_login'
     if request.method == 'GET':
         return render(request, 'doctor-login.html')
     elif request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
-        
+        otp_code = request.POST.get('otp_code', '')
+
         try:
             user = User.objects.get(username=username)
-        except:
+        except User.DoesNotExist:
             messages.error(request, 'Username does not exist')
-                
-        user = authenticate(username=username, password=password)
-        
-        if user is not None:
-            
-            login(request, user)
-            if request.user.is_doctor:
-                # user.login_status = "online"
-                # user.save()
-                messages.success(request, 'Welcome Doctor!')
+            return render(request, 'doctor-login.html')
+
+        # Check if account is locked
+        if user.is_account_locked():
+            messages.error(request, 'Account is temporarily locked due to multiple failed login attempts. Please try again later.')
+            return render(request, 'doctor-login.html')
+
+        # Authenticate user
+        authenticated_user = authenticate(username=username, password=password)
+
+        if authenticated_user is not None:
+            # Reset failed attempts on successful password verification
+            user.failed_login_attempts = 0
+            user.save()
+
+            if not user.is_active:
+                # User is not active, redirect to OTP verification
+                messages.warning(request, 'Your account is not active. Please verify your email with OTP.')
+                if not user.otp_code or user.otp_expires_at < datetime.now():
+                    from hospital.utils import send_otp_email
+                    if send_otp_email(user, "account verification"):
+                        messages.info(request, 'A new OTP has been sent to your email.')
+                    else:
+                        messages.error(request, 'Error sending OTP email. Please try again.')
+                return redirect('otp_verify', user_id=user.id)
+
+            # Check if 2FA is enabled
+            if user.two_factor_enabled:
+                if not otp_code:
+                    # Send 2FA OTP
+                    from hospital.utils import send_otp_email
+                    if send_otp_email(user, "two_factor_authentication"):
+                        messages.info(request, 'Please enter the 2FA code sent to your email.')
+                        return render(request, 'doctor-login.html', {'require_2fa': True, 'username': username})
+                    else:
+                        messages.error(request, 'Error sending 2FA code. Please try again.')
+                        return render(request, 'doctor-login.html')
+                else:
+                    # Verify 2FA OTP
+                    if user.otp_code == otp_code and user.otp_expires_at > datetime.now():
+                        user.otp_code = None
+                        user.otp_expires_at = None
+                        user.save()
+                    else:
+                        messages.error(request, 'Invalid or expired 2FA code.')
+                        return render(request, 'doctor-login.html', {'require_2fa': True, 'username': username})
+
+            # Check if password reset is required
+            if user.password_reset_required:
+                messages.warning(request, 'You must change your password before continuing.')
+                return redirect('doctor-change-password', pk=user.id)
+
+            if user.is_doctor:
+                login(request, user)
+                messages.success(request, 'User Logged in Successfully')
                 return redirect('doctor-dashboard')
             else:
                 messages.error(request, 'Invalid credentials. Not a Doctor')
-                return redirect('doctor-logout')   
+                return redirect('logout')
         else:
-            messages.error(request, 'Invalid username or password')
-            
+            # Handle failed login attempt
+            user.failed_login_attempts += 1
+
+            # Lock account after 5 failed attempts
+            if user.failed_login_attempts >= 5:
+                user.lock_account(duration_minutes=30)
+                messages.error(request, 'Account locked due to multiple failed login attempts. Please try again in 30 minutes.')
+            else:
+                remaining_attempts = 5 - user.failed_login_attempts
+                messages.error(request, f'Invalid username or password. {remaining_attempts} attempts remaining.')
+
+            user.save()
+
     return render(request, 'doctor-login.html')
 
 @csrf_exempt
@@ -162,21 +219,21 @@ def doctor_dashboard(request):
                 current_date = datetime.date.today()
                 current_date_str = str(current_date)  
                 today_appointments = Appointment.objects.filter(date=current_date_str).filter(doctor=doctor).filter(appointment_status='confirmed')
-                
+
                 next_date = current_date + datetime.timedelta(days=1) # next days date 
                 next_date_str = str(next_date)  
                 next_days_appointment = Appointment.objects.filter(date=next_date_str).filter(doctor=doctor).filter(Q(appointment_status='pending') | Q(appointment_status='confirmed')).count()
-                
+
                 today_patient_count = Appointment.objects.filter(date=current_date_str).filter(doctor=doctor).annotate(count=Count('patient'))
                 total_appointments_count = Appointment.objects.filter(doctor=doctor).annotate(count=Count('id'))
             else:
                 return redirect('doctor-logout')
-            
+
             context = {'doctor': doctor, 'today_appointments': today_appointments, 'today_patient_count': today_patient_count, 'total_appointments_count': total_appointments_count, 'next_days_appointment': next_days_appointment, 'current_date': current_date_str, 'next_date': next_date_str}
             return render(request, 'doctor-dashboard.html', context)
         else:
             return redirect('doctor-login')
- 
+
 @csrf_exempt
 @login_required(login_url="doctor-login")
 def appointments(request):
@@ -184,16 +241,16 @@ def appointments(request):
     appointments = Appointment.objects.filter(doctor=doctor).filter(appointment_status='pending').order_by('date')
     context = {'doctor': doctor, 'appointments': appointments}
     return render(request, 'appointments.html', context) 
- 
+
 @csrf_exempt        
 @login_required(login_url="doctor-login")
 def accept_appointment(request, pk):
     appointment = Appointment.objects.get(id=pk)
     appointment.appointment_status = 'confirmed'
     appointment.save()
-    
+
     # Mailtrap
-    
+
     patient_email = appointment.patient.email
     patient_name = appointment.patient.name
     patient_username = appointment.patient.username
@@ -204,9 +261,9 @@ def accept_appointment(request, pk):
     appointment_date = appointment.date
     appointment_time = appointment.time
     appointment_status = appointment.appointment_status
-    
+
     subject = "Appointment Acceptance Email"
-    
+
     values = {
             "email":patient_email,
             "name":patient_name,
@@ -218,17 +275,17 @@ def accept_appointment(request, pk):
             "appointment_time":appointment_time,
             "appointment_status":appointment_status,
     }
-    
+
     html_message = render_to_string('appointment_accept_mail.html', {'values': values})
     plain_message = strip_tags(html_message)
-    
+
     try:
         send_mail(subject, plain_message, 'hospital_admin@gmail.com',  [patient_email], html_message=html_message, fail_silently=False)
     except BadHeaderError:
         return HttpResponse('Invalid header found')
-    
+
     messages.success(request, 'Appointment Accepted')
-    
+
     return redirect('doctor-dashboard')
 
 @csrf_exempt
@@ -237,31 +294,31 @@ def reject_appointment(request, pk):
     appointment = Appointment.objects.get(id=pk)
     appointment.appointment_status = 'cancelled'
     appointment.save()
-    
+
     # Mailtrap
-    
+
     patient_email = appointment.patient.email
     patient_name = appointment.patient.name
     doctor_name = appointment.doctor.name
 
     subject = "Appointment Rejection Email"
-    
+
     values = {
             "email":patient_email,
             "name":patient_name,
             "doctor_name":doctor_name,
     }
-    
+
     html_message = render_to_string('appointment_reject_mail.html', {'values': values})
     plain_message = strip_tags(html_message)
-    
+
     try:
         send_mail(subject, plain_message, 'hospital_admin@gmail.com',  [patient_email], html_message=html_message, fail_silently=False)
     except BadHeaderError:
         return HttpResponse('Invalid header found')
-    
+
     messages.error(request, 'Appointment Rejected')
-    
+
     return redirect('doctor-dashboard')
 
 
@@ -281,14 +338,14 @@ def doctor_profile(request, pk):
         patient = request.user.patient
     else:
         patient = None
-    
+
     doctor = Doctor_Information.objects.get(doctor_id=pk)
     # doctor = Doctor_Information.objects.filter(doctor_id=pk).order_by('-doctor_id')
-    
+
     educations = Education.objects.filter(doctor=doctor).order_by('-year_of_completion')
     experiences = Experience.objects.filter(doctor=doctor).order_by('-from_year','-to_year')
     doctor_review = Doctor_review.objects.filter(doctor=doctor)
-            
+
     context = {'doctor': doctor, 'patient': patient, 'educations': educations, 'experiences': experiences, 'doctor_review': doctor_review}
     return render(request, 'doctor-profile.html', context)
 
@@ -297,10 +354,10 @@ def doctor_profile(request, pk):
 def delete_education(request, pk):
     if request.user.is_doctor:
         doctor = Doctor_Information.objects.get(user=request.user)
-        
+
         educations = Education.objects.get(education_id=pk)
         educations.delete()
-        
+
         messages.success(request, 'Education Deleted')
         return redirect('doctor-profile-settings')
 
@@ -309,13 +366,13 @@ def delete_education(request, pk):
 def delete_experience(request, pk):
     if request.user.is_doctor:
         doctor = Doctor_Information.objects.get(user=request.user)
-        
+
         experiences = Experience.objects.get(experience_id=pk)
         experiences.delete()
-        
+
         messages.success(request, 'Experience Deleted')
         return redirect('doctor-profile-settings')
-      
+
 @csrf_exempt      
 @login_required(login_url="doctor-login")
 def doctor_profile_settings(request):
@@ -323,12 +380,12 @@ def doctor_profile_settings(request):
     if request.user.is_doctor:
         doctor = Doctor_Information.objects.get(user=request.user)
         old_featured_image = doctor.featured_image
-        
+
 
         if request.method == 'GET':
             educations = Education.objects.filter(doctor=doctor)
             experiences = Experience.objects.filter(doctor=doctor)
-                    
+
             context = {'doctor': doctor, 'educations': educations, 'experiences': experiences}
             return render(request, 'doctor-profile-settings.html', context)
         elif request.method == 'POST':
@@ -336,7 +393,7 @@ def doctor_profile_settings(request):
                 featured_image = request.FILES['featured_image']
             else:
                 featured_image = old_featured_image
-                
+
             name = request.POST.get('name')
             number = request.POST.get('number')
             gender = request.POST.get('gender')
@@ -346,7 +403,7 @@ def doctor_profile_settings(request):
             report_fee = request.POST.get('report_fee')
             nid = request.POST.get('nid')
             visit_hour = request.POST.get('visit_hour')
-            
+
             degree = request.POST.getlist('degree')
             institute = request.POST.getlist('institute')
             year_complete = request.POST.getlist('year_complete')
@@ -366,9 +423,9 @@ def doctor_profile_settings(request):
             doctor.report_fee = report_fee
             doctor.description = description
             doctor.dob = dob
-            
+
             doctor.save()
-            
+
             # Education
             for i in range(len(degree)):
                 education = Education(doctor=doctor)
@@ -385,13 +442,13 @@ def doctor_profile_settings(request):
                 experience.to_year = end_year[i]
                 experience.designation = designation[i]
                 experience.save()
-      
+
             # context = {'degree': degree}
             messages.success(request, 'Profile Updated')
             return redirect('doctor-dashboard')
     else:
         redirect('doctor-logout')
-               
+
 @csrf_exempt    
 @login_required(login_url="doctor-login")      
 def booking_success(request):
@@ -410,10 +467,10 @@ def booking(request, pk):
         appointment_type = request.POST['appointment_type']
         message = request.POST['message']
 
-    
+
         transformed_date = datetime.datetime.strptime(date, '%m/%d/%Y').strftime('%Y-%m-%d')
         transformed_date = str(transformed_date)
-         
+
         appointment.date = transformed_date
         appointment.time = time
         appointment.appointment_status = 'pending'
@@ -421,7 +478,7 @@ def booking(request, pk):
         appointment.appointment_type = appointment_type
         appointment.message = message
         appointment.save()
-        
+
         if message:
             # Mailtrap
             patient_email = appointment.patient.email
@@ -429,9 +486,9 @@ def booking(request, pk):
             patient_username = appointment.patient.username
             patient_phone_number = appointment.patient.phone_number
             doctor_name = appointment.doctor.name
-        
+
             subject = "Appointment Request"
-            
+
             values = {
                     "email":patient_email,
                     "name":patient_name,
@@ -440,16 +497,16 @@ def booking(request, pk):
                     "doctor_name":doctor_name,
                     "message":message,
                 }
-            
+
             html_message = render_to_string('appointment-request-mail.html', {'values': values})
             plain_message = strip_tags(html_message)
-            
+
             try:
                 send_mail(subject, plain_message, 'hospital_admin@gmail.com',  [patient_email], html_message=html_message, fail_silently=False)
             except BadHeaderError:
                 return HttpResponse('Invalid header found')
-        
-        
+
+
         messages.success(request, 'Appointment Booked')
         return redirect('patient-dashboard')
 
@@ -465,8 +522,8 @@ def my_patients(request):
         # patients = Patient.objects.all()
     else:
         redirect('doctor-logout')
-    
-    
+
+
     context = {'doctor': doctor, 'appointments': appointments}
     return render(request, 'my-patients.html', context)
 
@@ -497,11 +554,11 @@ def create_prescription(request,pk):
             doctor = Doctor_Information.objects.get(user=request.user)
             patient = Patient.objects.get(patient_id=pk) 
             create_date = datetime.date.today()
-            
+
 
             if request.method == 'POST':
                 prescription = Prescription(doctor=doctor, patient=patient)
-                
+
                 test_name= request.POST.getlist('test_name')
                 test_description = request.POST.getlist('description')
                 medicine_name = request.POST.getlist('medicine_name')
@@ -513,10 +570,10 @@ def create_prescription(request,pk):
                 extra_information = request.POST.get('extra_information')
                 test_info_id = request.POST.getlist('id')
 
-            
+
                 prescription.extra_information = extra_information
                 prescription.create_date = create_date
-                
+
                 prescription.save()
 
                 for i in range(len(medicine_name)):
@@ -536,16 +593,16 @@ def create_prescription(request,pk):
                     tests.test_info_id = test_info_id[i]
                     test_info = Test_Information.objects.get(test_id=test_info_id[i])
                     tests.test_info_price = test_info.test_price
-                   
+
                     tests.save()
 
                 messages.success(request, 'Prescription Created')
                 return redirect('patient-profile', pk=patient.patient_id)
-             
+
         context = {'doctor': doctor,'patient': patient}  
         return render(request, 'create-prescription.html',context)
 
-        
+
 @csrf_exempt      
 def render_to_pdf(template_src, context_dict={}):
     template = get_template(template_src)
@@ -576,12 +633,12 @@ def report_pdf(request, pk):
 #     degree = degree.replace("]", "")
 #     degree = degree.replace(",", "")
 #     degree_array = degree.split()
-    
+
 #     education = zip(degree_array, institute_array)
-    
+
 #     context = {'doctor': doctor, 'degree': institute, 'institute_array': institute_array, 'education': education}
 #     # test range, len, and loop to show variables before moving on to doctor profile
-    
+
 #     return render(request, 'testing.html', context)
 
 @csrf_exempt
@@ -607,13 +664,13 @@ def doctor_test_list(request):
         tests = Test_Information.objects.all
         context = {'doctor': doctor, 'tests': tests}
         return render(request, 'doctor-test-list.html', context)
-    
+
     elif request.user.is_authenticated and request.user.is_patient:
         patient = Patient.objects.get(user=request.user)
         tests = Test_Information.objects.all
         context = {'patient': patient, 'tests': tests}
         return render(request, 'doctor-test-list.html', context)
-        
+
     else:
         logout(request)
         messages.info(request, 'Not Authorized')
@@ -665,9 +722,9 @@ def doctor_review(request, pk):
     if request.user.is_doctor:
         # doctor = Doctor_Information.objects.get(user_id=pk)
         doctor = Doctor_Information.objects.get(user=request.user)
-            
+
         doctor_review = Doctor_review.objects.filter(doctor=doctor)
-        
+
         context = {'doctor': doctor, 'doctor_review': doctor_review}  
         return render(request, 'doctor-profile.html', context)
 
@@ -678,7 +735,7 @@ def doctor_review(request, pk):
         if request.method == 'POST':
             title = request.POST.get('title')
             message = request.POST.get('message')
-            
+
             doctor_review = Doctor_review(doctor=doctor, patient=patient, title=title, message=message)
             doctor_review.save()
 
@@ -686,9 +743,3 @@ def doctor_review(request, pk):
         return render(request, 'doctor-profile.html', context)
     else:
         logout(request)
- 
- 
-   
- 
-
-
