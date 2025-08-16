@@ -1,193 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0" />
+    <title>CliniCore - Login</title>
 
-{% extends 'base.html' %}
-{% load static %}
+    <!-- Favicons -->
+    <link type="image/x-icon" href="{% static 'HealthStack-System/images/Normal/favicon.png' %}" rel="icon" />
 
-{% block title %}Login - CliniCore{% endblock %}
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="{% static 'HealthStack-System/css/Normal/bootstrap.min.css' %}" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 
-{% block content %}
-<div class="login-page min-vh-100 d-flex align-items-center">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-lg-5 col-md-7">
-                <div class="login-card">
-                    <div class="card border-0 shadow-lg">
-                        <div class="card-body p-5">
-                            <!-- CliniCore Logo -->
-                            <div class="text-center mb-4">
-                                <div class="login-logo mb-3">
-                                    <div class="clinicore-icon mx-auto">
-                                        <i class="fas fa-heartbeat fa-2x"></i>
-                                    </div>
-                                </div>
-                                <h2 class="fw-bold text-primary">CliniCore</h2>
-                                <p class="text-muted">Welcome back to modern healthcare</p>
-                            </div>
+    <!-- Fontawesome CSS -->
+    <link rel="stylesheet" href="{% static 'HealthStack-System/plugins/Normal/fontawesome/css/fontawesome.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'HealthStack-System/plugins/Normal/fontawesome/css/all.min.css' %}" />
 
-                            <!-- Login Form -->
-                            <form method="post" class="login-form">
-                                {% csrf_token %}
-                                
-                                {% if messages %}
-                                    {% for message in messages %}
-                                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                                            <i class="fas fa-exclamation-circle me-2"></i>
-                                            {{ message }}
-                                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="{% static 'HealthStack-System/css/Normal/style.css' %}" />
+</head>
+
+<body class="account-page">
+
+    <!-- Main Wrapper -->
+    <div class="main-wrapper">
+        <!-- Header -->
+        {% include 'navbar_home.html' %}
+
+        {% block content %}
+        <div class="login-page min-vh-100 d-flex align-items-center">
+            <div class="container">
+                <div class="row justify-content-center">
+                    <div class="col-lg-5 col-md-7">
+                        <div class="login-card">
+                            <div class="card border-0 shadow-lg">
+                                <div class="card-body p-5">
+                                    <!-- CliniCore Logo -->
+                                    <div class="text-center mb-4">
+                                        <div class="login-logo mb-3">
+                                            <div class="clinicore-icon mx-auto">
+                                                <i class="fas fa-heartbeat fa-2x"></i>
+                                            </div>
                                         </div>
-                                    {% endfor %}
-                                {% endif %}
-
-                                <div class="mb-3">
-                                    <label for="username" class="form-label">Email or Username</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text">
-                                            <i class="fas fa-user"></i>
-                                        </span>
-                                        <input type="text" class="form-control" id="username" name="username" required>
+                                        <h2 class="fw-bold text-primary">CliniCore</h2>
+                                        <p class="text-muted">Welcome back to modern healthcare</p>
                                     </div>
-                                </div>
 
-                                <div class="mb-3">
-                                    <label for="password" class="form-label">Password</label>
-                                    <div class="input-group">
-                                        <span class="input-group-text">
-                                            <i class="fas fa-lock"></i>
-                                        </span>
-                                        <input type="password" class="form-control" id="password" name="password" required>
-                                        <button class="btn btn-outline-secondary" type="button" id="togglePassword">
-                                            <i class="fas fa-eye"></i>
+                                    <!-- Login Form -->
+                                    <form method="post" class="login-form">
+                                        {% csrf_token %}
+
+                                        {% if messages %}
+                                            {% for message in messages %}
+                                                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                                    <i class="fas fa-exclamation-circle me-2"></i>
+                                                    {{ message }}
+                                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                                </div>
+                                            {% endfor %}
+                                        {% endif %}
+
+                                        <div class="mb-3">
+                                            <label for="username" class="form-label">Email or Username</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">
+                                                    <i class="fas fa-user"></i>
+                                                </span>
+                                                <input type="text" class="form-control" id="username" name="username" required>
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label for="password" class="form-label">Password</label>
+                                            <div class="input-group">
+                                                <span class="input-group-text">
+                                                    <i class="fas fa-lock"></i>
+                                                </span>
+                                                <input type="password" class="form-control" id="password" name="password" required>
+                                                <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-3 d-flex justify-content-between align-items-center">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="remember">
+                                                <label class="form-check-label" for="remember">
+                                                    Remember me
+                                                </label>
+                                            </div>
+                                            <a href="/reset-password/" class="text-decoration-none">
+                                                Forgot password?
+                                            </a>
+                                        </div>
+
+                                        <button type="submit" class="btn btn-primary btn-lg w-100 mb-3">
+                                            <i class="fas fa-sign-in-alt me-2"></i>Sign In
                                         </button>
-                                    </div>
-                                </div>
 
-                                <div class="mb-3 d-flex justify-content-between align-items-center">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="remember">
-                                        <label class="form-check-label" for="remember">
-                                            Remember me
-                                        </label>
-                                    </div>
-                                    <a href="/reset-password/" class="text-decoration-none">
-                                        Forgot password?
-                                    </a>
+                                        <div class="text-center">
+                                            <p class="mb-0">Don't have an account?</p>
+                                            <div class="register-links mt-2">
+                                                <a href="/patient-register/" class="btn btn-outline-primary btn-sm me-2">
+                                                    <i class="fas fa-user me-1"></i>Patient
+                                                </a>
+                                                <a href="/doctor-register/" class="btn btn-outline-success btn-sm me-2">
+                                                    <i class="fas fa-user-md me-1"></i>Doctor
+                                                </a>
+                                                <a href="/hospital_admin/register/" class="btn btn-outline-info btn-sm">
+                                                    <i class="fas fa-hospital me-1"></i>Hospital
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </form>
                                 </div>
-
-                                <button type="submit" class="btn btn-primary btn-lg w-100 mb-3">
-                                    <i class="fas fa-sign-in-alt me-2"></i>Sign In
-                                </button>
-
-                                <div class="text-center">
-                                    <p class="mb-0">Don't have an account?</p>
-                                    <div class="register-links mt-2">
-                                        <a href="/patient-register/" class="btn btn-outline-primary btn-sm me-2">
-                                            <i class="fas fa-user me-1"></i>Patient
-                                        </a>
-                                        <a href="/doctor-register/" class="btn btn-outline-success btn-sm me-2">
-                                            <i class="fas fa-user-md me-1"></i>Doctor
-                                        </a>
-                                        <a href="/hospital_admin/register/" class="btn btn-outline-info btn-sm">
-                                            <i class="fas fa-hospital me-1"></i>Hospital
-                                        </a>
-                                    </div>
-                                </div>
-                            </form>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
+        <style>
+        .login-page {
+            background: linear-gradient(135deg, #caf0f8, #90e0ef);
+            min-height: 100vh;
+        }
+
+        .login-card {
+            animation: slideInUp 0.8s ease-out;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .clinicore-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #0066cc, #00b4d8);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            box-shadow: 0 4px 20px rgba(0, 102, 204, 0.3);
+        }
+
+        .input-group-text {
+            background: var(--light-color);
+            border: 1px solid var(--border-color);
+            color: var(--primary-color);
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(0, 102, 204, 0.25);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #0066cc, #00b4d8);
+            border: none;
+            box-shadow: 0 4px 15px rgba(0, 102, 204, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 102, 204, 0.4);
+        }
+
+        .register-links .btn {
+            transition: all 0.3s ease;
+        }
+
+        .register-links .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .card {
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .alert {
+            border-radius: 10px;
+            border: none;
+        }
+        </style>
+
+        <script>
+        document.getElementById('togglePassword').addEventListener('click', function() {
+            const password = document.getElementById('password');
+            const icon = this.querySelector('i');
+
+            if (password.type === 'password') {
+                password.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                password.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        });
+        </script>
+        {% endblock %}
     </div>
-</div>
-
-<style>
-.login-page {
-    background: linear-gradient(135deg, #caf0f8, #90e0ef);
-    min-height: 100vh;
-}
-
-.login-card {
-    animation: slideInUp 0.8s ease-out;
-}
-
-@keyframes slideInUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.clinicore-icon {
-    width: 80px;
-    height: 80px;
-    background: linear-gradient(135deg, #0066cc, #00b4d8);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    box-shadow: 0 4px 20px rgba(0, 102, 204, 0.3);
-}
-
-.input-group-text {
-    background: var(--light-color);
-    border: 1px solid var(--border-color);
-    color: var(--primary-color);
-}
-
-.form-control:focus {
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 0.2rem rgba(0, 102, 204, 0.25);
-}
-
-.btn-primary {
-    background: linear-gradient(135deg, #0066cc, #00b4d8);
-    border: none;
-    box-shadow: 0 4px 15px rgba(0, 102, 204, 0.3);
-    transition: all 0.3s ease;
-}
-
-.btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 102, 204, 0.4);
-}
-
-.register-links .btn {
-    transition: all 0.3s ease;
-}
-
-.register-links .btn:hover {
-    transform: translateY(-2px);
-}
-
-.card {
-    border-radius: 20px;
-    overflow: hidden;
-}
-
-.alert {
-    border-radius: 10px;
-    border: none;
-}
-</style>
-
-<script>
-document.getElementById('togglePassword').addEventListener('click', function() {
-    const password = document.getElementById('password');
-    const icon = this.querySelector('i');
-    
-    if (password.type === 'password') {
-        password.type = 'text';
-        icon.classList.remove('fa-eye');
-        icon.classList.add('fa-eye-slash');
-    } else {
-        password.type = 'password';
-        icon.classList.remove('fa-eye-slash');
-        icon.classList.add('fa-eye');
-    }
-});
-</script>
-{% endblock %}
+</body>
+</html>
