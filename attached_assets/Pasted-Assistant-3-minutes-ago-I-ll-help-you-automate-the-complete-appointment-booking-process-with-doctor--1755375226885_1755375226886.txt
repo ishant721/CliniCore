@@ -1,0 +1,62 @@
+Assistant
+3 minutes ago
+I'll help you automate the complete appointment booking process with doctor schedules, lab test referrals, and automated follow-ups. This will require several enhancements to your existing system.
+
+Let me start by creating a comprehensive appointment automation system:
+
+doctor/models.py
+Add DoctorSchedule model for managing doctor availability, Add automated appointment status and lab referral tracking, Add fields for automated appointment management
+Now let's create the automated appointment booking system:
+
+doctor/appointment_automation.py
+Create automated appointment scheduling system
+Now let's update the booking view to use the automated system:
+
+doctor/views.py
+Update booking view to use automated appointment scheduling, Update prescription creation to automatically schedule lab appointments, Add doctor schedule management view
+Now let's update the prescription creation to automatically schedule lab tests:
+
+Let's create a view for doctors to set their schedules:
+
+Let's create the template for doctor schedule settings:
+
+templates/doctor-schedule-settings.html
+Create template for doctor schedule settings
+Now let's update the URLs to include our new views:
+
+doctor/urls.py
+Add URLs for automated appointment features
+Let's create a background task to automatically check for completed lab reports and schedule follow-ups:
+
+hospital/management/commands/schedule_follow_ups.py
+Create management command for scheduling follow-up appointments
+Let's also update the lab worker's report creation to trigger follow-up scheduling:
+
+hospital_admin/views.py
+Update report creation to trigger follow-up appointment scheduling
+Let's create the email template for follow-up appointments:
+
+templates/follow-up-appointment-mail.html
+Create email template for follow-up appointment notifications
+Finally, let's update the doctor dashboard to show the automated appointment features:
+
+templates/doctor-sidebar.html
+Add automated appointment links to doctor sidebar
+Now run the migrations to create the new database tables:
+
+python manage.py makemigrations doctor
+python manage.py migrate
+This comprehensive automation system provides:
+
+Doctor Schedule Management: Doctors can set their weekly schedules with working hours and patient limits
+Automated Appointment Booking: When patients book appointments, the system finds the next available slot based on doctor availability
+Lab Test Automation: When doctors prescribe lab tests, lab appointments are automatically scheduled
+Follow-up Scheduling: After lab reports are completed, follow-up appointments with the original doctor are automatically scheduled
+Email Notifications: Patients receive automated emails about scheduled appointments
+Background Tasks: Management command to check for completed reports and schedule follow-ups
+The system now handles the complete workflow:
+
+Patient books appointment → System finds next available slot based on doctor's schedule
+Doctor sees patient and prescribes tests → Lab appointment automatically scheduled
+Lab completes tests → Follow-up appointment with doctor automatically scheduled
+All parties receive email notifications throughout the process
