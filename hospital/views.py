@@ -32,6 +32,7 @@ from django.utils.encoding import force_bytes
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.views.decorators.csrf import csrf_exempt
+from django.utils import timezone
 
 
 # Create your views here.
@@ -52,7 +53,7 @@ def change_password(request,pk):
         new_password = request.POST["new_password"]
         confirm_password = request.POST["confirm_password"]
         if new_password == confirm_password:
-            
+
             request.user.set_password(new_password)
             request.user.save()
             messages.success(request,"Password Changed Successfully")
@@ -101,8 +102,8 @@ def resetPassword(request):
 
     context = {'form': form}
     return render(request, 'reset_password.html', context)
-    
-    
+
+
 def privacy_policy(request):
     return render(request, 'privacy-policy.html')
 
@@ -124,7 +125,7 @@ def chat_doctor(request):
     if request.user.is_doctor:
         doctor = Doctor_Information.objects.get(user=request.user)
         patients = Patient.objects.all()
-        
+
     context = {'patients': patients, 'doctor': doctor}
     return render(request, 'chat-doctor.html', context)
 
@@ -165,13 +166,13 @@ def login_user(request):
             if not user.is_active:
                 # User is not active, redirect to OTP verification
                 messages.warning(request, 'Your account is not active. Please verify your email with OTP.')
-                if not user.otp_code or user.otp_expires_at < datetime.now():
+                if not user.otp_code or user.otp_expires_at < timezone.now():
                     if send_otp_email(user, "account verification"):
                         messages.info(request, 'A new OTP has been sent to your email.')
                     else:
                         messages.error(request, 'Error sending OTP email. Please try again.')
                 return redirect('otp_verify', user_id=user.id)
-            
+
             # Check if 2FA is enabled
             if user.two_factor_enabled:
                 if not otp_code:
@@ -184,19 +185,19 @@ def login_user(request):
                         return render(request, 'patient-login.html')
                 else:
                     # Verify 2FA OTP
-                    if user.otp_code == otp_code and user.otp_expires_at > datetime.now():
+                    if user.otp_code == otp_code and user.otp_expires_at > timezone.now():
                         user.otp_code = None
                         user.otp_expires_at = None
                         user.save()
                     else:
                         messages.error(request, 'Invalid or expired 2FA code.')
                         return render(request, 'patient-login.html', {'require_2fa': True, 'username': username})
-            
+
             # Check if password reset is required
             if user.password_reset_required:
                 messages.warning(request, 'You must change your password before continuing.')
                 return redirect('change-password', pk=user.id)
-            
+
             login(request, user)
             if user.is_patient:   
                 messages.success(request, 'User Logged in Successfully')    
@@ -207,7 +208,7 @@ def login_user(request):
         else:
             # Handle failed login attempt
             user.failed_login_attempts += 1
-            
+
             # Lock account after 5 failed attempts
             if user.failed_login_attempts >= 5:
                 user.lock_account(duration_minutes=30)
@@ -215,7 +216,7 @@ def login_user(request):
             else:
                 remaining_attempts = 5 - user.failed_login_attempts
                 messages.error(request, f'Invalid username or password. {remaining_attempts} attempts remaining.')
-            
+
             user.save()
 
     return render(request, 'patient-login.html')
@@ -259,7 +260,7 @@ def otp_verify(request, user_id, reset_password=False):
     user = get_object_or_404(User, id=user_id)
     if request.method == 'POST':
         otp_code = request.POST.get('otp_code')
-        if user.otp_code == otp_code and user.otp_expires_at > datetime.now():
+        if user.otp_code == otp_code and user.otp_expires_at > timezone.now():
             user.otp_code = None # Clear OTP
             user.otp_expires_at = None # Clear OTP expiration
             user.save()
@@ -307,7 +308,7 @@ def patient_dashboard(request):
         context = {'patient': patient, 'appointments': appointments, 'payments': payments,'report':report,'prescription':prescription}
     else:
         return redirect('logout')
-        
+
     return render(request, 'patient-dashboard.html', context)
 
 
@@ -337,7 +338,7 @@ def profile_settings(request):
         # patient = Patient.objects.get(user_id=pk)
         patient = Patient.objects.get(user=request.user)
         old_featured_image = patient.featured_image
-        
+
         if request.method == 'GET':
             context = {'patient': patient}
             return render(request, 'profile-settings.html', context)
@@ -346,7 +347,7 @@ def profile_settings(request):
                 featured_image = request.FILES['featured_image']
             else:
                 featured_image = old_featured_image
-                
+
             name = request.POST.get('name')
             dob = request.POST.get('dob')
             age = request.POST.get('age')
@@ -355,7 +356,7 @@ def profile_settings(request):
             address = request.POST.get('address')
             nid = request.POST.get('nid')
             history = request.POST.get('history')
-            
+
             patient.name = name
             patient.age = age
             patient.phone_number = phone_number
@@ -365,15 +366,15 @@ def profile_settings(request):
             patient.dob = dob
             patient.nid = nid
             patient.featured_image = featured_image
-            
+
             patient.save()
-            
+
             messages.success(request, 'Profile Settings Changed!')
-            
+
             return redirect('patient-dashboard')
     else:
         redirect('logout')  
-        
+
 @csrf_exempt
 @login_required(login_url="login")
 def search(request):
@@ -381,7 +382,7 @@ def search(request):
         # patient = Patient.objects.get(user_id=pk)
         patient = Patient.objects.get(user=request.user)
         doctors = Doctor_Information.objects.filter(register_status='Accepted')
-        
+
         doctors, search_query = searchDoctors(request)
         context = {'patient': patient, 'doctors': doctors, 'search_query': search_query}
         return render(request, 'search.html', context)
@@ -389,7 +390,7 @@ def search(request):
         logout(request)
         messages.error(request, 'Not Authorized')
         return render(request, 'patient-login.html')    
-    
+
 
 def checkout_payment(request):
     return render(request, 'checkout.html')
@@ -397,80 +398,80 @@ def checkout_payment(request):
 @csrf_exempt
 @login_required(login_url="login")
 def multiple_hospital(request):
-    
+
     if request.user.is_authenticated: 
-        
+
         if request.user.is_patient:
             # patient = Patient.objects.get(user_id=pk)
             patient = Patient.objects.get(user=request.user)
             doctors = Doctor_Information.objects.all()
             hospitals = Hospital_Information.objects.all()
-            
+
             hospitals, search_query = searchHospitals(request)
-            
+
             # PAGINATION ADDED TO MULTIPLE HOSPITALS
             custom_range, hospitals = paginateHospitals(request, hospitals, 3)
-        
+
             context = {'patient': patient, 'doctors': doctors, 'hospitals': hospitals, 'search_query': search_query, 'custom_range': custom_range}
             return render(request, 'multiple-hospital.html', context)
-        
+
         elif request.user.is_doctor:
             doctor = Doctor_Information.objects.get(user=request.user)
             hospitals = Hospital_Information.objects.all()
-            
+
             hospitals, search_query = searchHospitals(request)
-            
+
             context = {'doctor': doctor, 'hospitals': hospitals, 'search_query': search_query}
             return render(request, 'multiple-hospital.html', context)
     else:
         logout(request)
         messages.error(request, 'Not Authorized')
         return render(request, 'patient-login.html') 
-    
+
 @csrf_exempt    
 @login_required(login_url="login")
 def hospital_profile(request, pk):
-    
+
     if request.user.is_authenticated: 
-        
+
         if request.user.is_patient:
             patient = Patient.objects.get(user=request.user)
             doctors = Doctor_Information.objects.all()
             hospitals = Hospital_Information.objects.get(hospital_id=pk)
-        
+
             departments = hospital_department.objects.filter(hospital=hospitals)
             specializations = specialization.objects.filter(hospital=hospitals)
             services = service.objects.filter(hospital=hospitals)
-            
+
             # department_list = None
             # for d in departments:
             #     vald = d.hospital_department_name
-            #     vald = re.sub("'", "", vald)
+            #     vald = re.sub("'", "",vald)
             #     vald = vald.replace("[", "")
             #     vald = vald.replace("]", "")
             #     vald = vald.replace(",", "")
             #     department_list = vald.split()
-            
+
             context = {'patient': patient, 'doctors': doctors, 'hospitals': hospitals, 'departments': departments, 'specializations': specializations, 'services': services}
             return render(request, 'hospital-profile.html', context)
-        
+
         elif request.user.is_doctor:
-           
+
             doctor = Doctor_Information.objects.get(user=request.user)
             hospitals = Hospital_Information.objects.get(hospital_id=pk)
-            
+
             departments = hospital_department.objects.filter(hospital=hospitals)
             specializations = specialization.objects.filter(hospital=hospitals)
             services = service.objects.filter(hospital=hospitals)
-            
+
             context = {'doctor': doctor, 'hospitals': hospitals, 'departments': departments, 'specializations': specializations, 'services': services}
             return render(request, 'hospital-profile.html', context)
     else:
         logout(request)
         messages.error(request, 'Not Authorized')
         return render(request, 'patient-login.html') 
-    
-    
+
+
 def data_table(request):
     return render(request, 'data-table.html')
 
@@ -478,23 +479,23 @@ def data_table(request):
 @login_required(login_url="login")
 def hospital_department_list(request, pk):
     if request.user.is_authenticated: 
-        
+
         if request.user.is_patient:
             # patient = Patient.objects.get(user_id=pk)
             patient = Patient.objects.get(user=request.user)
             doctors = Doctor_Information.objects.all()
-            
+
             hospitals = Hospital_Information.objects.get(hospital_id=pk)
             departments = hospital_department.objects.filter(hospital=hospitals)
-        
+
             context = {'patient': patient, 'doctors': doctors, 'hospitals': hospitals, 'departments': departments}
             return render(request, 'hospital-department.html', context)
-        
+
         elif request.user.is_doctor:
             doctor = Doctor_Information.objects.get(user=request.user)
             hospitals = Hospital_Information.objects.get(hospital_id=pk)
             departments = hospital_department.objects.filter(hospital=hospitals)
-            
+
             context = {'doctor': doctor, 'hospitals': hospitals, 'departments': departments}
             return render(request, 'hospital-department.html', context)
     else:
@@ -510,74 +511,74 @@ def hospital_doctor_list(request, pk):
         patient = Patient.objects.get(user=request.user)
         departments = hospital_department.objects.get(hospital_department_id=pk)
         doctors = Doctor_Information.objects.filter(department_name=departments)
-        
+
         doctors, search_query = searchDepartmentDoctors(request, pk)
-        
+
         context = {'patient': patient, 'department': departments, 'doctors': doctors, 'search_query': search_query, 'pk_id': pk}
         return render(request, 'hospital-doctor-list.html', context)
 
     elif request.user.is_authenticated and request.user.is_doctor:
         # patient = Patient.objects.get(user_id=pk)
-        
+
         doctor = Doctor_Information.objects.get(user=request.user)
         departments = hospital_department.objects.get(hospital_department_id=pk)
-        
+
         doctors = Doctor_Information.objects.filter(department_name=departments)
         doctors, search_query = searchDepartmentDoctors(request, pk)
-        
+
         context = {'doctor':doctor, 'department': departments, 'doctors': doctors, 'search_query': search_query, 'pk_id': pk}
         return render(request, 'hospital-doctor-list.html', context)
     else:
         logout(request)
         messages.error(request, 'Not Authorized')
         return render(request, 'patient-login.html')   
-    
+
 
 
 @csrf_exempt
 @login_required(login_url="login")
 def hospital_doctor_register(request, pk):
     if request.user.is_authenticated: 
-        
+
         if request.user.is_doctor:
             doctor = Doctor_Information.objects.get(user=request.user)
             hospitals = Hospital_Information.objects.get(hospital_id=pk)
-            
+
             departments = hospital_department.objects.filter(hospital=hospitals)
             specializations = specialization.objects.filter(hospital=hospitals)
-            
+
             if request.method == 'POST':
                 if 'certificate_image' in request.FILES:
                     certificate_image = request.FILES['certificate_image']
                 else:
                     certificate_image = "doctors_certificate/default.png"
-                
+
                 department_id_selected = request.POST.get('department_radio')
                 specialization_id_selected = request.POST.get('specialization_radio')
-                
+
                 department_chosen = hospital_department.objects.get(hospital_department_id=department_id_selected)
                 specialization_chosen = specialization.objects.get(specialization_id=specialization_id_selected)
-                
+
                 doctor.department_name = department_chosen
                 doctor.specialization = specialization_chosen
                 doctor.register_status = 'Pending'
                 doctor.certificate_image = certificate_image
-                
+
                 doctor.save()
-                
+
                 messages.success(request, 'Hospital Registration Request Sent')
-                
+
                 return redirect('doctor-dashboard')
-                
-                 
+
+
             context = {'doctor': doctor, 'hospitals': hospitals, 'departments': departments, 'specializations': specializations}
             return render(request, 'hospital-doctor-register.html', context)
     else:
         logout(request)
         messages.info(request, 'Not Authorized')
         return render(request, 'doctor-login.html')
-    
-   
+
+
 def testing(request):
     # hospitals = Hospital_Information.objects.get(hospital_id=1)
     test = "test"
@@ -607,11 +608,11 @@ def test_cart(request):
 @login_required(login_url="login")
 def test_single(request,pk):
      if request.user.is_authenticated and request.user.is_patient:
-         
+
         patient = Patient.objects.get(user=request.user)
         Perscription_test = Perscription_test.objects.get(test_id=pk)
         carts = testCart.objects.filter(user=request.user, purchased=False)
-        
+
         context = {'patient': patient, 'carts': carts, 'Perscription_test': Perscription_test}
         return render(request, 'test-cart.html',context)
      else:
@@ -623,7 +624,7 @@ def test_single(request,pk):
 @login_required(login_url="login")
 def test_add_to_cart(request, pk, pk2):
     if request.user.is_authenticated and request.user.is_patient:
-         
+
         patient = Patient.objects.get(user=request.user)
         test_information = Test_Information.objects.get(test_id=pk2)
         prescription = Prescription.objects.filter(prescription_id=pk)
@@ -655,17 +656,17 @@ def test_add_to_cart(request, pk, pk2):
 def test_cart(request, pk):
     if request.user.is_authenticated and request.user.is_patient:
         # prescription = Prescription.objects.filter(prescription_id=pk)
-        
+
         prescription = Prescription.objects.filter(prescription_id=pk)
-        
+
         patient = Patient.objects.get(user=request.user)
         prescription_test = Prescription_test.objects.all()
         test_carts = testCart.objects.filter(user=request.user, purchased=False)
         test_orders = testOrder.objects.filter(user=request.user, ordered=False)
-        
+
         if test_carts.exists() and test_orders.exists():
             test_order = test_orders[0]
-            
+
             context = {'test_carts': test_carts,'test_order': test_order, 'patient': patient, 'prescription_test':prescription_test, 'prescription_id':pk}
             return render(request, 'test-cart.html', context)
         else:
@@ -688,7 +689,7 @@ def test_remove_cart(request, pk):
         prescription_medicine = Prescription_medicine.objects.filter(prescription__in=prescription)
         prescription_test = Prescription_test.objects.filter(prescription__in=prescription)
         test_carts = testCart.objects.filter(user=request.user, purchased=False)
-        
+
         # item = get_object_or_404(test, pk=pk)
         test_order_qs = testOrder.objects.filter(user=request.user, ordered=False)
         if test_order_qs.exists():
@@ -798,32 +799,32 @@ def setup_two_factor(request):
     """Setup two-factor authentication"""
     if request.user.is_patient:
         patient = Patient.objects.get(user=request.user)
-        
+
         if request.method == 'POST':
             action = request.POST.get('action')
-            
+
             if action == 'enable':
                 # Generate backup codes
                 backup_codes = generate_backup_codes()
                 request.user.backup_codes = backup_codes
                 request.user.two_factor_enabled = True
                 request.user.save()
-                
+
                 messages.success(request, 'Two-factor authentication has been enabled successfully!')
                 return render(request, 'setup-2fa.html', {
                     'patient': patient,
                     'backup_codes': backup_codes,
                     'action_completed': True
                 })
-            
+
             elif action == 'disable':
                 request.user.two_factor_enabled = False
                 request.user.backup_codes = []
                 request.user.save()
-                
+
                 messages.success(request, 'Two-factor authentication has been disabled.')
                 return redirect('profile-settings')
-        
+
         context = {
             'patient': patient,
             'two_factor_enabled': request.user.two_factor_enabled
@@ -838,7 +839,7 @@ def security_settings(request):
     """Security settings page"""
     if request.user.is_patient:
         patient = Patient.objects.get(user=request.user)
-        
+
         # Get recent login attempts (you might want to create a LoginAttempt model)
         context = {
             'patient': patient,
@@ -861,6 +862,3 @@ def got_online(sender, user, request, **kwargs):
 def got_offline(sender, user, request, **kwargs):   
     user.login_status = False
     user.save()
-    
-
-
