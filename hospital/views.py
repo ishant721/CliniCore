@@ -34,6 +34,17 @@ from django.utils.html import strip_tags
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 from datetime import datetime
+import secrets
+import string
+
+
+def generate_backup_codes(count=10):
+    """Generate backup codes for two-factor authentication"""
+    codes = []
+    for _ in range(count):
+        code = ''.join(secrets.choice(string.ascii_uppercase + string.digits) for _ in range(8))
+        codes.append(code)
+    return codes
 
 
 # Create your views here.

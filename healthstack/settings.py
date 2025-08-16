@@ -36,16 +36,15 @@ except Exception as e:
     raise ValueError(f"SECRET_KEY configuration error: {e}")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env('DEBUG')
+DEBUG = env('DEBUG', default=True)
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '*']
-# ALLOWED_HOSTS = ['mobile view', 'local host','ngrok -- keeps on changing']
+ALLOWED_HOSTS = ['*']
 
 # CSRF trusted origins for HTTPS
 CSRF_TRUSTED_ORIGINS = [
-    'https://44bb32ec-8e6a-49f1-8261-75d6f4d756cf-00-3rgyy5my4wftn.pike.replit.dev',
-    'https://7b38a038-4124-4f25-b5b0-1d8f5fa6f028-00-20pwu0o0h9v64.sisko.replit.dev',
     'https://*.replit.dev',
+    'https://*.replit.app',
+    'https://*.replit.co',
 ]
 
 # Application definition
@@ -66,9 +65,11 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt', # Added for JWT authentication
     'ChatApp.apps.ChatappConfig',
-    'debug_toolbar',
     'marketplace',
 ]
+
+if DEBUG:
+    INSTALLED_APPS.append('debug_toolbar')
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -119,8 +120,10 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
 ]
+
+if DEBUG:
+    MIDDLEWARE.append('debug_toolbar.middleware.DebugToolbarMiddleware')
 
 # Security Settings
 SECURE_BROWSER_XSS_FILTER = True
