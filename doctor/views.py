@@ -190,7 +190,7 @@ def doctor_login(request):
                 return redirect('doctor-change-password', pk=user.id)
 
             if user.is_doctor:
-                login(request, user)
+                login(request, user, backend='hospital.auth_backends.CustomAuthBackend')
                 messages.success(request, 'User Logged in Successfully')
                 return redirect('doctor-dashboard')
             else:
