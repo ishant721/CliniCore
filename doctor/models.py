@@ -58,6 +58,21 @@ class Doctor_Information(models.Model):
     latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
     longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
     
+    # Marketplace features
+    is_marketplace_active = models.BooleanField(default=False)
+    home_visit_available = models.BooleanField(default=False)
+    online_consultation_available = models.BooleanField(default=True)
+    instant_booking_available = models.BooleanField(default=False)
+    service_radius = models.IntegerField(default=10)  # in kilometers
+    home_visit_fee = models.IntegerField(null=True, blank=True)
+    online_consultation_fee = models.IntegerField(null=True, blank=True)
+    average_response_time = models.IntegerField(default=30)  # in minutes
+    
+    # Ratings and reviews
+    marketplace_rating = models.DecimalField(max_digits=3, decimal_places=2, default=5.0)
+    total_marketplace_reviews = models.IntegerField(default=0)
+    total_consultations = models.IntegerField(default=0)
+    
     # Education
     institute = models.CharField(max_length=200, null=True, blank=True)
     degree = models.CharField(max_length=200, null=True, blank=True)

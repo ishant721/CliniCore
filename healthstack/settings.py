@@ -61,7 +61,8 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt', # Added for JWT authentication
     'ChatApp.apps.ChatappConfig',
     'debug_toolbar',
-    ]
+    'marketplace',
+]
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (

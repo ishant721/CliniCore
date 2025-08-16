@@ -64,6 +64,16 @@
       <li>
         <a href="{% url 'pharmacy_shop' %}">Medical Shop</a>
       </li>
+      
+      <li class="has-submenu">
+        <a href="#">Marketplace <i class="fas fa-chevron-down"></i></a>
+        <ul class="submenu">
+          <li><a href="{% url 'marketplace_home' %}">Dashboard</a></li>
+          <li><a href="{% url 'marketplace_doctors' %}">Find Doctors</a></li>
+          <li><a href="{% url 'marketplace_medicine' %}">Medicine Delivery</a></li>
+          <li><a href="{% url 'marketplace_orders' %}">My Orders</a></li>
+        </ul>
+      </li>
       <!-- <li class="has-submenu">
                   <a href="#">Pages <i class="fas fa-chevron-down"></i></a>
                   <ul class="submenu">

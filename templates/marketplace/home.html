@@ -1,0 +1,226 @@
+
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="main-wrapper">
+    {% include 'patient_navbar.html' %}
+    
+    <div class="breadcrumb-bar">
+        <div class="container-fluid">
+            <div class="row align-items-center">
+                <div class="col-md-12 col-12">
+                    <nav aria-label="breadcrumb" class="page-breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="{% url 'hospital_home' %}">Home</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">Healthcare Marketplace</li>
+                        </ol>
+                    </nav>
+                    <h2 class="breadcrumb-title">Healthcare at Your Doorstep</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="content">
+        <div class="container-fluid">
+            <!-- Quick Service Cards -->
+            <div class="row">
+                <div class="col-lg-3 col-md-6">
+                    <div class="card service-card">
+                        <div class="card-body text-center">
+                            <i class="fas fa-user-md fa-3x text-primary mb-3"></i>
+                            <h5>Online Consultation</h5>
+                            <p>Consult with doctors instantly</p>
+                            <a href="{% url 'marketplace_doctors' %}?consultation_type=online" class="btn btn-primary">Book Now</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="card service-card">
+                        <div class="card-body text-center">
+                            <i class="fas fa-home fa-3x text-success mb-3"></i>
+                            <h5>Home Visit</h5>
+                            <p>Doctor visits at your home</p>
+                            <a href="{% url 'marketplace_doctors' %}?consultation_type=home_visit" class="btn btn-success">Book Visit</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="card service-card">
+                        <div class="card-body text-center">
+                            <i class="fas fa-pills fa-3x text-warning mb-3"></i>
+                            <h5>Medicine Delivery</h5>
+                            <p>Medicines delivered fast</p>
+                            <a href="{% url 'marketplace_medicine' %}" class="btn btn-warning">Order Now</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-6">
+                    <div class="card service-card">
+                        <div class="card-body text-center">
+                            <i class="fas fa-vial fa-3x text-info mb-3"></i>
+                            <h5>Lab Tests</h5>
+                            <p>Sample collection at home</p>
+                            <a href="#" class="btn btn-info">Book Test</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Nearby Doctors -->
+            <div class="row">
+                <div class="col-md-12">
+                    <h4 class="mb-4">Available Doctors Near You</h4>
+                    <div class="row">
+                        {% for doctor in nearby_doctors %}
+                        <div class="col-lg-4 col-md-6">
+                            <div class="card doctor-card mb-4">
+                                <div class="card-body">
+                                    <div class="doctor-widget">
+                                        <div class="doc-info-left">
+                                            <div class="doctor-img">
+                                                <img src="{{ doctor.featured_image.url }}" class="img-fluid" alt="Doctor">
+                                            </div>
+                                            <div class="doc-info-cont">
+                                                <h4 class="doc-name">{{ doctor.name }}</h4>
+                                                <p class="doc-speciality">{{ doctor.department }}</p>
+                                                <div class="rating">
+                                                    {% for i in "12345" %}
+                                                        <i class="fas fa-star"></i>
+                                                    {% endfor %}
+                                                    <span class="d-inline-block average-rating">({{ doctor.marketplace_rating }})</span>
+                                                </div>
+                                                <div class="clinic-details">
+                                                    <p class="doc-location">
+                                                        <i class="fas fa-map-marker-alt"></i> 
+                                                        {{ doctor.hospital_name.name|default:"Available Online" }}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="doc-info-right">
+                                            <div class="clini-infos">
+                                                <ul>
+                                                    {% if doctor.online_consultation_available %}
+                                                    <li><i class="fas fa-video text-success"></i> Online</li>
+                                                    {% endif %}
+                                                    {% if doctor.home_visit_available %}
+                                                    <li><i class="fas fa-home text-info"></i> Home Visit</li>
+                                                    {% endif %}
+                                                </ul>
+                                            </div>
+                                            <div class="clinic-booking">
+                                                <a class="apt-btn" href="{% url 'book_consultation' doctor.doctor_id %}">Book Consultation</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="text-center">
+                        <a href="{% url 'marketplace_doctors' %}" class="btn btn-primary">View All Doctors</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Orders -->
+            {% if recent_orders %}
+            <div class="row">
+                <div class="col-md-12">
+                    <h4 class="mb-4">Recent Orders</h4>
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Order ID</th>
+                                            <th>Service Type</th>
+                                            <th>Status</th>
+                                            <th>Amount</th>
+                                            <th>Date</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for order in recent_orders %}
+                                        <tr>
+                                            <td>#{{ order.order_id }}</td>
+                                            <td>{{ order.get_order_type_display }}</td>
+                                            <td>
+                                                <span class="badge badge-{% if order.status == 'delivered' %}success{% elif order.status == 'cancelled' %}danger{% else %}warning{% endif %}">
+                                                    {{ order.get_status_display }}
+                                                </span>
+                                            </td>
+                                            <td>৳{{ order.total_amount }}</td>
+                                            <td>{{ order.created_at|date:"M d, Y" }}</td>
+                                            <td>
+                                                <a href="{% url 'track_order' order.order_id %}" class="btn btn-sm btn-primary">Track</a>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {% include 'footer.html' %}
+</div>
+
+<style>
+.service-card {
+    border: none;
+    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    transition: transform 0.3s;
+    margin-bottom: 30px;
+}
+
+.service-card:hover {
+    transform: translateY(-5px);
+}
+
+.doctor-card {
+    border: none;
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+}
+
+.doc-info-left {
+    display: flex;
+    align-items: center;
+}
+
+.doctor-img {
+    margin-right: 15px;
+}
+
+.doctor-img img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.doc-name {
+    font-size: 18px;
+    margin-bottom: 5px;
+}
+
+.doc-speciality {
+    color: #666;
+    margin-bottom: 10px;
+}
+
+.rating i {
+    color: #ffc107;
+}
+</style>
+{% endblock %}

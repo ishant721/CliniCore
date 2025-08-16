@@ -67,6 +67,17 @@ class Medicine(models.Model):
     price = models.IntegerField(null=True, blank=True, default=0)
     stock_quantity = models.IntegerField(null=True, blank=True, default=0)
     Prescription_reqiuired = models.CharField(max_length=200, choices=REQUIREMENT_TYPE, null=True, blank=True)
+    
+    # Delivery features
+    is_delivery_available = models.BooleanField(default=True)
+    delivery_time_minutes = models.IntegerField(default=60)
+    is_emergency_available = models.BooleanField(default=False)
+    storage_temperature = models.CharField(max_length=50, null=True, blank=True)
+    
+    # Marketplace features
+    is_marketplace_active = models.BooleanField(default=True)
+    supplier_name = models.CharField(max_length=200, null=True, blank=True)
+    
     def __str__(self):
         return str(self.name)
     
