@@ -16,22 +16,22 @@
     	<link rel="shortcut icon" type="image/x-icon" href="{% static 'HealthStack-System/images/Normal/favicon.png' %}"/>
 
 
-		
+
 		<!--[if lt IE 9]>
 			<script src="assets/js/html5shiv.min.js"></script>
 			<script src="assets/js/respond.min.js"></script>
 		<![endif]-->
     </head>
     <body>
-	
-	
+
+
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="{% static 'HealthStack-System/css/Normal/bootstrap.min.css' %}"> 
-		
+
     <!-- Fontawesome CSS -->
     <link rel="stylesheet" href="{% static 'HealthStack-System/plugins/Normal/fontawesome/css/fontawesome.min.css' %}">
-    
+
     <!-- Feathericon CSS -->
     <link rel="stylesheet" href="{% static 'HealthStack-System/admin_assets/css/feathericon.min.css'%}">
 
@@ -56,24 +56,24 @@
       <!-- Header -->
 			<header class="header">{% include 'hospital_admin/labworker-navbar.html' %}</header>            
 			<!-- /Header -->
-			
+
 			<!-- Sidebar -->
 			<aside class="sidebar" id="sidebar">
 				{% include 'hospital_admin/labworker-sidebar.html' %} </aside>
 			<!-- /Sidebar -->
-			
+
 			<!-- Page Wrapper -->
             <div class="page-wrapper">
-			
+
                 <div class="content container-fluid">
-					
+
 					<!-- Page Header -->
 
 					<!-- /Page Header -->
 
                     <div class="row">
                         <div class="col-md-12 d-flex">
-						
+
 							<!-- Feed Activity -->
 							<div class="card  card-table flex-fill">
 								<div class="card-header">
@@ -87,7 +87,8 @@
                         <tr>												
                           <th>Report ID</th>   
                           <th>Patient Name</th>
-                          <th>Doctor Name</th>									
+                          <th>Doctor Name</th>
+                          <th>Actions</th>									
                         </tr>
                       </thead>
                       <tbody>
@@ -96,24 +97,28 @@
                           <td>{{t.report_id}}</td>
                           <td>{{t.patient}}</td>
                           <td>{{t.doctor}}</td>
-              
+                          <td class="text-right">
+                                                <a class="btn btn-sm bg-info-light" href="{% url 'update-report' t.report_id %}">
+                                                    <i class="fe fe-edit"></i> Update
+                                                </a>
+                                            </td>
                         </tr>
                    {% endfor %}
-                        
-                        
+
+
                       </tbody>
                     </table>
                   </div>
 								</div>
 							</div>
 							<!-- /Feed Activity -->
-							
+
 						</div>
                     </div>
 
 
-          
-          
+
+
                 </div>
             </div>
       <!-- /Page Wrapper -->
@@ -123,7 +128,7 @@
     <!-- jQuery -->
 
     </body>
-    
+
 
     <!-- jQuery -->
     <script src="{% static 'HealthStack-System/js/admin/jquery-3.2.1.min.js'%}"></script>
@@ -182,7 +187,7 @@
 
     <script src="{% static 'HealthStack-System/js/admin/morris_init.js'%}"></script>
 
-    
+
 
   </body>
 

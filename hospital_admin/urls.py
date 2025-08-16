@@ -64,6 +64,8 @@ urlpatterns = [
     path('testing/', views.testing, name="testing"),
     path('admin-setup-2fa/', views.admin_setup_two_factor, name="admin-setup-2fa"),
     path('admin-security-settings/', views.admin_security_settings, name="admin-security-settings"),
+    path('report-list/', views.report_list, name='report-list'),
+    path('update-report/<int:report_id>/', views.update_report, name='update-report'),
 
 
 ]

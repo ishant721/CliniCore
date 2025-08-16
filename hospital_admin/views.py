@@ -536,26 +536,25 @@ def generate_random_specimen():
 @csrf_exempt
 def create_report(request, pk):
     if request.user.is_labworker:
-        lab_workers = Clinical_Laboratory_Technician.objects.get(user=request.user)
-        prescription =Prescription.objects.get(prescription_id=pk)
+        lab_worker = Clinical_Laboratory_Technician.objects.get(user=request.user)
+        prescription = Prescription.objects.get(prescription_id=pk)
         patient = Patient.objects.get(patient_id=prescription.patient_id)
         doctor = Doctor_Information.objects.get(doctor_id=prescription.doctor_id)
         tests = Prescription_test.objects.filter(prescription=prescription).filter(test_info_pay_status='Paid')
 
-
         if request.method == 'POST':
-            report = Report(doctor=doctor, patient=patient)
+            report = Report(doctor=doctor, patient=patient, lab_technician=lab_worker)
 
             specimen_type = request.POST.getlist('specimen_type')
-            collection_date  = request.POST.getlist('collection_date')
+            collection_date = request.POST.getlist('collection_date')
             receiving_date = request.POST.getlist('receiving_date')
             test_name = request.POST.getlist('test_name')
             result = request.POST.getlist('result')
             unit = request.POST.getlist('unit')
             referred_value = request.POST.getlist('referred_value')
             delivery_date = request.POST.get('delivery_date')
-            other_information= request.POST.get('other_information')
-            
+            other_information = request.POST.get('other_information')
+
             # Handle file upload for lab report
             if 'report_file' in request.FILES:
                 report.report_file = request.FILES['report_file']
@@ -597,8 +596,6 @@ def create_report(request, pk):
             report_id = report.report_id
             delivery_date = report.delivery_date
 
-            subject = "Report Delivery"
-
             values = {
                     "doctor_name":doctor_name,
                     "doctor_email":doctor_email,
@@ -617,9 +614,9 @@ def create_report(request, pk):
 
             report.delivery_date = delivery_date
             report.other_information = other_information
-            report.lab_technician = lab_workers
+            report.lab_technician = lab_worker
             report.status = 'completed'
-            
+
             report.save()
 
             # Create specimen records
@@ -629,7 +626,7 @@ def create_report(request, pk):
                 specimens.collection_date = collection_date[i]
                 specimens.receiving_date = receiving_date[i]
                 specimens.save()
-                
+
             # Create test records
             for i in range(len(test_name)):
                 test_record = Test(report=report)
@@ -1098,14 +1095,14 @@ def labworker_dashboard(request):
     if request.user.is_authenticated:
         if request.user.is_labworker:
             lab_worker = Clinical_Laboratory_Technician.objects.get(user=request.user)
-            
+
             # Get appointments that are confirmed
             confirmed_appointments = Appointment.objects.filter(appointment_status='confirmed')
-            
+
             # We can further enhance this by adding a status to the report
             # to check if it's already created or not.
             # For now, we will list all confirmed appointments.
-            
+
             context = {
                 'lab_worker': lab_worker,
                 'appointments': confirmed_appointments

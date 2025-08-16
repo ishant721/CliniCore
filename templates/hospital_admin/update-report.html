@@ -1,0 +1,345 @@
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Update Lab Report - HealthStack</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
+    
+    <!-- Favicons -->
+    <link type="image/x-icon" href="{% static 'HealthStack-System/images/Normal/favicon.png' %}" rel="icon">
+    
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="{% static 'HealthStack-System/admin_assets/css/bootstrap.min.css' %}">
+    
+    <!-- Fontawesome CSS -->
+    <link rel="stylesheet" href="{% static 'HealthStack-System/admin_assets/css/font-awesome.min.css' %}">
+    
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="{% static 'HealthStack-System/admin_assets/css/style.css' %}">
+    
+    <style>
+        .report-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .section-title {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            font-weight: 600;
+            color: #34495e;
+        }
+        .test-item, .specimen-item {
+            background: white;
+            padding: 15px;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="main-wrapper">
+        <!-- Header -->
+        {% include 'hospital_admin/labworker-navbar.html' %}
+        <!-- /Header -->
+        
+        <!-- Sidebar -->
+        {% include 'hospital_admin/labworker-sidebar.html' %}
+        <!-- /Sidebar -->
+        
+        <!-- Page Wrapper -->
+        <div class="page-wrapper">
+            <div class="content container-fluid">
+                <!-- Page Header -->
+                <div class="page-header">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <h3 class="page-title">Update Lab Report #{{ report.report_id }}</h3>
+                            <ul class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="{% url 'labworker-dashboard' %}">Dashboard</a></li>
+                                <li class="breadcrumb-item"><a href="{% url 'report-list' %}">Reports</a></li>
+                                <li class="breadcrumb-item active">Update Report</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <!-- /Page Header -->
+                
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h4 class="card-title">Report Information</h4>
+                                <div class="text-muted">
+                                    Patient: {{ report.patient.name }} | Doctor: {{ report.doctor.name }}
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <form method="POST" enctype="multipart/form-data">
+                                    {% csrf_token %}
+                                    
+                                    <!-- Report Status and Basic Info -->
+                                    <div class="report-section">
+                                        <h5 class="section-title">Report Details</h5>
+                                        <div class="row">
+                                            <div class="col-md-4">
+                                                <div class="form-group">
+                                                    <label>Report Status</label>
+                                                    <select name="status" class="form-control">
+                                                        <option value="pending" {% if report.status == 'pending' %}selected{% endif %}>Pending</option>
+                                                        <option value="in_progress" {% if report.status == 'in_progress' %}selected{% endif %}>In Progress</option>
+                                                        <option value="completed" {% if report.status == 'completed' %}selected{% endif %}>Completed</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-group">
+                                                    <label>Delivery Date</label>
+                                                    <input type="date" name="delivery_date" class="form-control" value="{{ report.delivery_date }}">
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-group">
+                                                    <label>Upload Report File (PDF/Image)</label>
+                                                    <input type="file" name="report_file" class="form-control" accept=".pdf,.jpg,.jpeg,.png">
+                                                    {% if report.report_file %}
+                                                        <small class="text-muted">Current: <a href="{{ report.report_file.url }}" target="_blank">View File</a></small>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Specimen Information -->
+                                    <div class="report-section">
+                                        <h5 class="section-title">Specimen Information</h5>
+                                        <div id="specimen-container">
+                                            {% for spec in specimen %}
+                                            <div class="specimen-item">
+                                                <div class="row">
+                                                    <div class="col-md-4">
+                                                        <div class="form-group">
+                                                            <label>Specimen Type</label>
+                                                            <input type="text" name="specimen_type" class="form-control" value="{{ spec.specimen_type }}">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <div class="form-group">
+                                                            <label>Collection Date</label>
+                                                            <input type="datetime-local" name="collection_date" class="form-control" value="{{ spec.collection_date }}">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <div class="form-group">
+                                                            <label>Receiving Date</label>
+                                                            <input type="datetime-local" name="receiving_date" class="form-control" value="{{ spec.receiving_date }}">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {% empty %}
+                                            <div class="specimen-item">
+                                                <div class="row">
+                                                    <div class="col-md-4">
+                                                        <div class="form-group">
+                                                            <label>Specimen Type</label>
+                                                            <input type="text" name="specimen_type" class="form-control" placeholder="e.g., Blood, Urine">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <div class="form-group">
+                                                            <label>Collection Date</label>
+                                                            <input type="datetime-local" name="collection_date" class="form-control">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <div class="form-group">
+                                                            <label>Receiving Date</label>
+                                                            <input type="datetime-local" name="receiving_date" class="form-control">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                        <button type="button" class="btn btn-secondary btn-sm" onclick="addSpecimen()">Add Another Specimen</button>
+                                    </div>
+                                    
+                                    <!-- Test Results -->
+                                    <div class="report-section">
+                                        <h5 class="section-title">Test Results</h5>
+                                        <div id="test-container">
+                                            {% for test in tests %}
+                                            <div class="test-item">
+                                                <div class="row">
+                                                    <div class="col-md-3">
+                                                        <div class="form-group">
+                                                            <label>Test Name</label>
+                                                            <input type="text" name="test_name" class="form-control" value="{{ test.test_name }}">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <div class="form-group">
+                                                            <label>Result</label>
+                                                            <input type="text" name="result" class="form-control" value="{{ test.result }}">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <div class="form-group">
+                                                            <label>Unit</label>
+                                                            <input type="text" name="unit" class="form-control" value="{{ test.unit }}">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <div class="form-group">
+                                                            <label>Reference Range</label>
+                                                            <input type="text" name="referred_value" class="form-control" value="{{ test.referred_value }}">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {% empty %}
+                                            <div class="test-item">
+                                                <div class="row">
+                                                    <div class="col-md-3">
+                                                        <div class="form-group">
+                                                            <label>Test Name</label>
+                                                            <input type="text" name="test_name" class="form-control" placeholder="e.g., Hemoglobin">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <div class="form-group">
+                                                            <label>Result</label>
+                                                            <input type="text" name="result" class="form-control" placeholder="e.g., 12.5">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <div class="form-group">
+                                                            <label>Unit</label>
+                                                            <input type="text" name="unit" class="form-control" placeholder="e.g., g/dL">
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        <div class="form-group">
+                                                            <label>Reference Range</label>
+                                                            <input type="text" name="referred_value" class="form-control" placeholder="e.g., 12-15">
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                        <button type="button" class="btn btn-secondary btn-sm" onclick="addTest()">Add Another Test</button>
+                                    </div>
+                                    
+                                    <!-- Additional Information -->
+                                    <div class="report-section">
+                                        <h5 class="section-title">Additional Information</h5>
+                                        <div class="form-group">
+                                            <label>Other Information / Comments</label>
+                                            <textarea name="other_information" class="form-control" rows="4" placeholder="Any additional notes or comments...">{{ report.other_information }}</textarea>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Action Buttons -->
+                                    <div class="text-center">
+                                        <button type="submit" class="btn btn-primary btn-lg">Update Report</button>
+                                        <a href="{% url 'report-list' %}" class="btn btn-secondary btn-lg">Cancel</a>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /Page Wrapper -->
+    </div>
+    <!-- /Main Wrapper -->
+    
+    <!-- jQuery -->
+    <script src="{% static 'HealthStack-System/admin_assets/js/jquery-3.2.1.min.js' %}"></script>
+    
+    <!-- Bootstrap Core JS -->
+    <script src="{% static 'HealthStack-System/admin_assets/js/popper.min.js' %}"></script>
+    <script src="{% static 'HealthStack-System/admin_assets/js/bootstrap.min.js' %}"></script>
+    
+    <!-- Custom JS -->
+    <script src="{% static 'HealthStack-System/admin_assets/js/script.js' %}"></script>
+    
+    <script>
+        function addSpecimen() {
+            const container = document.getElementById('specimen-container');
+            const newSpecimen = document.createElement('div');
+            newSpecimen.className = 'specimen-item';
+            newSpecimen.innerHTML = `
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Specimen Type</label>
+                            <input type="text" name="specimen_type" class="form-control" placeholder="e.g., Blood, Urine">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Collection Date</label>
+                            <input type="datetime-local" name="collection_date" class="form-control">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label>Receiving Date</label>
+                            <input type="datetime-local" name="receiving_date" class="form-control">
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.appendChild(newSpecimen);
+        }
+        
+        function addTest() {
+            const container = document.getElementById('test-container');
+            const newTest = document.createElement('div');
+            newTest.className = 'test-item';
+            newTest.innerHTML = `
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Test Name</label>
+                            <input type="text" name="test_name" class="form-control" placeholder="e.g., Hemoglobin">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Result</label>
+                            <input type="text" name="result" class="form-control" placeholder="e.g., 12.5">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Unit</label>
+                            <input type="text" name="unit" class="form-control" placeholder="e.g., g/dL">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>Reference Range</label>
+                            <input type="text" name="referred_value" class="form-control" placeholder="e.g., 12-15">
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.appendChild(newTest);
+        }
+    </script>
+</body>
+</html>

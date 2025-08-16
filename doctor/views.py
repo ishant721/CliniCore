@@ -230,7 +230,7 @@ def doctor_dashboard(request):
                 today_patient_count = today_appointments.count()
                 total_appointments_count = Appointment.objects.filter(doctor=doctor).count()
                 
-                reports = Report.objects.filter(doctor=doctor)
+                reports = Report.objects.filter(doctor=doctor).order_by('-created_at')
 
             else:
                 return redirect('doctor-logout')
