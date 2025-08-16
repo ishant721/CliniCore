@@ -38,7 +38,7 @@ except Exception as e:
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '*.replit.dev', '*.replit.app', '*.replit.co']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '*']
 # ALLOWED_HOSTS = ['mobile view', 'local host','ngrok -- keeps on changing']
 
 # CSRF trusted origins for HTTPS
