@@ -11,7 +11,8 @@ from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import csrf_exempt
 from datetime import datetime
 from django.contrib.auth.models import User
-from hospital.models import Hospital_Information, User, Patient, Admin_Information
+from hospital.models import Hospital_Information, User, Patient
+from hospital_admin.models import Admin_Information
 from django.db.models import Q
 from pharmacy.models import Medicine, Pharmacist
 from doctor.models import Doctor_Information, Prescription, Prescription_test, Report, Appointment, Experience , Education,Specimen,Test
