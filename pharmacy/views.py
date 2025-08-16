@@ -13,6 +13,8 @@ from pharmacy.models import Medicine, Cart, Order
 from .utils import searchMedicines
 from django.views.decorators.csrf import csrf_exempt
 
+# Import necessary models for medicine_price_comparison and order_medicine
+from pharmacy.models import MedicinePrice, PharmacyShop
 
 # from django.db.models.signals import post_save, post_delete
 # from django.dispatch import receiver
@@ -26,7 +28,7 @@ from django.views.decorators.csrf import csrf_exempt
 @login_required(login_url="unified-login")
 def pharmacy_single_product(request,pk):
      if request.user.is_authenticated and request.user.is_patient:
-         
+
         patient = Patient.objects.get(user=request.user)
         medicines = Medicine.objects.get(serial_number=pk)
         orders = Order.objects.filter(user=request.user, ordered=False)
@@ -47,14 +49,14 @@ def pharmacy_single_product(request,pk):
 @login_required(login_url="unified-login")
 def pharmacy_shop(request):
     if request.user.is_authenticated and request.user.is_patient:
-        
+
         patient = Patient.objects.get(user=request.user)
         medicines = Medicine.objects.all()
         orders = Order.objects.filter(user=request.user, ordered=False)
         carts = Cart.objects.filter(user=request.user, purchased=False)
-        
+
         medicines, search_query = searchMedicines(request)
-        
+
         if carts.exists() and orders.exists():
             order = orders[0]
             context = {'patient': patient, 'medicines': medicines,'carts': carts,'order': order, 'orders': orders, 'search_query': search_query}
@@ -62,7 +64,7 @@ def pharmacy_shop(request):
         else:
             context = {'patient': patient, 'medicines': medicines,'carts': carts,'orders': orders, 'search_query': search_query}
             return render(request, 'Pharmacy/shop.html', context)
-    
+
     else:
         logout(request)
         messages.error(request, 'Not Authorized')
@@ -77,10 +79,10 @@ def checkout(request):
 @login_required(login_url="unified-login")
 def add_to_cart(request, pk):
     if request.user.is_authenticated and request.user.is_patient:
-         
+
         patient = Patient.objects.get(user=request.user)
         medicines = Medicine.objects.all()
-        
+
         item = get_object_or_404(Medicine, pk=pk)
         order_item = Cart.objects.get_or_create(item=item, user=request.user, purchased=False)
         order_qs = Order.objects.filter(user=request.user, ordered=False)
@@ -92,7 +94,7 @@ def add_to_cart(request, pk):
                 # messages.warning(request, "This item quantity was updated!")
                 context = {'patient': patient,'medicines': medicines, 'order': order}
                 return render(request, 'pharmacy/shop.html', context)
-            
+
             else:
                 order.orderitems.add(order_item[0])
                 # messages.warning(request, "This item is added to your cart!")
@@ -114,10 +116,10 @@ def add_to_cart(request, pk):
 @login_required(login_url="unified-login")
 def cart_view(request):
     if request.user.is_authenticated and request.user.is_patient:
-         
+
         patient = Patient.objects.get(user=request.user)
         medicines = Medicine.objects.all()
-        
+
         carts = Cart.objects.filter(user=request.user, purchased=False)
         orders = Order.objects.filter(user=request.user, ordered=False)
         if carts.exists() and orders.exists():
@@ -137,11 +139,11 @@ def cart_view(request):
 @login_required(login_url="unified-login")
 def remove_from_cart(request, pk):
     if request.user.is_authenticated and request.user.is_patient:
-         
+
         patient = Patient.objects.get(user=request.user)
         medicines = Medicine.objects.all()
         carts = Cart.objects.filter(user=request.user, purchased=False)
-        
+
         item = get_object_or_404(Medicine, pk=pk)
         order_qs = Order.objects.filter(user=request.user, ordered=False)
         if order_qs.exists():
@@ -171,7 +173,7 @@ def remove_from_cart(request, pk):
 @login_required(login_url="unified-login")
 def increase_cart(request, pk):
     if request.user.is_authenticated and request.user.is_patient:
-         
+
         patient = Patient.objects.get(user=request.user)
         medicines = Medicine.objects.all()
         carts = Cart.objects.filter(user=request.user, purchased=False)
@@ -205,7 +207,7 @@ def increase_cart(request, pk):
 @login_required(login_url="unified-login")
 def decrease_cart(request, pk):
     if request.user.is_authenticated and request.user.is_patient:
-         
+
         patient = Patient.objects.get(user=request.user)
         medicines = Medicine.objects.all()
         carts = Cart.objects.filter(user=request.user, purchased=False)
@@ -247,26 +249,39 @@ from doctor.models import Prescription_medicine
 
 @csrf_exempt
 @login_required(login_url="unified-login")
+def medicine_list(request):
+    """Display list of all available medicines"""
+    medicines = Medicine.objects.all()
+
+    context = {
+        'medicines': medicines,
+        'total_medicines': medicines.count(),
+    }
+
+    return render(request, 'pharmacy/medicine_list.html', context)
+
+@csrf_exempt
+@login_required(login_url="unified-login")
 def medicine_price_comparison(request):
     """Compare prices of medicines across different pharmacy shops"""
     if request.user.is_patient:
         patient = Patient.objects.get(user=request.user)
-        
+
         # Get prescription medicines for the patient
         prescription_medicines = Prescription_medicine.objects.filter(
             prescription__patient=patient,
             is_ordered=False
         )
-        
+
         comparison_data = []
-        
+
         for presc_med in prescription_medicines:
             # Find medicines with similar names or generic names
             medicines = Medicine.objects.filter(
                 Q(name__icontains=presc_med.medicine_name) |
                 Q(generic_name__icontains=presc_med.medicine_name)
             ).filter(is_marketplace_active=True)
-            
+
             medicine_prices = []
             for medicine in medicines:
                 prices = MedicinePrice.objects.filter(
@@ -274,7 +289,7 @@ def medicine_price_comparison(request):
                     is_available=True,
                     stock_quantity__gt=0
                 ).select_related('pharmacy_shop').order_by('price')
-                
+
                 for price_obj in prices:
                     medicine_prices.append({
                         'medicine': medicine,
@@ -286,7 +301,7 @@ def medicine_price_comparison(request):
                         'delivery_time': price_obj.pharmacy_shop.average_delivery_time,
                         'rating': price_obj.pharmacy_shop.rating,
                     })
-            
+
             if medicine_prices:
                 # Sort by discounted price
                 medicine_prices.sort(key=lambda x: x['discounted_price'])
@@ -294,14 +309,14 @@ def medicine_price_comparison(request):
                     'prescription_medicine': presc_med,
                     'available_options': medicine_prices
                 })
-        
+
         context = {
             'patient': patient,
             'comparison_data': comparison_data
         }
-        
+
         return render(request, 'pharmacy/medicine_comparison.html', context)
-    
+
     return redirect('unified-login')
 
 @csrf_exempt
@@ -310,12 +325,12 @@ def order_medicine(request):
     """Handle medicine ordering from selected pharmacy"""
     if request.method == 'POST' and request.user.is_patient:
         patient = Patient.objects.get(user=request.user)
-        
+
         medicine_id = request.POST.get('medicine_id')
         pharmacy_shop_id = request.POST.get('pharmacy_shop_id')
         quantity = int(request.POST.get('quantity', 1))
         prescription_medicine_id = request.POST.get('prescription_medicine_id')
-        
+
         try:
             medicine = Medicine.objects.get(serial_number=medicine_id)
             pharmacy_shop = PharmacyShop.objects.get(shop_id=pharmacy_shop_id)
@@ -323,13 +338,13 @@ def order_medicine(request):
                 medicine=medicine,
                 pharmacy_shop=pharmacy_shop
             )
-            
+
             # Create order
             order = Order.objects.create(
                 user=request.user,
                 ordered=False
             )
-            
+
             # Create cart item
             cart_item = Cart.objects.create(
                 user=request.user,
@@ -337,9 +352,9 @@ def order_medicine(request):
                 quantity=quantity,
                 purchased=False
             )
-            
+
             order.orderitems.add(cart_item)
-            
+
             # Update prescription medicine status
             if prescription_medicine_id:
                 presc_med = Prescription_medicine.objects.get(
@@ -348,14 +363,14 @@ def order_medicine(request):
                 presc_med.is_ordered = True
                 presc_med.order_status = 'ordered'
                 presc_med.save()
-            
+
             messages.success(request, f'Medicine ordered successfully from {pharmacy_shop.name}!')
             return redirect('medicine-comparison')
-            
+
         except Exception as e:
             messages.error(request, f'Error placing order: {str(e)}')
             return redirect('medicine-comparison')
-    
+
     return redirect('unified-login')
 
 @csrf_exempt
@@ -363,7 +378,7 @@ def order_medicine(request):
 def pharmacy_shop_list(request):
     """List all verified pharmacy shops"""
     shops = PharmacyShop.objects.filter(is_verified=True).order_by('-rating')
-    
+
     # Add search functionality
     search_query = request.GET.get('search', '')
     if search_query:
@@ -371,17 +386,17 @@ def pharmacy_shop_list(request):
             Q(name__icontains=search_query) |
             Q(address__icontains=search_query)
         )
-    
+
     # Pagination
     paginator = Paginator(shops, 12)
     page_number = request.GET.get('page')
     shops = paginator.get_page(page_number)
-    
+
     context = {
         'shops': shops,
         'search_query': search_query
     }
-    
+
     return render(request, 'pharmacy/pharmacy_shops.html', context)
 
 @csrf_exempt
@@ -393,17 +408,17 @@ def pharmacy_shop_detail(request, shop_id):
         pharmacy_shop=shop,
         is_marketplace_active=True
     ).order_by('name')
-    
+
     # Get medicine prices for this shop
     medicine_prices = MedicinePrice.objects.filter(
         pharmacy_shop=shop,
         is_available=True
     ).select_related('medicine')
-    
+
     context = {
         'shop': shop,
         'medicines': medicines,
         'medicine_prices': medicine_prices
     }
-    
+
     return render(request, 'pharmacy/pharmacy_shop_detail.html', context)
