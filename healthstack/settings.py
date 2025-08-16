@@ -33,12 +33,13 @@ SECRET_KEY = env('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = ['192.168.0.100', '127.0.0.1','5749-103-109-53-5.in.ngrok.io', 'c708b00c-999d-484b-9f99-7b97f8a64341-00-29nze73m7cbtb.sisko.replit.dev', '1b9a8282-058b-4f47-bf13-63fce1913440-00-2ndxir2u9vjzi.pike.replit.dev', '44bb32ec-8e6a-49f1-8261-75d6f4d756cf-00-3rgyy5my4wftn.pike.replit.dev', '*.replit.dev']
+ALLOWED_HOSTS = ['192.168.0.100', '127.0.0.1','5749-103-109-53-5.in.ngrok.io', 'c708b00c-999d-484b-9f99-7b97f8a64341-00-29nze73m7cbtb.sisko.replit.dev', '1b9a8282-058b-4f47-bf13-63fce1913440-00-2ndxir2u9vjzi.pike.replit.dev', '44bb32ec-8e6a-49f1-8261-75d6f4d756cf-00-3rgyy5my4wftn.pike.replit.dev', '7b38a038-4124-4f25-b5b0-1d8f5fa6f028-00-20pwu0o0h9v64.sisko.replit.dev', '*.replit.dev']
 # ALLOWED_HOSTS = ['mobile view', 'local host','ngrok -- keeps on changing']
 
 # CSRF trusted origins for HTTPS
 CSRF_TRUSTED_ORIGINS = [
     'https://44bb32ec-8e6a-49f1-8261-75d6f4d756cf-00-3rgyy5my4wftn.pike.replit.dev',
+    'https://7b38a038-4124-4f25-b5b0-1d8f5fa6f028-00-20pwu0o0h9v64.sisko.replit.dev',
     'https://*.replit.dev',
 ]
 
