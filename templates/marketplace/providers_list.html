@@ -1,0 +1,285 @@
+
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Find {{ service_type|title }} Providers - HealthStack Marketplace{% endblock %}
+
+{% block content %}
+<div class="content">
+    <div class="container-fluid">
+        
+        <!-- Search Header -->
+        <div class="row mb-4">
+            <div class="col-lg-12">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <form method="GET" class="row g-3">
+                            <div class="col-md-3">
+                                <label class="form-label">Service Type</label>
+                                <select name="type" class="form-select">
+                                    <option value="consultation" {% if service_type == 'consultation' %}selected{% endif %}>Medical Consultation</option>
+                                    <option value="medicine_delivery" {% if service_type == 'medicine_delivery' %}selected{% endif %}>Medicine Delivery</option>
+                                    <option value="lab_service" {% if service_type == 'lab_service' %}selected{% endif %}>Lab Service</option>
+                                    <option value="home_visit" {% if service_type == 'home_visit' %}selected{% endif %}>Home Visit</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Location</label>
+                                <input type="text" name="location" class="form-control" placeholder="Enter location" value="{{ location }}">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Search</label>
+                                <input type="text" name="search" class="form-control" placeholder="Search by name or specialization" value="{{ search_query }}">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">&nbsp;</label>
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-search"></i> Search
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Header -->
+        <div class="row mb-3">
+            <div class="col-lg-8">
+                <h3>{{ service_type|title }} Providers
+                    {% if providers.paginator.count %}
+                        <small class="text-muted">({{ providers.paginator.count }} found)</small>
+                    {% endif %}
+                </h3>
+            </div>
+            <div class="col-lg-4">
+                <div class="dropdown">
+                    <button class="btn btn-outline-secondary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
+                        Sort by: Rating
+                    </button>
+                    <ul class="dropdown-menu w-100">
+                        <li><a class="dropdown-item" href="?{{ request.GET.urlencode }}&sort=rating">Rating</a></li>
+                        <li><a class="dropdown-item" href="?{{ request.GET.urlencode }}&sort=price">Price</a></li>
+                        <li><a class="dropdown-item" href="?{{ request.GET.urlencode }}&sort=delivery_time">Delivery Time</a></li>
+                        <li><a class="dropdown-item" href="?{{ request.GET.urlencode }}&sort=reviews">Reviews</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Providers List -->
+        <div class="row">
+            {% for provider in providers %}
+            <div class="col-lg-6 col-xl-4 mb-4">
+                <div class="card provider-card h-100 border-0 shadow-sm">
+                    <div class="card-body">
+                        <!-- Provider Header -->
+                        <div class="d-flex align-items-center mb-3">
+                            {% if provider.doctor %}
+                                <img src="{% if provider.doctor.featured_image %}{{ provider.doctor.featured_image.url }}{% else %}{% static 'HealthStack-System/images/Normal/doctors/user-default.png' %}{% endif %}" 
+                                     alt="{{ provider.name }}" class="rounded-circle me-3" width="60" height="60">
+                            {% else %}
+                                <div class="bg-primary rounded-circle me-3 d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+                                    <i class="fas fa-pills text-white fa-2x"></i>
+                                </div>
+                            {% endif %}
+                            <div class="flex-grow-1">
+                                <h5 class="card-title mb-1">{{ provider.name }}</h5>
+                                {% if provider.doctor and provider.doctor.specialization %}
+                                    <p class="text-muted mb-1">{{ provider.doctor.specialization.name }}</p>
+                                {% endif %}
+                                <div class="availability-status">
+                                    {% if provider.availability_status == 'available' %}
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-circle me-1"></i>Available
+                                        </span>
+                                    {% elif provider.availability_status == 'busy' %}
+                                        <span class="badge bg-warning">
+                                            <i class="fas fa-circle me-1"></i>Busy
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-danger">
+                                            <i class="fas fa-circle me-1"></i>Offline
+                                        </span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Rating and Reviews -->
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="rating me-3">
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= provider.rating %}
+                                        <i class="fas fa-star text-warning"></i>
+                                    {% else %}
+                                        <i class="far fa-star text-warning"></i>
+                                    {% endif %}
+                                {% endfor %}
+                                <span class="ms-2">{{ provider.rating }}/5</span>
+                            </div>
+                            <small class="text-muted">({{ provider.total_reviews }} reviews)</small>
+                        </div>
+
+                        <!-- Provider Details -->
+                        <div class="provider-details mb-3">
+                            <div class="row text-center">
+                                <div class="col-4">
+                                    <div class="detail-item">
+                                        <i class="fas fa-clock text-primary"></i>
+                                        <div class="fw-bold">{{ provider.average_delivery_time }}</div>
+                                        <small class="text-muted">minutes</small>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="detail-item">
+                                        <i class="fas fa-money-bill text-success"></i>
+                                        <div class="fw-bold">৳{{ provider.base_fee }}</div>
+                                        <small class="text-muted">base fee</small>
+                                    </div>
+                                </div>
+                                <div class="col-4">
+                                    <div class="detail-item">
+                                        <i class="fas fa-truck text-info"></i>
+                                        <div class="fw-bold">৳{{ provider.delivery_fee }}</div>
+                                        <small class="text-muted">delivery</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Services -->
+                        {% if provider.doctor %}
+                        <div class="services mb-3">
+                            <div class="d-flex flex-wrap gap-1">
+                                {% if provider.doctor.online_consultation_available %}
+                                    <span class="badge bg-light text-dark border">
+                                        <i class="fas fa-video me-1"></i>Online
+                                    </span>
+                                {% endif %}
+                                {% if provider.doctor.home_visit_available %}
+                                    <span class="badge bg-light text-dark border">
+                                        <i class="fas fa-home me-1"></i>Home Visit
+                                    </span>
+                                {% endif %}
+                                {% if provider.doctor.instant_booking_available %}
+                                    <span class="badge bg-light text-dark border">
+                                        <i class="fas fa-bolt me-1"></i>Instant
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- Action Button -->
+                        <div class="d-grid">
+                            {% if provider.availability_status == 'available' %}
+                                <a href="{% url 'marketplace:provider_detail' provider.provider_id %}" class="btn btn-primary">
+                                    {% if service_type == 'consultation' %}
+                                        <i class="fas fa-user-md me-2"></i>Consult Now
+                                    {% elif service_type == 'medicine_delivery' %}
+                                        <i class="fas fa-pills me-2"></i>Order Medicine
+                                    {% elif service_type == 'lab_service' %}
+                                        <i class="fas fa-flask me-2"></i>Book Test
+                                    {% else %}
+                                        <i class="fas fa-home me-2"></i>Book Visit
+                                    {% endif %}
+                                </a>
+                            {% else %}
+                                <button class="btn btn-secondary" disabled>
+                                    Currently Unavailable
+                                </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-lg-12">
+                <div class="card text-center">
+                    <div class="card-body py-5">
+                        <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                        <h4>No providers found</h4>
+                        <p class="text-muted">Try adjusting your search criteria or location.</p>
+                        <a href="{% url 'marketplace:home' %}" class="btn btn-primary">Back to Home</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if providers.has_other_pages %}
+        <div class="row">
+            <div class="col-lg-12">
+                <nav aria-label="Providers pagination">
+                    <ul class="pagination justify-content-center">
+                        {% if providers.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?{{ request.GET.urlencode }}&page={{ providers.previous_page_number }}">&laquo; Previous</a>
+                            </li>
+                        {% endif %}
+                        
+                        {% for num in providers.paginator.page_range %}
+                            {% if providers.number == num %}
+                                <li class="page-item active">
+                                    <span class="page-link">{{ num }}</span>
+                                </li>
+                            {% elif num > providers.number|add:'-3' and num < providers.number|add:'3' %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?{{ request.GET.urlencode }}&page={{ num }}">{{ num }}</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% if providers.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?{{ request.GET.urlencode }}&page={{ providers.next_page_number }}">Next &raquo;</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+
+<style>
+.provider-card:hover {
+    transform: translateY(-3px);
+    transition: transform 0.3s ease;
+}
+
+.detail-item {
+    padding: 0.5rem;
+}
+
+.detail-item i {
+    font-size: 1.2rem;
+    margin-bottom: 0.25rem;
+}
+
+.rating i {
+    font-size: 0.9rem;
+}
+
+.availability-status .badge {
+    font-size: 0.75rem;
+}
+
+.services .badge {
+    font-size: 0.7rem;
+}
+</style>
+
+<script>
+$(document).ready(function() {
+    // Auto-submit form on service type change
+    $('select[name="type"]').change(function() {
+        $(this).closest('form').submit();
+    });
+});
+</script>
+{% endblock %}

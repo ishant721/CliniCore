@@ -2,225 +2,292 @@
 {% extends 'base.html' %}
 {% load static %}
 
+{% block title %}HealthStack Marketplace - Your Health, Delivered{% endblock %}
+
 {% block content %}
-<div class="main-wrapper">
-    {% include 'patient_navbar.html' %}
-    
-    <div class="breadcrumb-bar">
-        <div class="container-fluid">
-            <div class="row align-items-center">
-                <div class="col-md-12 col-12">
-                    <nav aria-label="breadcrumb" class="page-breadcrumb">
-                        <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="{% url 'hospital_home' %}">Home</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">Healthcare Marketplace</li>
-                        </ol>
-                    </nav>
-                    <h2 class="breadcrumb-title">Healthcare at Your Doorstep</h2>
+<div class="content">
+    <div class="container-fluid">
+        
+        <!-- Hero Section -->
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="marketplace-hero bg-primary text-white p-5 rounded mb-4">
+                    <div class="row align-items-center">
+                        <div class="col-lg-6">
+                            <h1 class="display-4 fw-bold">Your Health, Delivered</h1>
+                            <p class="lead">Get instant access to doctors, medicines, and health services. Fast, reliable, and convenient healthcare delivery.</p>
+                            <div class="d-flex gap-3 mt-4">
+                                <a href="{% url 'marketplace:providers_list' %}?type=consultation" class="btn btn-light btn-lg">Find Doctors</a>
+                                <a href="{% url 'marketplace:providers_list' %}?type=medicine_delivery" class="btn btn-outline-light btn-lg">Order Medicines</a>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <img src="{% static 'HealthStack-System/images/Normal/pppp.jpg' %}" alt="Healthcare Delivery" class="img-fluid rounded">
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <div class="content">
-        <div class="container-fluid">
-            <!-- Quick Service Cards -->
-            <div class="row">
-                <div class="col-lg-3 col-md-6">
-                    <div class="card service-card">
-                        <div class="card-body text-center">
-                            <i class="fas fa-user-md fa-3x text-primary mb-3"></i>
-                            <h5>Online Consultation</h5>
-                            <p>Consult with doctors instantly</p>
-                            <a href="{% url 'marketplace_doctors' %}?consultation_type=online" class="btn btn-primary">Book Now</a>
+        <!-- Quick Stats -->
+        <div class="row mb-5">
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="card text-center border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="text-primary mb-3">
+                            <i class="fas fa-user-md fa-3x"></i>
                         </div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <div class="card service-card">
-                        <div class="card-body text-center">
-                            <i class="fas fa-home fa-3x text-success mb-3"></i>
-                            <h5>Home Visit</h5>
-                            <p>Doctor visits at your home</p>
-                            <a href="{% url 'marketplace_doctors' %}?consultation_type=home_visit" class="btn btn-success">Book Visit</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <div class="card service-card">
-                        <div class="card-body text-center">
-                            <i class="fas fa-pills fa-3x text-warning mb-3"></i>
-                            <h5>Medicine Delivery</h5>
-                            <p>Medicines delivered fast</p>
-                            <a href="{% url 'marketplace_medicine' %}" class="btn btn-warning">Order Now</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6">
-                    <div class="card service-card">
-                        <div class="card-body text-center">
-                            <i class="fas fa-vial fa-3x text-info mb-3"></i>
-                            <h5>Lab Tests</h5>
-                            <p>Sample collection at home</p>
-                            <a href="#" class="btn btn-info">Book Test</a>
-                        </div>
+                        <h3 class="fw-bold">{{ total_doctors }}+</h3>
+                        <p class="text-muted">Verified Doctors</p>
                     </div>
                 </div>
             </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="card text-center border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="text-success mb-3">
+                            <i class="fas fa-pills fa-3x"></i>
+                        </div>
+                        <h3 class="fw-bold">{{ total_pharmacies }}+</h3>
+                        <p class="text-muted">Partner Pharmacies</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="card text-center border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="text-warning mb-3">
+                            <i class="fas fa-clock fa-3x"></i>
+                        </div>
+                        <h3 class="fw-bold">30 min</h3>
+                        <p class="text-muted">Average Delivery</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="card text-center border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="text-info mb-3">
+                            <i class="fas fa-star fa-3x"></i>
+                        </div>
+                        <h3 class="fw-bold">4.8/5</h3>
+                        <p class="text-muted">Customer Rating</p>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-            <!-- Nearby Doctors -->
-            <div class="row">
-                <div class="col-md-12">
-                    <h4 class="mb-4">Available Doctors Near You</h4>
-                    <div class="row">
-                        {% for doctor in nearby_doctors %}
-                        <div class="col-lg-4 col-md-6">
-                            <div class="card doctor-card mb-4">
-                                <div class="card-body">
-                                    <div class="doctor-widget">
-                                        <div class="doc-info-left">
-                                            <div class="doctor-img">
-                                                <img src="{{ doctor.featured_image.url }}" class="img-fluid" alt="Doctor">
-                                            </div>
-                                            <div class="doc-info-cont">
-                                                <h4 class="doc-name">{{ doctor.name }}</h4>
-                                                <p class="doc-speciality">{{ doctor.department }}</p>
-                                                <div class="rating">
-                                                    {% for i in "12345" %}
-                                                        <i class="fas fa-star"></i>
-                                                    {% endfor %}
-                                                    <span class="d-inline-block average-rating">({{ doctor.marketplace_rating }})</span>
-                                                </div>
-                                                <div class="clinic-details">
-                                                    <p class="doc-location">
-                                                        <i class="fas fa-map-marker-alt"></i> 
-                                                        {{ doctor.hospital_name.name|default:"Available Online" }}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="doc-info-right">
-                                            <div class="clini-infos">
-                                                <ul>
-                                                    {% if doctor.online_consultation_available %}
-                                                    <li><i class="fas fa-video text-success"></i> Online</li>
-                                                    {% endif %}
-                                                    {% if doctor.home_visit_available %}
-                                                    <li><i class="fas fa-home text-info"></i> Home Visit</li>
-                                                    {% endif %}
-                                                </ul>
-                                            </div>
-                                            <div class="clinic-booking">
-                                                <a class="apt-btn" href="{% url 'book_consultation' doctor.doctor_id %}">Book Consultation</a>
-                                            </div>
-                                        </div>
-                                    </div>
+        <!-- Service Categories -->
+        <div class="row mb-5">
+            <div class="col-lg-12">
+                <h2 class="mb-4">Our Services</h2>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="card service-card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="service-icon text-primary mb-3">
+                            <i class="fas fa-video fa-3x"></i>
+                        </div>
+                        <h5 class="card-title">Online Consultation</h5>
+                        <p class="card-text">Connect with doctors instantly via video call</p>
+                        <a href="{% url 'marketplace:providers_list' %}?type=consultation" class="btn btn-primary">Find Doctors</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="card service-card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="service-icon text-success mb-3">
+                            <i class="fas fa-home fa-3x"></i>
+                        </div>
+                        <h5 class="card-title">Home Visit</h5>
+                        <p class="card-text">Doctor visits at your convenience</p>
+                        <a href="{% url 'marketplace:providers_list' %}?type=home_visit" class="btn btn-success">Book Visit</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="card service-card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="service-icon text-warning mb-3">
+                            <i class="fas fa-pills fa-3x"></i>
+                        </div>
+                        <h5 class="card-title">Medicine Delivery</h5>
+                        <p class="card-text">Get medicines delivered to your doorstep</p>
+                        <a href="{% url 'marketplace:providers_list' %}?type=medicine_delivery" class="btn btn-warning">Order Now</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="card service-card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="service-icon text-info mb-3">
+                            <i class="fas fa-flask fa-3x"></i>
+                        </div>
+                        <h5 class="card-title">Lab Services</h5>
+                        <p class="card-text">Home sample collection and lab tests</p>
+                        <a href="{% url 'marketplace:providers_list' %}?type=lab_service" class="btn btn-info">Book Test</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Featured Doctors -->
+        {% if featured_doctors %}
+        <div class="row mb-5">
+            <div class="col-lg-12">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2>Featured Doctors</h2>
+                    <a href="{% url 'marketplace:providers_list' %}?type=consultation" class="btn btn-outline-primary">View All</a>
+                </div>
+            </div>
+            {% for provider in featured_doctors %}
+            <div class="col-lg-4 col-md-6 mb-3">
+                <div class="card doctor-card h-100 border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <img src="{% if provider.doctor.featured_image %}{{ provider.doctor.featured_image.url }}{% else %}{% static 'HealthStack-System/images/Normal/doctors/user-default.png' %}{% endif %}" 
+                                 alt="{{ provider.name }}" class="rounded-circle me-3" width="60" height="60">
+                            <div>
+                                <h5 class="card-title mb-1">{{ provider.name }}</h5>
+                                <p class="text-muted mb-1">{{ provider.doctor.specialization.name|default:"General Physician" }}</p>
+                                <div class="rating">
+                                    {% for i in "12345" %}
+                                        {% if forloop.counter <= provider.rating %}
+                                            <i class="fas fa-star text-warning"></i>
+                                        {% else %}
+                                            <i class="far fa-star text-warning"></i>
+                                        {% endif %}
+                                    {% endfor %}
+                                    <span class="ms-1">({{ provider.total_reviews }})</span>
                                 </div>
                             </div>
                         </div>
-                        {% endfor %}
-                    </div>
-                    <div class="text-center">
-                        <a href="{% url 'marketplace_doctors' %}" class="btn btn-primary">View All Doctors</a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Recent Orders -->
-            {% if recent_orders %}
-            <div class="row">
-                <div class="col-md-12">
-                    <h4 class="mb-4">Recent Orders</h4>
-                    <div class="card">
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th>Order ID</th>
-                                            <th>Service Type</th>
-                                            <th>Status</th>
-                                            <th>Amount</th>
-                                            <th>Date</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for order in recent_orders %}
-                                        <tr>
-                                            <td>#{{ order.order_id }}</td>
-                                            <td>{{ order.get_order_type_display }}</td>
-                                            <td>
-                                                <span class="badge badge-{% if order.status == 'delivered' %}success{% elif order.status == 'cancelled' %}danger{% else %}warning{% endif %}">
-                                                    {{ order.get_status_display }}
-                                                </span>
-                                            </td>
-                                            <td>৳{{ order.total_amount }}</td>
-                                            <td>{{ order.created_at|date:"M d, Y" }}</td>
-                                            <td>
-                                                <a href="{% url 'track_order' order.order_id %}" class="btn btn-sm btn-primary">Track</a>
-                                            </td>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <small class="text-muted">Consultation Fee</small>
+                                <div class="fw-bold text-primary">৳{{ provider.base_fee }}</div>
                             </div>
+                            <div>
+                                <small class="text-muted">Response Time</small>
+                                <div class="fw-bold">{{ provider.average_delivery_time }} min</div>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <a href="{% url 'marketplace:provider_detail' provider.provider_id %}" class="btn btn-primary w-100">
+                                {% if provider.availability_status == 'available' %}
+                                    <i class="fas fa-circle text-success me-2"></i>Consult Now
+                                {% else %}
+                                    <i class="fas fa-circle text-danger me-2"></i>Currently Unavailable
+                                {% endif %}
+                            </a>
                         </div>
                     </div>
                 </div>
             </div>
-            {% endif %}
+            {% endfor %}
         </div>
-    </div>
+        {% endif %}
 
-    {% include 'footer.html' %}
+        <!-- How It Works -->
+        <div class="row mb-5">
+            <div class="col-lg-12">
+                <h2 class="text-center mb-5">How It Works</h2>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="text-center">
+                    <div class="step-icon bg-primary text-white rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                        <i class="fas fa-search fa-2x"></i>
+                    </div>
+                    <h5>1. Search & Select</h5>
+                    <p class="text-muted">Find the right doctor or service provider based on your needs</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="text-center">
+                    <div class="step-icon bg-success text-white rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                        <i class="fas fa-calendar-check fa-2x"></i>
+                    </div>
+                    <h5>2. Book & Confirm</h5>
+                    <p class="text-muted">Schedule your appointment or place your order with instant confirmation</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="text-center">
+                    <div class="step-icon bg-warning text-white rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                        <i class="fas fa-truck fa-2x"></i>
+                    </div>
+                    <h5>3. Get Delivered</h5>
+                    <p class="text-muted">Receive your service or medicine at your preferred location</p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-3">
+                <div class="text-center">
+                    <div class="step-icon bg-info text-white rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                        <i class="fas fa-star fa-2x"></i>
+                    </div>
+                    <h5>4. Rate & Review</h5>
+                    <p class="text-muted">Share your experience to help others make informed decisions</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Emergency Banner -->
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="alert alert-danger d-flex align-items-center p-4">
+                    <div class="me-3">
+                        <i class="fas fa-exclamation-triangle fa-3x"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h4 class="alert-heading">Medical Emergency?</h4>
+                        <p class="mb-2">For life-threatening emergencies, please call emergency services immediately or visit the nearest hospital emergency room.</p>
+                        <a href="tel:999" class="btn btn-danger me-2">Call 999</a>
+                        <a href="{% url 'marketplace:providers_list' %}?type=consultation&priority=emergency" class="btn btn-outline-danger">Emergency Consultation</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
 </div>
 
 <style>
-.service-card {
-    border: none;
-    box-shadow: 0 0 20px rgba(0,0,0,0.1);
-    transition: transform 0.3s;
-    margin-bottom: 30px;
+.marketplace-hero {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
 }
 
 .service-card:hover {
     transform: translateY(-5px);
+    transition: transform 0.3s ease;
 }
 
-.doctor-card {
-    border: none;
-    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+.doctor-card:hover {
+    transform: translateY(-3px);
+    transition: transform 0.3s ease;
 }
 
-.doc-info-left {
-    display: flex;
-    align-items: center;
-}
-
-.doctor-img {
-    margin-right: 15px;
-}
-
-.doctor-img img {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    object-fit: cover;
-}
-
-.doc-name {
-    font-size: 18px;
-    margin-bottom: 5px;
-}
-
-.doc-speciality {
-    color: #666;
-    margin-bottom: 10px;
+.step-icon {
+    font-size: 2rem;
 }
 
 .rating i {
-    color: #ffc107;
+    font-size: 0.8rem;
 }
 </style>
+
+<script>
+$(document).ready(function() {
+    // Add smooth scrolling to anchor links
+    $('a[href^="#"]').on('click', function(event) {
+        var target = $(this.getAttribute('href'));
+        if( target.length ) {
+            event.preventDefault();
+            $('html, body').stop().animate({
+                scrollTop: target.offset().top
+            }, 1000);
+        }
+    });
+});
+</script>
 {% endblock %}
