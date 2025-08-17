@@ -8,7 +8,7 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, user-scalable=0"
     />
-    <title>HealthStack</title>
+    <title>CliniCore - Your Trusted Healthcare Platform</title>
 
     <!-- Favicons -->
     <link
@@ -38,6 +38,243 @@
       rel="stylesheet"
       href="{% static 'HealthStack-System/css/Normal/style.css' %}"
     />
+    
+    <!-- CliniCore Custom Styles -->
+    <style>
+      :root {
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        --text-dark: #2c3e50;
+        --text-light: #6c757d;
+      }
+
+      body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      }
+
+      .hero-section {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        padding: 80px 0;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .hero-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="%23667eea" opacity="0.05"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+        pointer-events: none;
+      }
+
+      .min-vh-75 {
+        min-height: 75vh;
+      }
+
+      .hero-content {
+        padding: 2rem 0;
+      }
+
+      .hero-badge {
+        display: inline-flex;
+        align-items: center;
+        background: rgba(102, 126, 234, 0.1);
+        color: #667eea;
+        padding: 8px 16px;
+        border-radius: 50px;
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        border: 1px solid rgba(102, 126, 234, 0.2);
+      }
+
+      .hero-title {
+        font-size: 3.5rem;
+        font-weight: 800;
+        line-height: 1.2;
+        color: var(--text-dark);
+        margin-bottom: 1.5rem;
+      }
+
+      .text-gradient {
+        background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .hero-description {
+        font-size: 1.2rem;
+        color: var(--text-light);
+        line-height: 1.6;
+        margin-bottom: 2rem;
+        max-width: 90%;
+      }
+
+      .hero-stats {
+        display: flex;
+        gap: 2rem;
+        margin-bottom: 2.5rem;
+      }
+
+      .stat-item h3 {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin: 0;
+      }
+
+      .stat-item p {
+        color: var(--text-light);
+        margin: 0;
+        font-size: 14px;
+      }
+
+      .hero-actions {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+      }
+
+      .btn-primary-gradient {
+        background: var(--primary-gradient);
+        border: none;
+        color: white;
+        padding: 12px 32px;
+        border-radius: 50px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+      }
+
+      .btn-primary-gradient:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 25px rgba(102, 126, 234, 0.4);
+        color: white;
+      }
+
+      .btn-outline-primary {
+        border: 2px solid #667eea;
+        color: #667eea;
+        padding: 10px 32px;
+        border-radius: 50px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        background: transparent;
+      }
+
+      .btn-outline-primary:hover {
+        background: #667eea;
+        color: white;
+        transform: translateY(-2px);
+      }
+
+      .hero-image {
+        position: relative;
+        padding: 2rem;
+      }
+
+      .image-container {
+        position: relative;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+      }
+
+      .main-image {
+        border-radius: 20px;
+        width: 100%;
+        height: auto;
+      }
+
+      .floating-card {
+        position: absolute;
+        background: white;
+        padding: 12px 20px;
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 600;
+        color: var(--text-dark);
+        animation: float 3s ease-in-out infinite;
+      }
+
+      .floating-card i {
+        color: #667eea;
+        font-size: 18px;
+      }
+
+      .card-1 {
+        top: 20%;
+        left: -10%;
+        animation-delay: 0s;
+      }
+
+      .card-2 {
+        top: 60%;
+        right: -10%;
+        animation-delay: 1s;
+      }
+
+      .card-3 {
+        bottom: 20%;
+        left: 10%;
+        animation-delay: 2s;
+      }
+
+      @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+      }
+
+      .section-specialities {
+        padding: 80px 0;
+        background: white;
+      }
+
+      .section-header h2 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--text-dark);
+        margin-bottom: 1rem;
+      }
+
+      .section-doctor {
+        padding: 80px 0;
+        background: #f8f9fa;
+      }
+
+      .section-features {
+        padding: 80px 0;
+        background: white;
+      }
+
+      @media (max-width: 768px) {
+        .hero-title {
+          font-size: 2.5rem;
+        }
+
+        .hero-stats {
+          gap: 1rem;
+        }
+
+        .hero-actions {
+          flex-direction: column;
+        }
+
+        .floating-card {
+          display: none;
+        }
+      }
+    </style>
 
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -52,36 +289,84 @@
       <header class="header">{% include 'navbar_home.html' %}</header>
       <!-- header -->
 
-      <!-- Home Banner -->
-      <section class="section section-search" style="background-color:rgb(172, 209, 242); padding-bottom: 0px;min-height: 0px;padding-left: 0px;padding-right: 0px;">
-        <div  style="background-color:rgb(172, 209, 242)">
-          <div class="banner-wrapper" style="background-color:rgb(172, 209, 242);padding-bottom: 20px;padding-top: 12px;"> 
-            <div class="banner-header text-center">
-              <h1>Welcome To HealthStack</h1>
-              <p>
-                Choose well by choosing us.
-              </p>
+      <!-- Hero Section -->
+      <section class="hero-section">
+        <div class="container">
+          <div class="row align-items-center min-vh-75">
+            <div class="col-lg-6">
+              <div class="hero-content">
+                <div class="hero-badge">
+                  <i class="fas fa-heart-pulse me-2"></i>
+                  Trusted Healthcare Platform
+                </div>
+                <h1 class="hero-title">
+                  Your Health, Our <span class="text-gradient">Priority</span>
+                </h1>
+                <p class="hero-description">
+                  Experience seamless healthcare with CliniCore - connecting patients with top doctors, 
+                  managing appointments, and providing comprehensive medical services all in one platform.
+                </p>
+                <div class="hero-stats">
+                  <div class="stat-item">
+                    <h3>1000+</h3>
+                    <p>Expert Doctors</p>
+                  </div>
+                  <div class="stat-item">
+                    <h3>50+</h3>
+                    <p>Partner Hospitals</p>
+                  </div>
+                  <div class="stat-item">
+                    <h3>24/7</h3>
+                    <p>Medical Support</p>
+                  </div>
+                </div>
+                <div class="hero-actions">
+                  {% if user.is_authenticated and user.is_patient %}
+                  <a href="{% url 'search' %}" class="btn btn-primary-gradient">
+                    <i class="fas fa-search me-2"></i>Find Doctors
+                  </a>
+                  {% else %}
+                  <a href="{% url 'unified-login' %}" class="btn btn-primary-gradient">
+                    <i class="fas fa-user-plus me-2"></i>Get Started
+                  </a>
+                  {% endif %}
+                  <a href="{% url 'about-us' %}" class="btn btn-outline-primary">
+                    <i class="fas fa-play me-2"></i>Learn More
+                  </a>
+                </div>
+              </div>
             </div>
-
-           
-            <!-- /Search -->
-          </div>
-          <div class="home-image">
-            <img
-              src="{% static 'HealthStack-System/images/Normal/p2.png' %}"
-              class="img-fluid" style="width: 100%;"
-            />
+            <div class="col-lg-6">
+              <div class="hero-image">
+                <div class="image-container">
+                  <img src="{% static 'HealthStack-System/images/Normal/p2.png' %}" alt="CliniCore Healthcare" class="img-fluid main-image">
+                  <div class="floating-card card-1">
+                    <i class="fas fa-calendar-check"></i>
+                    <span>Easy Booking</span>
+                  </div>
+                  <div class="floating-card card-2">
+                    <i class="fas fa-user-md"></i>
+                    <span>Expert Care</span>
+                  </div>
+                  <div class="floating-card card-3">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>Secure Platform</span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
-      <!-- /Home Banner -->
+      <!-- /Hero Section -->
 
       <!-- Clinic and Specialities -->
-      <section class="section section-specialities" style="padding-top: 80px">
+      <section class="section section-specialities">
         <div class="container-fluid">
           <div class="section-header text-center">
-            <h2>Clinic and Specialities</h2>
-            <p class="sub-title">
+            <h2>Medical Specialities</h2>
+            <p class="sub-title" style="font-size: 1.1rem; color: var(--text-light); max-width: 600px; margin: 0 auto;">
+              Comprehensive healthcare services across multiple specialities with expert doctors and modern facilities
             </p>
           </div>
           <div class="row justify-content-center">
@@ -165,26 +450,33 @@
       </section>
       <!-- Clinic and Specialities -->
 
-      <!-- Popular Section -->
+      <!-- Featured Doctors Section -->
       <section class="section section-doctor">
         <div class="container-fluid">
           <div class="row">
             <div class="col-lg-4">
               <div class="section-header">
-                <h2>Book Our Doctor</h2>
-                <p>From the Best</p>
+                <h2>Expert Medical Professionals</h2>
+                <p style="color: #667eea; font-weight: 600;">Trusted by Thousands</p>
               </div>
               <div class="about-content">
-                <p>
-                  You can book doctors from any hospital from here.
+                <p style="font-size: 1.1rem; line-height: 1.6; color: var(--text-light);">
+                  Connect with qualified doctors across various specialities. Book appointments easily and get the medical care you deserve with CliniCore's network of certified healthcare professionals.
                 </p>
-                <!-- <p>
-                  web page editors now use Lorem Ipsum as their default model
-                  text, and a search for 'lorem ipsum' will uncover many web
-                  sites still in their infancy. Various versions have evolved
-                  over the years, sometimes
-                </p> -->
-                <!-- <a href="javascript:;">Read More..</a> -->
+                <div class="features-list" style="margin-top: 1.5rem;">
+                  <div class="feature-item" style="display: flex; align-items: center; margin-bottom: 0.8rem;">
+                    <i class="fas fa-check-circle" style="color: #28a745; margin-right: 0.8rem;"></i>
+                    <span>Verified Medical Credentials</span>
+                  </div>
+                  <div class="feature-item" style="display: flex; align-items: center; margin-bottom: 0.8rem;">
+                    <i class="fas fa-check-circle" style="color: #28a745; margin-right: 0.8rem;"></i>
+                    <span>Easy Online Booking</span>
+                  </div>
+                  <div class="feature-item" style="display: flex; align-items: center; margin-bottom: 0.8rem;">
+                    <i class="fas fa-check-circle" style="color: #28a745; margin-right: 0.8rem;"></i>
+                    <span>24/7 Support Available</span>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -255,24 +547,52 @@
       </section>
       <!-- /Popular Section -->
 
-      <!-- Availabe Features -->
+      <!-- Partner Hospitals -->
       <section class="section section-features">
         <div class="container-fluid">
-          <div class="row">
+          <div class="row align-items-center">
             <div class="col-md-5 features-img">
-              <img
-                src="{% static 'HealthStack-System/images/Normal/pppp.jpg' %}"
-                class="img-fluid"
-                alt="Feature"
-              />
+              <div class="image-wrapper" style="position: relative; border-radius: 20px; overflow: hidden; box-shadow: 0 15px 50px rgba(0, 0, 0, 0.1);">
+                <img
+                  src="{% static 'HealthStack-System/images/Normal/pppp.jpg' %}"
+                  class="img-fluid"
+                  alt="CliniCore Partner Hospitals"
+                  style="border-radius: 20px;"
+                />
+                <div style="position: absolute; top: 20px; left: 20px; background: rgba(255, 255, 255, 0.9); padding: 12px 20px; border-radius: 50px; font-weight: 600; color: var(--text-dark);">
+                  <i class="fas fa-hospital me-2" style="color: #667eea;"></i>
+                  50+ Partner Hospitals
+                </div>
+              </div>
             </div>
             <div class="col-md-7">
               <div class="section-header">
-                <h2 class="mt-2">Availabe Hospitals</h2>
-                <p>
-                  Here You can access multiple hospitals. You can book your appointment from
-                  your doctor & can collect all hospital infromations from here.
+                <h2 class="mt-2">Trusted Hospital Network</h2>
+                <p style="font-size: 1.1rem; line-height: 1.6; color: var(--text-light); margin-bottom: 2rem;">
+                  Access a comprehensive network of top-rated hospitals and medical facilities. 
+                  From emergency care to specialized treatments, find the right healthcare provider 
+                  with complete hospital information, services, and real-time availability.
                 </p>
+                <div class="hospital-benefits">
+                  <div class="benefit-item" style="display: flex; align-items: center; margin-bottom: 1rem; padding: 1rem; background: rgba(102, 126, 234, 0.05); border-radius: 10px;">
+                    <div style="background: var(--primary-gradient); color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 1rem;">
+                      <i class="fas fa-search"></i>
+                    </div>
+                    <div>
+                      <h6 style="margin: 0; color: var(--text-dark);">Easy Hospital Discovery</h6>
+                      <small style="color: var(--text-light);">Find hospitals by location, specialty, and services</small>
+                    </div>
+                  </div>
+                  <div class="benefit-item" style="display: flex; align-items: center; margin-bottom: 1rem; padding: 1rem; background: rgba(102, 126, 234, 0.05); border-radius: 10px;">
+                    <div style="background: var(--success-gradient); color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 1rem;">
+                      <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <div>
+                      <h6 style="margin: 0; color: var(--text-dark);">Integrated Booking</h6>
+                      <small style="color: var(--text-light);">Book appointments directly with hospital doctors</small>
+                    </div>
+                  </div>
+                </div>
               </div>
               <div class="features-slider slider">
                 <!-- Slider Item -->
