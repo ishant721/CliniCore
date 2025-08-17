@@ -100,13 +100,15 @@
                 </button>
               </div>
 
+              <!-- Divider -->
+              <div class="login-or">
+                <span class="or-line"></span>
+                <span class="span-or">or</span>
+              </div>
+
               <!-- Register Link -->
-              <div class="auth-footer">
-                <p>Don't have an account? 
-                  <a href="{% url 'chat:register' %}" class="register-link">
-                    Create Account
-                  </a>
-                </p>
+              <div class="text-center dont-have">
+                Don't have an account? <a href="{% url 'patient-register' %}">Register</a>
               </div>
             </div>
           </div>
@@ -427,6 +429,49 @@
   background: rgba(33, 150, 243, 0.1);
   color: #1976d2;
   border-left: 4px solid #2196f3;
+}
+
+/* Login Divider */
+.login-or {
+  text-align: center;
+  margin: 2rem 0 1.5rem;
+  position: relative;
+}
+
+.or-line {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--border-color);
+}
+
+.span-or {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 0 1rem;
+  color: var(--text-light);
+  font-size: 0.9rem;
+  position: relative;
+  z-index: 1;
+}
+
+/* Register Link */
+.dont-have {
+  color: var(--text-light);
+  font-size: 0.9rem;
+  margin-top: 0;
+}
+
+.dont-have a {
+  color: #667eea;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+.dont-have a:hover {
+  color: #764ba2;
 }
 
 /* Responsive */
