@@ -1,7 +1,6 @@
 
 {% extends 'base.html' %}
 {% load static %}
-{% load crispy_forms_tags %}
 
 {% block title %}Chat Register - CliniCore{% endblock %}
 
@@ -30,7 +29,66 @@
             <div class="auth-form">
               <form id="register-frm" action="" method="post" class="register-form">
                 {% csrf_token %}
-                {{ form|crispy }}
+                
+                <div class="form-group">
+                  <label for="username" class="form-label">Username</label>
+                  <input type="text" 
+                         class="form-control" 
+                         id="username" 
+                         name="username" 
+                         placeholder="Choose a username"
+                         required>
+                </div>
+
+                <div class="form-group">
+                  <label for="email" class="form-label">Email</label>
+                  <input type="email" 
+                         class="form-control" 
+                         id="email" 
+                         name="email" 
+                         placeholder="Enter your email"
+                         required>
+                </div>
+
+                <div class="form-group">
+                  <label for="first_name" class="form-label">First Name</label>
+                  <input type="text" 
+                         class="form-control" 
+                         id="first_name" 
+                         name="first_name" 
+                         placeholder="Enter your first name"
+                         required>
+                </div>
+
+                <div class="form-group">
+                  <label for="last_name" class="form-label">Last Name</label>
+                  <input type="text" 
+                         class="form-control" 
+                         id="last_name" 
+                         name="last_name" 
+                         placeholder="Enter your last name"
+                         required>
+                </div>
+
+                <div class="form-group">
+                  <label for="password1" class="form-label">Password</label>
+                  <input type="password" 
+                         class="form-control" 
+                         id="password1" 
+                         name="password1" 
+                         placeholder="Create a password"
+                         required>
+                </div>
+
+                <div class="form-group">
+                  <label for="password2" class="form-label">Confirm Password</label>
+                  <input type="password" 
+                         class="form-control" 
+                         id="password2" 
+                         name="password2" 
+                         placeholder="Confirm your password"
+                         required>
+                </div>
                 
                 <div class="form-actions">
                   <button type="submit" class="btn auth-btn">
