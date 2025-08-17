@@ -1,103 +1,575 @@
+
+{% extends 'base.html' %}
 {% load static %}
-<!DOCTYPE html> 
-<html lang="en">
-	
-<!-- doccure/blank-page.html  30 Nov 2019 04:12:20 GMT -->
-<head>
 
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
-    <title>HealthStack</title>
+{% block title %}About Us - CliniCore{% endblock %}
+
+{% block extra_css %}
+<style>
+  .about-hero {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 100px 0;
+    color: white;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .about-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="%23ffffff" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+    pointer-events: none;
+  }
+
+  .breadcrumb-custom {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 10px 20px;
+    border-radius: 50px;
+    margin-bottom: 2rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .breadcrumb-custom a {
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+
+  .breadcrumb-custom a:hover {
+    color: white;
+  }
+
+  .breadcrumb-custom span {
+    color: rgba(255, 255, 255, 0.6);
+  }
+
+  .about-section {
+    padding: 80px 0;
+    background: white;
+  }
+
+  .about-card {
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+    transition: transform 0.3s ease;
+  }
+
+  .about-card:hover {
+    transform: translateY(-5px);
+  }
+
+  .section-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 1rem;
+  }
+
+  .section-subtitle {
+    font-size: 1.1rem;
+    color: #6c757d;
+    margin-bottom: 3rem;
+    line-height: 1.6;
+  }
+
+  .feature-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 32px;
+    margin-bottom: 25px;
+  }
+
+  .stats-section {
+    padding: 80px 0;
+    background: #f8f9fa;
+  }
+
+  .stat-card {
+    text-align: center;
+    padding: 30px;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+  }
+
+  .stat-card:hover {
+    transform: translateY(-5px);
+  }
+
+  .stat-number {
+    font-size: 3rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 10px;
+  }
+
+  .stat-label {
+    font-size: 1.1rem;
+    color: #6c757d;
+    font-weight: 600;
+  }
+
+  .mission-section {
+    padding: 80px 0;
+    background: white;
+  }
+
+  .mission-card {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+    border-radius: 20px;
+    padding: 40px;
+    border: 2px solid rgba(102, 126, 234, 0.1);
+  }
+
+  .team-section {
+    padding: 80px 0;
+    background: #f8f9fa;
+  }
+
+  .team-card {
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+  }
+
+  .team-card:hover {
+    transform: translateY(-5px);
+  }
+
+  .team-image {
+    width: 100%;
+    height: 250px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 4rem;
+  }
+
+  .team-content {
+    padding: 25px;
+    text-align: center;
+  }
+
+  .team-name {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 5px;
+  }
+
+  .team-role {
+    color: #667eea;
+    font-weight: 600;
+    margin-bottom: 15px;
+  }
+
+  .team-description {
+    color: #6c757d;
+    line-height: 1.6;
+  }
+
+  .values-section {
+    padding: 80px 0;
+    background: white;
+  }
+
+  .value-item {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+
+  .value-icon {
+    width: 70px;
+    height: 70px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 28px;
+    margin: 0 auto 20px;
+  }
+
+  .value-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 15px;
+  }
+
+  .value-description {
+    color: #6c757d;
+    line-height: 1.6;
+  }
+
+  @media (max-width: 768px) {
+    .about-hero {
+      padding: 60px 0;
+    }
     
-    <!-- Favicons -->
-    <link type="image/x-icon" href="{% static 'HealthStack-System/images/Normal/favicon.png' %}" rel="icon">
+    .section-title {
+      font-size: 2rem;
+    }
     
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="{% static 'HealthStack-System/css/Normal/bootstrap.min.css' %}">
+    .stat-number {
+      font-size: 2.5rem;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="about-hero">
+  <div class="container">
+    <div class="row">
+      <div class="col-12">
+        <div class="breadcrumb-custom">
+          <a href="{% url 'hospital_home' %}">
+            <i class="fas fa-home"></i> Home
+          </a>
+          <span>/</span>
+          <span>About Us</span>
+        </div>
+        <h1 style="font-size: 3.5rem; font-weight: 800; margin-bottom: 1rem;">About CliniCore</h1>
+        <p style="font-size: 1.3rem; opacity: 0.9; max-width: 700px; line-height: 1.6;">
+          Transforming healthcare through innovative technology and compassionate care. 
+          We're dedicated to making quality healthcare accessible to everyone.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Main About Section -->
+<section class="about-section">
+  <div class="container">
+    <div class="row text-center mb-5">
+      <div class="col-12">
+        <h2 class="section-title">Our Story</h2>
+        <p class="section-subtitle">
+          CliniCore is a comprehensive healthcare platform that bridges the gap between patients and healthcare providers, 
+          offering seamless medical services and emergency assistance.
+        </p>
+      </div>
+    </div>
     
-    <!-- Fontawesome CSS -->
-    <link rel="stylesheet" href="{% static 'HealthStack-System/plugins/Normal/fontawesome/css/fontawesome.min.css' %}">
-    <link rel="stylesheet" href="{% static 'HealthStack-System/plugins/Normal/fontawesome/css/all.min.css' %}">
+    <div class="row">
+      <div class="col-lg-6 mb-4">
+        <div class="about-card">
+          <div class="feature-icon">
+            <i class="fas fa-heartbeat"></i>
+          </div>
+          <h3 style="color: #2c3e50; margin-bottom: 20px; font-weight: 700;">Healthcare Innovation</h3>
+          <p style="color: #6c757d; line-height: 1.6; margin-bottom: 0;">
+            CliniCore leverages cutting-edge technology to provide seamless healthcare services. 
+            Our platform connects patients with qualified healthcare providers, enabling easy appointment 
+            scheduling, medical consultations, and comprehensive health record management.
+          </p>
+        </div>
+      </div>
+      
+      <div class="col-lg-6 mb-4">
+        <div class="about-card">
+          <div class="feature-icon">
+            <i class="fas fa-users"></i>
+          </div>
+          <h3 style="color: #2c3e50; margin-bottom: 20px; font-weight: 700;">Patient-Centered Care</h3>
+          <p style="color: #6c757d; line-height: 1.6; margin-bottom: 0;">
+            We believe in putting patients first. Our platform is designed to make healthcare more 
+            accessible, convenient, and personalized. From finding the right doctor to tracking your 
+            health journey, we're here to support you every step of the way.
+          </p>
+        </div>
+      </div>
+      
+      <div class="col-lg-6 mb-4">
+        <div class="about-card">
+          <div class="feature-icon">
+            <i class="fas fa-shield-alt"></i>
+          </div>
+          <h3 style="color: #2c3e50; margin-bottom: 20px; font-weight: 700;">Security & Privacy</h3>
+          <p style="color: #6c757d; line-height: 1.6; margin-bottom: 0;">
+            Your health information is precious and private. We employ state-of-the-art security measures 
+            to protect your data, ensuring complete confidentiality and compliance with healthcare 
+            privacy regulations.
+          </p>
+        </div>
+      </div>
+      
+      <div class="col-lg-6 mb-4">
+        <div class="about-card">
+          <div class="feature-icon">
+            <i class="fas fa-clock"></i>
+          </div>
+          <h3 style="color: #2c3e50; margin-bottom: 20px; font-weight: 700;">24/7 Availability</h3>
+          <p style="color: #6c757d; line-height: 1.6; margin-bottom: 0;">
+            Healthcare emergencies don't wait for business hours. Our platform provides round-the-clock 
+            access to medical services, emergency assistance, and health consultations whenever you need them.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-    <!-- Main CSS -->
-    <link rel="stylesheet" href="{% static 'HealthStack-System/css/Normal/style.css' %}">
+<!-- Statistics Section -->
+<section class="stats-section">
+  <div class="container">
+    <div class="row text-center mb-5">
+      <div class="col-12">
+        <h2 class="section-title">Our Impact in Numbers</h2>
+        <p class="section-subtitle">
+          These numbers represent the trust our community has placed in us and our commitment to excellence.
+        </p>
+      </div>
+    </div>
     
-    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!--[if lt IE 9]>
-        <script src="assets/js/html5shiv.min.js"></script>
-        <script src="assets/js/respond.min.js"></script>
-    <![endif]-->
+    <div class="row">
+      <div class="col-lg-3 col-md-6 mb-4">
+        <div class="stat-card">
+          <div class="stat-number">1000+</div>
+          <div class="stat-label">Expert Doctors</div>
+        </div>
+      </div>
+      
+      <div class="col-lg-3 col-md-6 mb-4">
+        <div class="stat-card">
+          <div class="stat-number">50+</div>
+          <div class="stat-label">Partner Hospitals</div>
+        </div>
+      </div>
+      
+      <div class="col-lg-3 col-md-6 mb-4">
+        <div class="stat-card">
+          <div class="stat-number">10K+</div>
+          <div class="stat-label">Happy Patients</div>
+        </div>
+      </div>
+      
+      <div class="col-lg-3 col-md-6 mb-4">
+        <div class="stat-card">
+          <div class="stat-number">24/7</div>
+          <div class="stat-label">Medical Support</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-</head>
-	<body>
+<!-- Mission & Vision Section -->
+<section class="mission-section">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-6 mb-4">
+        <div class="mission-card">
+          <h3 style="color: #2c3e50; margin-bottom: 25px; font-weight: 700; font-size: 2rem;">
+            <i class="fas fa-bullseye" style="color: #667eea; margin-right: 15px;"></i>
+            Our Mission
+          </h3>
+          <p style="color: #6c757d; line-height: 1.7; font-size: 1.1rem;">
+            To revolutionize healthcare delivery by creating an integrated platform that connects patients 
+            with healthcare providers, ensuring quality care is accessible, affordable, and available to 
+            everyone, everywhere, at any time.
+          </p>
+        </div>
+      </div>
+      
+      <div class="col-lg-6 mb-4">
+        <div class="mission-card">
+          <h3 style="color: #2c3e50; margin-bottom: 25px; font-weight: 700; font-size: 2rem;">
+            <i class="fas fa-eye" style="color: #667eea; margin-right: 15px;"></i>
+            Our Vision
+          </h3>
+          <p style="color: #6c757d; line-height: 1.7; font-size: 1.1rem;">
+            To be the leading healthcare platform that transforms how people access and experience healthcare, 
+            creating a world where quality medical care is just a click away and health outcomes are 
+            improved for all.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-		<!-- Main Wrapper -->
-		<div class="main-wrapper">
-		
-			<!-- Header -->
-			<header class="header">{% include 'navbar_home.html' %}</header>
-			<!-- /Header -->
-			
-			<!-- Breadcrumb -->
-			<div class="breadcrumb-bar">
-				<div class="container-fluid">
-					<div class="row align-items-center">
-						<div class="col-md-12 col-12">
-							<nav aria-label="breadcrumb" class="page-breadcrumb">
-								<ol class="breadcrumb">
-									<li class="breadcrumb-item"><a href="index-2.html">Home</a></li>
-									<li class="breadcrumb-item active" aria-current="page">About Us</li>
-								</ol>
-							</nav>
-							<h2 class="breadcrumb-title">About Us</h2>
-						</div>
-					</div>
-				</div>
-			</div>
-			<!-- /Breadcrumb -->
-			
-			<!-- Page Content -->
-			<div class="content">
-				<div class="container-fluid">
-					<div class="row">
-						<div class="col-12">
-							<h5>About Us</h5>
-							<p>
-								Healthstack is an internet platform that supports numerous hospitals. It offers urgent medical aid to those in need of emergency care. Its capability of tracking, monitoring, and sharing a patient's health records across all hospitals. Patients can also view information about various hospitals and providers and schedule appointments online.
-							</p>
-						</div>
-					</div>
-				</div>
+<!-- Core Values Section -->
+<section class="values-section">
+  <div class="container">
+    <div class="row text-center mb-5">
+      <div class="col-12">
+        <h2 class="section-title">Our Core Values</h2>
+        <p class="section-subtitle">
+          These principles guide everything we do and every decision we make.
+        </p>
+      </div>
+    </div>
+    
+    <div class="row">
+      <div class="col-lg-4 col-md-6 mb-4">
+        <div class="value-item">
+          <div class="value-icon">
+            <i class="fas fa-heart"></i>
+          </div>
+          <h4 class="value-title">Compassion</h4>
+          <p class="value-description">
+            We approach every interaction with empathy and understanding, 
+            recognizing that behind every patient is a human story.
+          </p>
+        </div>
+      </div>
+      
+      <div class="col-lg-4 col-md-6 mb-4">
+        <div class="value-item">
+          <div class="value-icon">
+            <i class="fas fa-award"></i>
+          </div>
+          <h4 class="value-title">Excellence</h4>
+          <p class="value-description">
+            We strive for the highest standards in everything we do, 
+            continuously improving our services and platform.
+          </p>
+        </div>
+      </div>
+      
+      <div class="col-lg-4 col-md-6 mb-4">
+        <div class="value-item">
+          <div class="value-icon">
+            <i class="fas fa-handshake"></i>
+          </div>
+          <h4 class="value-title">Trust</h4>
+          <p class="value-description">
+            We build lasting relationships based on transparency, 
+            reliability, and unwavering commitment to our patients.
+          </p>
+        </div>
+      </div>
+      
+      <div class="col-lg-4 col-md-6 mb-4">
+        <div class="value-item">
+          <div class="value-icon">
+            <i class="fas fa-lightbulb"></i>
+          </div>
+          <h4 class="value-title">Innovation</h4>
+          <p class="value-description">
+            We embrace new technologies and approaches to solve 
+            healthcare challenges and improve patient outcomes.
+          </p>
+        </div>
+      </div>
+      
+      <div class="col-lg-4 col-md-6 mb-4">
+        <div class="value-item">
+          <div class="value-icon">
+            <i class="fas fa-users-cog"></i>
+          </div>
+          <h4 class="value-title">Collaboration</h4>
+          <p class="value-description">
+            We work together with healthcare providers, patients, 
+            and communities to achieve better health outcomes.
+          </p>
+        </div>
+      </div>
+      
+      <div class="col-lg-4 col-md-6 mb-4">
+        <div class="value-item">
+          <div class="value-icon">
+            <i class="fas fa-globe"></i>
+          </div>
+          <h4 class="value-title">Accessibility</h4>
+          <p class="value-description">
+            We believe healthcare should be accessible to everyone, 
+            regardless of location, background, or circumstances.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-			</div>		
-			<!-- /Page Content -->
-   
-			
-			<!-- Footer -->
-			{% include 'footer.html' %}
-			<!-- /Footer -->
-			
-		   
-		</div>
-		<!-- /Main Wrapper -->
-	  
-		<!-- jQuery -->
-		<script src="{% static 'HealthStack-System/js/Normal/jquery.min.js' %}"></script>
-		
-		<!-- Bootstrap Core JS -->
-		<script src="{% static 'HealthStack-System/js/Normal/popper.min.js' %}"></script>
-		<script src="{% static 'HealthStack-System/js/Normal/bootstrap.min.js' %}"></script>
+<!-- Team Section -->
+<section class="team-section">
+  <div class="container">
+    <div class="row text-center mb-5">
+      <div class="col-12">
+        <h2 class="section-title">Our Leadership Team</h2>
+        <p class="section-subtitle">
+          Meet the passionate individuals driving CliniCore's mission forward.
+        </p>
+      </div>
+    </div>
+    
+    <div class="row">
+      <div class="col-lg-4 col-md-6 mb-4">
+        <div class="team-card">
+          <div class="team-image">
+            <i class="fas fa-user-md"></i>
+          </div>
+          <div class="team-content">
+            <h4 class="team-name">Dr. Sarah Johnson</h4>
+            <p class="team-role">Chief Medical Officer</p>
+            <p class="team-description">
+              Leading our medical standards and ensuring the highest quality of care across our platform.
+            </p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-lg-4 col-md-6 mb-4">
+        <div class="team-card">
+          <div class="team-image">
+            <i class="fas fa-laptop-code"></i>
+          </div>
+          <div class="team-content">
+            <h4 class="team-name">Michael Chen</h4>
+            <p class="team-role">Chief Technology Officer</p>
+            <p class="team-description">
+              Driving innovation and ensuring our platform remains at the forefront of healthcare technology.
+            </p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-lg-4 col-md-6 mb-4">
+        <div class="team-card">
+          <div class="team-image">
+            <i class="fas fa-chart-line"></i>
+          </div>
+          <div class="team-content">
+            <h4 class="team-name">Emily Rodriguez</h4>
+            <p class="team-role">Chief Executive Officer</p>
+            <p class="team-description">
+              Visionary leader committed to transforming healthcare accessibility and patient experience.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
-		<link rel="stylesheet" href="{% static 'HealthStack-System/plugins/Normal/fontawesome/css/fontawesome.min.css' %}">
-		<link rel="stylesheet" href="{% static 'HealthStack-System/plugins/Normal/fontawesome/css/all.min.css' %}">
-		
-		<!-- Slick JS -->
-		<script src="{% static 'HealthStack-System/js/Normal/slick.js' %}"></script>
-		
-		<!-- Custom JS -->
-		<script src="{% static 'HealthStack-System/Outside_assets/js/script.js' %}"></script>
-		
-	</body>
-
-<!-- doccure/blank-page.html  30 Nov 2019 04:12:20 GMT -->
-</html>
+{% include 'footer.html' %}
+{% endblock %}
