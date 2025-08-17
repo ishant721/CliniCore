@@ -1,155 +1,426 @@
+
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
-  <!-- doccure/doctor-register.html  30 Nov 2019 04:12:15 GMT -->
-  <head>
+<head>
     <meta charset="utf-8" />
-    <title>HealthStack</title>
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1.0, user-scalable=0"
-    />
-
-    <!-- Favicons -->
-    <link
-      type="image/x-icon"
-      href=" {% static 'HealthStack-System/images/Normal/favicon.png' %}"
-      rel="icon"
-    />
-
-    <!-- Bootstrap CSS -->
-    <link
-      rel="stylesheet"
-      href="{% static 'HealthStack-System/css/Normal/bootstrap.min.css' %}"
-    />
-
-    <!-- Fontawesome CSS -->
-    <link
-      rel="stylesheet"
-      href="{% static 'HealthStack-System/plugins/Normal/fontawesome/css/fontawesome.min.css' %}"
-    />
-    <link
-      rel="stylesheet"
-      href="{% static 'HealthStack-System/plugins/Normal/fontawesome/css/all.min.css' %}"
-    />
-
-    <!-- Main CSS -->
-    <link
-      rel="stylesheet"
-      href="{% static 'HealthStack-System/css/Normal/style.css' %}"
-    />
-
-    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!--[if lt IE 9]>
-      <script src="assets/js/html5shiv.min.js"></script>
-      <script src="assets/js/respond.min.js"></script>
-    <![endif]-->
-  </head>
-  <body class="account-page">
-    <!-- Main Wrapper -->
-    <div class="main-wrapper">
-      <!-- Header -->
-      <header class="header">{% include 'navbar_home.html' %}
-
-      </header>
-      <!-- /Header -->
-
-      <!-- Page Content -->
-      <div class="content">
-        <div class="container-fluid">
-          <div class="row">
-            <div class="col-md-8 offset-md-2">
-              <!-- Account Content -->
-              <div class="account-content">
-                <div class="row align-items-center justify-content-center">
-                  <div class="col-md-7 col-lg-6 login-left">
-                    <img
-                      src="{% static 'HealthStack-System/images/Normal/login-banner.png' %}"
-                      class="img-fluid"
-                      alt="Login Banner"
-                    />
-                  </div>
-                  <div class="col-md-12 col-lg-6 login-right">
-                    <div class="login-header">
-                      <h3>
-                        Doctor Register
-                        <a href="{% url 'patient-register' %}">Not a Doctor?</a>
-                      </h3>
+    <title>HealthStack - Doctor Registration</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0" />
+    <link type="image/x-icon" href=" {% static 'HealthStack-System/images/Normal/favicon.png' %}" rel="icon" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="modern-auth-container">
+        <div class="auth-split-layout">
+            <!-- Left Side - Form -->
+            <div class="auth-form-section">
+                <div class="auth-form-content">
+                    <!-- Logo -->
+                    <div class="auth-logo">
+                        <div class="logo-icon">
+                            <i class="fas fa-user-md"></i>
+                        </div>
+                        <span class="logo-text">HealthStack</span>
                     </div>
 
-                    <!-- Register Form -->
-                    <form action="{% url 'doctor-register' %}" method="POST">
-                      {% csrf_token %} 
-                      
-                      {% include 'message.html' %}
-                      {% comment %} {% if messages %}
-                      <ul class="messages">
-                          {% for message in messages %}
-                          <li{% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
-                              {% endfor %}
-                      </ul>
-                      {% endif %} {% endcomment %}
-                      
-                      
-                      {% for field in form %}
-                      <div class="form-group form-focus">
-                        {{field}}{{ field.errors }}
-                        <label class="focus-label">{{ field.label }}</label>
-                      </div>
-                      {% endfor %}
+                    <!-- Welcome Text -->
+                    <div class="welcome-section">
+                        <h1>Join as a Doctor</h1>
+                        <p>Create your professional account</p>
+                    </div>
 
-                      <div class="text-right">
-                        <a class="forgot-link" href="{% url 'unified-login' %}"
-                          >Already have an account?</a
-                        >
-                      </div>
-                      <button
-                        class="btn btn-primary btn-block btn-lg login-btn"
-                        type="submit"
-                      >
-                        Signup
-                      </button>
-                     
-                      
+                    <!-- Registration Form -->
+                    <form action="{% url 'doctor-register' %}" method="POST" class="modern-form">
+                        {% csrf_token %} 
+                        
+                        {% include 'message.html' %}
+                        
+                        {% for field in form %}
+                        <div class="form-group">
+                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            {{ field|add_class:"form-input" }}
+                            {% if field.errors %}
+                                <div class="field-error">{{ field.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+
+                        <button type="submit" class="auth-btn primary">Create Doctor Account</button>
+
+                        <div class="auth-footer">
+                            <span>Already have an account? <a href="{% url 'unified-login' %}">Sign in</a></span>
+                            <br>
+                            <span>Not a doctor? <a href="{% url 'patient-register' %}">Register as Patient</a></span>
+                        </div>
                     </form>
-                    <!-- /Register Form -->
-                  </div>
                 </div>
-              </div>
-              <!-- /Account Content -->
             </div>
-          </div>
+
+            <!-- Right Side - Illustration -->
+            <div class="auth-illustration-section">
+                <div class="illustration-content">
+                    <div class="floating-icons">
+                        <div class="icon-item" style="top: 15%; left: 20%;">
+                            <i class="fas fa-stethoscope"></i>
+                        </div>
+                        <div class="icon-item" style="top: 25%; right: 25%;">
+                            <i class="fas fa-medical-bag"></i>
+                        </div>
+                        <div class="icon-item" style="top: 40%; left: 15%;">
+                            <i class="fas fa-prescription"></i>
+                        </div>
+                        <div class="icon-item" style="bottom: 30%; right: 20%;">
+                            <i class="fas fa-x-ray"></i>
+                        </div>
+                        <div class="icon-item" style="bottom: 15%; left: 25%;">
+                            <i class="fas fa-hospital"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="main-illustration">
+                        <div class="character doctor">
+                            <div class="character-body"></div>
+                            <div class="character-head"></div>
+                            <div class="character-arm left-arm"></div>
+                            <div class="character-arm right-arm"></div>
+                            <div class="doctor-coat"></div>
+                        </div>
+                        <div class="success-indicator">
+                            <i class="fas fa-user-md"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
-      <!-- /Page Content -->
-
-      <!-- Footer -->
-      {% include 'footer.html' %}
-      <!-- /Footer -->
     </div>
-    <!-- /Main Wrapper -->
 
-    <!-- jQuery -->
-    <script src="{% static 'HealthStack-System/js/Normal/jquery.min.js' %}"></script>
+    <style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
 
-    <!-- Bootstrap Core JS -->
-    <script src="{% static 'HealthStack-System/js/Normal/popper.min.js' %}"></script>
-    <script src="{% static 'HealthStack-System/js/Normal/bootstrap.min.js' %}"></script>
+    .modern-auth-container {
+        min-height: 100vh;
+        display: flex;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
 
-    <!-- Custom JS -->
-    <script src="{% static 'HealthStack-System/Outside_assets/js/script.js' %}"></script>
+    .auth-split-layout {
+        display: flex;
+        width: 100%;
+        min-height: 100vh;
+    }
 
+    .auth-form-section {
+        flex: 1;
+        max-width: 480px;
+        background: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+        overflow-y: auto;
+    }
+
+    .auth-form-content {
+        width: 100%;
+        max-width: 360px;
+        padding: 1rem 0;
+    }
+
+    .auth-logo {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 2rem;
+    }
+
+    .logo-icon {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, #3B82F6, #1D4ED8);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 20px;
+    }
+
+    .logo-text {
+        font-size: 20px;
+        font-weight: 700;
+        color: #1F2937;
+    }
+
+    .welcome-section {
+        margin-bottom: 2rem;
+    }
+
+    .welcome-section h1 {
+        font-size: 30px;
+        font-weight: 600;
+        color: #1F2937;
+        margin-bottom: 0.5rem;
+    }
+
+    .welcome-section p {
+        color: #6B7280;
+        font-size: 16px;
+    }
+
+    .modern-form {
+        display: flex;
+        flex-direction: column;
+        gap: 1.2rem;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .form-group label {
+        font-size: 14px;
+        font-weight: 500;
+        color: #374151;
+    }
+
+    .form-input {
+        padding: 12px 16px;
+        border: 1px solid #D1D5DB;
+        border-radius: 8px;
+        font-size: 16px;
+        transition: all 0.2s ease;
+        background: white;
+    }
+
+    .form-input:focus {
+        outline: none;
+        border-color: #3B82F6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .field-error {
+        color: #DC2626;
+        font-size: 12px;
+        margin-top: 2px;
+    }
+
+    .auth-btn {
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        text-decoration: none;
+        border: none;
+    }
+
+    .auth-btn.primary {
+        background: linear-gradient(135deg, #3B82F6, #1D4ED8);
+        color: white;
+    }
+
+    .auth-btn.primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+
+    .auth-footer {
+        text-align: center;
+        margin-top: 1.5rem;
+        font-size: 14px;
+        color: #6B7280;
+        line-height: 1.5;
+    }
+
+    .auth-footer a {
+        color: #3B82F6;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .auth-footer a:hover {
+        text-decoration: underline;
+    }
+
+    /* Right Side - Illustration */
+    .auth-illustration-section {
+        flex: 1;
+        background: linear-gradient(135deg, #3B82F6, #1D4ED8, #1E40AF);
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .illustration-content {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .floating-icons {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+    }
+
+    .icon-item {
+        position: absolute;
+        width: 60px;
+        height: 60px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 24px;
+        animation: float 6s ease-in-out infinite;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .icon-item:nth-child(2) { animation-delay: -2s; }
+    .icon-item:nth-child(3) { animation-delay: -4s; }
+    .icon-item:nth-child(4) { animation-delay: -1s; }
+    .icon-item:nth-child(5) { animation-delay: -3s; }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-20px); }
+    }
+
+    .main-illustration {
+        position: relative;
+        z-index: 2;
+    }
+
+    .character {
+        position: relative;
+        width: 200px;
+        height: 300px;
+    }
+
+    .character-body {
+        width: 160px;
+        height: 180px;
+        background: #1F2937;
+        border-radius: 80px 80px 40px 40px;
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .doctor-coat {
+        width: 140px;
+        height: 160px;
+        background: #F8FAFC;
+        border-radius: 70px 70px 35px 35px;
+        position: absolute;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        border: 3px solid #E2E8F0;
+    }
+
+    .character-head {
+        width: 80px;
+        height: 80px;
+        background: #F3E8FF;
+        border-radius: 50%;
+        position: absolute;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        border: 4px solid #1F2937;
+    }
+
+    .character-arm {
+        width: 60px;
+        height: 120px;
+        background: #F8FAFC;
+        border-radius: 30px;
+        position: absolute;
+        top: 80px;
+        border: 3px solid #E2E8F0;
+    }
+
+    .left-arm {
+        left: -20px;
+        transform: rotate(-20deg);
+    }
+
+    .right-arm {
+        right: -20px;
+        transform: rotate(20deg);
+    }
+
+    .success-indicator {
+        position: absolute;
+        bottom: -20px;
+        right: -20px;
+        width: 60px;
+        height: 60px;
+        background: #10B981;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 24px;
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .auth-split-layout {
+            flex-direction: column;
+        }
+        
+        .auth-illustration-section {
+            min-height: 200px;
+            flex: none;
+        }
+        
+        .auth-form-section {
+            max-width: none;
+            padding: 1rem;
+        }
+        
+        .floating-icons {
+            display: none;
+        }
+    }
+    </style>
+
+    {% load widget_tweaks %}
     {% if messages %}
     <script>
         {% for message in messages %}
-            $(document).ready(function () {
-                $('.toast').toast('show');
-            });
+            console.log('{{ message }}');
         {% endfor %}
     </script>
-  {% endif %}
-  
-  </body>
-
-  <!-- doccure/doctor-register.html  30 Nov 2019 04:12:16 GMT -->
+    {% endif %}
+</body>
 </html>

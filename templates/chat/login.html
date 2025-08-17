@@ -2,340 +2,450 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Chat Login - CliniCore{% endblock %}
+{% block title %}Chat Login - HealthStack{% endblock %}
 
 {% block content %}
-<!-- Include Navbar -->
-{% include 'navbar_home.html' %}
-
-<div class="auth-page">
-  <div class="auth-container">
-    <div class="container">
-      <div class="row justify-content-center">
-        <div class="col-lg-5 col-md-8">
-          <div class="auth-card">
-            <!-- Brand Logo -->
-            <div class="auth-brand">
-              <div class="brand-container">
-                <div class="brand-icon">
-                  <i class="fas fa-comments"></i>
+<div class="modern-auth-container">
+    <div class="auth-split-layout">
+        <!-- Left Side - Form -->
+        <div class="auth-form-section">
+            <div class="auth-form-content">
+                <!-- Logo -->
+                <div class="auth-logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <span class="logo-text">HealthStack Chat</span>
                 </div>
-                <span class="brand-text">Chat Login</span>
-              </div>
-              <p class="auth-subtitle">Access the CliniCore Chat System</p>
+
+                <!-- Welcome Text -->
+                <div class="welcome-section">
+                    <h1>Welcome back</h1>
+                    <p>Access the Chat System</p>
+                </div>
+
+                <!-- Login Form -->
+                <form id="login-frm" method="POST" class="modern-form">
+                    {% csrf_token %}
+                    
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input type="text" 
+                               class="form-input" 
+                               id="username" 
+                               name="username" 
+                               placeholder="Enter your username"
+                               required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" 
+                               class="form-input" 
+                               id="password" 
+                               name="password" 
+                               placeholder="Enter your password"
+                               required>
+                    </div>
+                    
+                    <button type="submit" class="auth-btn primary">
+                        <i class="fas fa-sign-in-alt me-2"></i>
+                        Login to Chat
+                    </button>
+
+                    <div class="divider">
+                        <span>or</span>
+                    </div>
+
+                    <div class="auth-footer">
+                        <span>Don't have an account? <a href="{% url 'chat:register' %}">Register</a></span>
+                    </div>
+                </form>
             </div>
-
-            <!-- Login Form -->
-            <div class="auth-form">
-              {% if messages %}
-                {% for message in messages %}
-                  <div class="alert alert-{{ message.tags }} modern-alert">
-                    <i class="fas fa-info-circle me-2"></i>
-                    {{ message }}
-                  </div>
-                {% endfor %}
-              {% endif %}
-
-              <form id="login-frm" method="POST" class="login-form">
-                {% csrf_token %}
-                
-                <div class="form-group">
-                  <label for="username" class="form-label">
-                    <i class="fas fa-user me-2"></i>Username
-                  </label>
-                  <input type="text" 
-                         class="form-control" 
-                         id="username" 
-                         name="username" 
-                         placeholder="Enter your username"
-                         required>
-                </div>
-
-                <div class="form-group">
-                  <label for="password" class="form-label">
-                    <i class="fas fa-lock me-2"></i>Password
-                  </label>
-                  <input type="password" 
-                         class="form-control" 
-                         id="password" 
-                         name="password" 
-                         placeholder="Enter your password"
-                         required>
-                </div>
-                
-                <div class="form-actions">
-                  <button type="submit" class="btn auth-btn">
-                    <i class="fas fa-sign-in-alt me-2"></i>
-                    Login to Chat
-                  </button>
-                </div>
-
-                <!-- Divider -->
-                <div class="login-or">
-                  <span class="or-line"></span>
-                  <span class="span-or">or</span>
-                </div>
-
-                <!-- Register Link -->
-                <div class="text-center dont-have">
-                  Don't have an account? <a href="{% url 'chat:register' %}">Register</a>
-                </div></div>
-              </form>
-            </div>
-          </div>
         </div>
-      </div>
+
+        <!-- Right Side - Illustration -->
+        <div class="auth-illustration-section">
+            <div class="illustration-content">
+                <div class="floating-icons">
+                    <div class="icon-item" style="top: 15%; left: 20%;">
+                        <i class="fas fa-comment-medical"></i>
+                    </div>
+                    <div class="icon-item" style="top: 25%; right: 25%;">
+                        <i class="fas fa-video"></i>
+                    </div>
+                    <div class="icon-item" style="top: 40%; left: 15%;">
+                        <i class="fas fa-phone-alt"></i>
+                    </div>
+                    <div class="icon-item" style="bottom: 30%; right: 20%;">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <div class="icon-item" style="bottom: 15%; left: 25%;">
+                        <i class="fas fa-users"></i>
+                    </div>
+                </div>
+                
+                <div class="main-illustration">
+                    <div class="character">
+                        <div class="character-body"></div>
+                        <div class="character-head"></div>
+                        <div class="character-arm left-arm"></div>
+                        <div class="character-arm right-arm"></div>
+                    </div>
+                    <div class="success-indicator">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
 
-<!-- Include Footer -->
-{% include 'footer.html' %}
-
 <style>
-:root {
-  --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-  --text-dark: #2c3e50;
-  --text-light: #6c757d;
-  --border-color: #e1e5e9;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-.auth-page {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  min-height: 100vh;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-  position: relative;
-  overflow: hidden;
+.modern-auth-container {
+    min-height: 100vh;
+    display: flex;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-.auth-page::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="%23667eea" fill-opacity="0.05"/><circle cx="75" cy="75" r="1" fill="%23764ba2" fill-opacity="0.05"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>') repeat;
-  pointer-events: none;
+.auth-split-layout {
+    display: flex;
+    width: 100%;
+    min-height: 100vh;
 }
 
-.auth-container {
-  padding: 120px 0 80px;
-  position: relative;
-  z-index: 1;
+.auth-form-section {
+    flex: 1;
+    max-width: 480px;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
 }
 
-.auth-card {
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(20px);
-  border-radius: 24px;
-  padding: 3rem;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  transition: all 0.3s ease;
+.auth-form-content {
+    width: 100%;
+    max-width: 360px;
 }
 
-.auth-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 30px 80px rgba(102, 126, 234, 0.15);
+.auth-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 3rem;
 }
 
-.auth-brand {
-  text-align: center;
-  margin-bottom: 2.5rem;
+.logo-icon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #8B5CF6, #A855F7);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 20px;
 }
 
-.brand-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  margin-bottom: 1rem;
+.logo-text {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1F2937;
 }
 
-.brand-icon {
-  width: 50px;
-  height: 50px;
-  background: var(--primary-gradient);
-  border-radius: 15px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 24px;
+.welcome-section {
+    margin-bottom: 2rem;
 }
 
-.brand-text {
-  font-size: 2rem;
-  font-weight: 800;
-  background: var(--primary-gradient);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+.welcome-section h1 {
+    font-size: 30px;
+    font-weight: 600;
+    color: #1F2937;
+    margin-bottom: 0.5rem;
 }
 
-.auth-subtitle {
-  color: var(--text-light);
-  font-size: 1rem;
-  margin: 0;
+.welcome-section p {
+    color: #6B7280;
+    font-size: 16px;
 }
 
-.auth-form {
-  margin-top: 2rem;
+.modern-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
 }
 
-.form-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  margin-top: 2rem;
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-group label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #374151;
+}
+
+.form-input {
+    padding: 12px 16px;
+    border: 1px solid #D1D5DB;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: all 0.2s ease;
+    background: white;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #8B5CF6;
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
 }
 
 .auth-btn {
-  width: 100%;
-  padding: 1rem 2rem;
-  background: var(--primary-gradient);
-  color: white;
-  border: none;
-  border-radius: 12px;
-  font-size: 1.1rem;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-decoration: none;
+    border: none;
 }
 
-.auth-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
-  color: white;
+.auth-btn.primary {
+    background: linear-gradient(135deg, #8B5CF6, #A855F7);
+    color: white;
 }
 
-.register-btn {
-  width: 100%;
-  padding: 1rem 2rem;
-  background: rgba(255, 255, 255, 0.8);
-  color: var(--text-dark);
-  border: 2px solid var(--border-color);
-  border-radius: 12px;
-  font-size: 1.1rem;
-  font-weight: 600;
-  transition: all 0.3s ease;
-  text-decoration: none;
-  text-align: center;
-  backdrop-filter: blur(10px);
+.auth-btn.primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
 }
 
-.register-btn:hover {
-  background: var(--primary-gradient);
-  color: white;
-  border-color: transparent;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+.divider {
+    text-align: center;
+    position: relative;
+    margin: 1rem 0;
 }
 
-.modern-alert {
-  border: none;
-  border-radius: 12px;
-  padding: 1rem 1.25rem;
-  margin-bottom: 1.5rem;
-  display: flex;
-  align-items: center;
-  backdrop-filter: blur(10px);
+.divider::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: #E5E7EB;
+}
+
+.divider span {
+    background: white;
+    padding: 0 1rem;
+    color: #9CA3AF;
+    font-size: 14px;
+}
+
+.auth-footer {
+    text-align: center;
+    margin-top: 1.5rem;
+    font-size: 14px;
+    color: #6B7280;
+}
+
+.auth-footer a {
+    color: #8B5CF6;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.auth-footer a:hover {
+    text-decoration: underline;
+}
+
+.alert {
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    font-size: 14px;
 }
 
 .alert-error {
-  background: rgba(244, 67, 54, 0.1);
-  color: #d32f2f;
-  border-left: 4px solid #f44336;
+    background: #FEF2F2;
+    color: #DC2626;
+    border: 1px solid #FECACA;
 }
 
 .alert-success {
-  background: rgba(76, 175, 80, 0.1);
-  color: #388e3c;
-  border-left: 4px solid #4caf50;
+    background: #F0FDF4;
+    color: #16A34A;
+    border: 1px solid #BBF7D0;
 }
 
-/* Crispy Forms Styling */
-.form-group {
-  margin-bottom: 1.5rem;
+/* Right Side - Illustration */
+.auth-illustration-section {
+    flex: 1;
+    background: linear-gradient(135deg, #8B5CF6, #A855F7, #EC4899);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.form-control {
-  padding: 1rem 1.25rem;
-  border: 2px solid var(--border-color);
-  border-radius: 12px;
-  font-size: 1rem;
-  transition: all 0.3s ease;
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(10px);
+.illustration-content {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.form-control:focus {
-  outline: none;
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-  background: white;
+.floating-icons {
+    position: absolute;
+    width: 100%;
+    height: 100%;
 }
 
-label {
-  color: var(--text-dark);
-  font-weight: 600;
-  font-size: 0.9rem;
-  margin-bottom: 0.5rem;
+.icon-item {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 24px;
+    animation: float 6s ease-in-out infinite;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* Login Divider */
-.login-or {
-  text-align: center;
-  margin: 2rem 0 1.5rem;
-  position: relative;
+.icon-item:nth-child(2) { animation-delay: -2s; }
+.icon-item:nth-child(3) { animation-delay: -4s; }
+.icon-item:nth-child(4) { animation-delay: -1s; }
+.icon-item:nth-child(5) { animation-delay: -3s; }
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
 }
 
-.or-line {
-  position: absolute;
-  top: 50%;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: var(--border-color);
+.main-illustration {
+    position: relative;
+    z-index: 2;
 }
 
-.span-or {
-  background: rgba(255, 255, 255, 0.95);
-  padding: 0 1rem;
-  color: var(--text-light);
-  font-size: 0.9rem;
-  position: relative;
-  z-index: 1;
+.character {
+    position: relative;
+    width: 200px;
+    height: 300px;
 }
 
-/* Register Link */
-.dont-have {
-  color: var(--text-light);
-  font-size: 0.9rem;
-  margin-top: 0;
+.character-body {
+    width: 160px;
+    height: 180px;
+    background: #1F2937;
+    border-radius: 80px 80px 40px 40px;
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
 }
 
-.dont-have a {
-  color: #667eea;
-  text-decoration: none;
-  font-weight: 600;
-  transition: color 0.3s ease;
+.character-head {
+    width: 80px;
+    height: 80px;
+    background: #F3E8FF;
+    border-radius: 50%;
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 4px solid #1F2937;
 }
 
-.dont-have a:hover {
-  color: #764ba2;
+.character-arm {
+    width: 60px;
+    height: 120px;
+    background: #1F2937;
+    border-radius: 30px;
+    position: absolute;
+    top: 80px;
 }
 
+.left-arm {
+    left: -20px;
+    transform: rotate(-20deg);
+}
+
+.right-arm {
+    right: -20px;
+    transform: rotate(20deg);
+}
+
+.success-indicator {
+    position: absolute;
+    bottom: -20px;
+    right: -20px;
+    width: 60px;
+    height: 60px;
+    background: #10B981;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 24px;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+/* Responsive */
 @media (max-width: 768px) {
-  .auth-container {
-    padding: 100px 1rem 60px;
-  }
-  
-  .auth-card {
-    padding: 2rem 1.5rem;
-  }
+    .auth-split-layout {
+        flex-direction: column;
+    }
+    
+    .auth-illustration-section {
+        min-height: 200px;
+        flex: none;
+    }
+    
+    .auth-form-section {
+        max-width: none;
+        padding: 1rem;
+    }
+    
+    .floating-icons {
+        display: none;
+    }
 }
 </style>
 
