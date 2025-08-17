@@ -103,7 +103,7 @@
               <!-- Register Link -->
               <div class="auth-footer">
                 <p>Don't have an account? 
-                  <a href="#" class="register-link" onclick="switchToRegister()">
+                  <a href="{% url 'chat:register' %}" class="register-link">
                     Create Account
                   </a>
                 </p>
@@ -465,12 +465,6 @@ function togglePassword() {
     toggleIcon.classList.remove('fa-eye-slash');
     toggleIcon.classList.add('fa-eye');
   }
-}
-
-function switchToRegister() {
-  // This would redirect to registration page
-  // You can customize this based on your URL structure
-  window.location.href = "{% url 'unified-login' %}#register";
 }
 </script>
 {% endblock %}
