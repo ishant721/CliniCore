@@ -1,96 +1,353 @@
 {% load static %}
 
-<footer class="footer">
+<footer class="modern-footer">
     <!-- Footer Top -->
-    <div class="footer-top">
-      <div class="container-fluid">
+    <div class="footer-main">
+      <div class="container">
         <div class="row">
           
-          <div class="col-lg-6 col-md-6">
-            <!-- Footer Widget -->
-            <div class="footer-widget footer-about">
-              <div class="footer-logo">
-                <img
-                  src="{% static 'HealthStack-System/images/Normal/footer_logo.png' %}"
-                  alt="logo"
-                />
+          <!-- Company Info -->
+          <div class="col-lg-4 col-md-6 mb-4">
+            <div class="footer-widget">
+              <div class="footer-brand">
+                <div class="brand-container">
+                  <div class="brand-icon">
+                    <i class="fas fa-heartbeat"></i>
+                  </div>
+                  <span class="brand-text">CliniCore</span>
+                </div>
               </div>
-              <div class="footer-about-content">
+              <div class="footer-about">
                 <p>
-                  Healthstack is an online based platform for multiple hospitals. It Provides immediate medical assistance to patients who require emergency treatment. Its Ability to track, monitor, and share a patient's health records between all hospitals. Patients can also see information regarding multiple hospitals and doctors and make appointments online.
+                  CliniCore is your trusted healthcare platform connecting patients with top doctors across multiple hospitals. 
+                  We provide seamless medical services, emergency assistance, and comprehensive health record management.
                 </p>
-                <br>
-                <div class="social-icon">
-                  <ul>
-                    <li>
-                      <a href="#" target="_blank"
-                        ><i class="fab fa-facebook-f"></i>
-                      </a>
-                    </li>
-                    <li>
-                      <a href="#" target="_blank"
-                        ><i class="fab fa-twitter"></i>
-                      </a>
-                    </li>
-                    <li>
-                      <a href="#" target="_blank"
-                        ><i class="fab fa-linkedin-in"></i
-                      ></a>
-                    </li>
-                    <li>
-                      <a href="#" target="_blank"
-                        ><i class="fab fa-instagram"></i
-                      ></a>
-                    </li>
-                    <li>
-                      <a href="#" target="_blank"
-                        ><i class="fab fa-dribbble"></i>
-                      </a>
-                    </li>
-                  </ul>
+                <div class="footer-features">
+                  <div class="feature-item">
+                    <i class="fas fa-check-circle"></i>
+                    <span>24/7 Emergency Support</span>
+                  </div>
+                  <div class="feature-item">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Verified Medical Professionals</span>
+                  </div>
+                  <div class="feature-item">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Secure Health Records</span>
+                  </div>
                 </div>
               </div>
             </div>
-            <!-- /Footer Widget -->
           </div>
 
-
-          <div class="col-lg-3 col-md-6">
-            <!-- Footer Widget -->
-            
-            <!-- /Footer Widget -->
+          <!-- Quick Links -->
+          <div class="col-lg-2 col-md-6 mb-4">
+            <div class="footer-widget">
+              <h3 class="footer-title">Quick Links</h3>
+              <ul class="footer-links">
+                <li><a href="{% url 'hospital_home' %}">Home</a></li>
+                <li><a href="{% url 'about-us' %}">About Us</a></li>
+                <li><a href="/contact-us/">Contact</a></li>
+                <li><a href="{% url 'multiple-hospital' %}">Hospitals</a></li>
+                <li><a href="{% url 'search' %}">Find Doctors</a></li>
+                <li><a href="/privacy-policy/">Privacy Policy</a></li>
+              </ul>
+            </div>
           </div>
 
-          <div class="col-lg-3 col-md-6">
-            <!-- Footer Widget -->
-            <div class="footer-widget footer-contact">
-              <h2 class="footer-title">Contact Us</h2>
-              <div class="footer-contact-info">
-                <div class="footer-address">
-                  <span><i class="fas fa-map-marker-alt"></i></span>
-                  <p>
-                    Dhanmondi,<br />
-                    Dhaka, Bangladesh
-                  </p>
+          <!-- Services -->
+          <div class="col-lg-2 col-md-6 mb-4">
+            <div class="footer-widget">
+              <h3 class="footer-title">Services</h3>
+              <ul class="footer-links">
+                <li><a href="#">Emergency Care</a></li>
+                <li><a href="#">Online Consultation</a></li>
+                <li><a href="#">Health Records</a></li>
+                <li><a href="#">Appointment Booking</a></li>
+                <li><a href="#">Pharmacy</a></li>
+                <li><a href="#">Lab Tests</a></li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Contact Info -->
+          <div class="col-lg-4 col-md-6 mb-4">
+            <div class="footer-widget">
+              <h3 class="footer-title">Get in Touch</h3>
+              <div class="contact-info">
+                <div class="contact-item">
+                  <div class="contact-icon">
+                    <i class="fas fa-map-marker-alt"></i>
+                  </div>
+                  <div class="contact-details">
+                    <h5>Address</h5>
+                    <p>123 Healthcare Street<br>Medical District, Dhaka 1000<br>Bangladesh</p>
+                  </div>
                 </div>
-                <p>
-                  <i class="fas fa-phone-alt"></i>
-                  +880 1234 567890
-                </p>
-                <p class="mb-0">
-                  <i class="fas fa-envelope"></i>
-                  HealthStack@gmail.com
-                </p>
+                
+                <div class="contact-item">
+                  <div class="contact-icon">
+                    <i class="fas fa-phone-alt"></i>
+                  </div>
+                  <div class="contact-details">
+                    <h5>Phone</h5>
+                    <p>Emergency: +880 1234 567890<br>Support: +880 1234 567891</p>
+                  </div>
+                </div>
+                
+                <div class="contact-item">
+                  <div class="contact-icon">
+                    <i class="fas fa-envelope"></i>
+                  </div>
+                  <div class="contact-details">
+                    <h5>Email</h5>
+                    <p>info@clinicore.com<br>support@clinicore.com</p>
+                  </div>
+                </div>
               </div>
             </div>
-            <!-- /Footer Widget -->
           </div>
         </div>
       </div>
     </div>
-    <!-- /Footer Top -->
 
     <!-- Footer Bottom -->
-    
-    <!-- /Footer Bottom -->
-  </footer>
+    <div class="footer-bottom">
+      <div class="container">
+        <div class="row align-items-center">
+          <div class="col-md-6">
+            <div class="copyright">
+              <p>&copy; 2024 CliniCore. All rights reserved. | Transforming Healthcare Together</p>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="social-links">
+              <a href="#" class="social-link" aria-label="Facebook">
+                <i class="fab fa-facebook-f"></i>
+              </a>
+              <a href="#" class="social-link" aria-label="Twitter">
+                <i class="fab fa-twitter"></i>
+              </a>
+              <a href="#" class="social-link" aria-label="LinkedIn">
+                <i class="fab fa-linkedin-in"></i>
+              </a>
+              <a href="#" class="social-link" aria-label="Instagram">
+                <i class="fab fa-instagram"></i>
+              </a>
+              <a href="#" class="social-link" aria-label="YouTube">
+                <i class="fab fa-youtube"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+</footer>
+
+<style>
+.modern-footer {
+  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+  color: #ecf0f1;
+  margin-top: 80px;
+}
+
+.footer-main {
+  padding: 80px 0 40px;
+}
+
+.footer-brand .brand-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.footer-brand .brand-icon {
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 24px;
+}
+
+.footer-brand .brand-text {
+  font-size: 32px;
+  font-weight: 800;
+  color: #ecf0f1;
+  letter-spacing: -1px;
+}
+
+.footer-about p {
+  color: #bdc3c7;
+  line-height: 1.7;
+  margin-bottom: 25px;
+  font-size: 15px;
+}
+
+.footer-features .feature-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.footer-features .feature-item i {
+  color: #27ae60;
+  margin-right: 10px;
+  font-size: 12px;
+}
+
+.footer-title {
+  color: #ecf0f1;
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 25px;
+  position: relative;
+  padding-bottom: 10px;
+}
+
+.footer-title::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 50px;
+  height: 3px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 2px;
+}
+
+.footer-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footer-links li {
+  margin-bottom: 12px;
+}
+
+.footer-links li a {
+  color: #bdc3c7;
+  text-decoration: none;
+  font-size: 15px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+}
+
+.footer-links li a::before {
+  content: '';
+  width: 0;
+  height: 2px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  margin-right: 0;
+  transition: all 0.3s ease;
+}
+
+.footer-links li a:hover {
+  color: #667eea;
+  padding-left: 15px;
+}
+
+.footer-links li a:hover::before {
+  width: 8px;
+  margin-right: 7px;
+}
+
+.contact-info .contact-item {
+  display: flex;
+  margin-bottom: 25px;
+}
+
+.contact-icon {
+  width: 50px;
+  height: 50px;
+  background: rgba(102, 126, 234, 0.1);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 15px;
+  flex-shrink: 0;
+}
+
+.contact-icon i {
+  color: #667eea;
+  font-size: 18px;
+}
+
+.contact-details h5 {
+  color: #ecf0f1;
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.contact-details p {
+  color: #bdc3c7;
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.footer-bottom {
+  background: rgba(0, 0, 0, 0.2);
+  padding: 25px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.copyright p {
+  color: #bdc3c7;
+  margin: 0;
+  font-size: 14px;
+}
+
+.social-links {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.social-link {
+  width: 40px;
+  height: 40px;
+  background: rgba(102, 126, 234, 0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #bdc3c7;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.social-link:hover {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  transform: translateY(-3px);
+}
+
+@media (max-width: 768px) {
+  .footer-main {
+    padding: 60px 0 30px;
+  }
+  
+  .social-links {
+    justify-content: center;
+    margin-top: 20px;
+  }
+  
+  .footer-bottom {
+    text-align: center;
+  }
+  
+  .footer-brand .brand-text {
+    font-size: 28px;
+  }
+}
+</style>

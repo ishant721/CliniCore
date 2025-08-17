@@ -1,3 +1,13 @@
+
+from django.shortcuts import render
+
+def contact_us(request):
+    if request.method == 'POST':
+        # Handle form submission here
+        # You can add email sending logic or save to database
+        pass
+    return render(request, 'contact-us.html')
+
 from unicodedata import name
 from django.urls import path,include
 from . import views

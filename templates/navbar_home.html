@@ -1,25 +1,27 @@
 {% load static %}
 
-<nav class="navbar navbar-expand-lg clinicore-navbar">
-  <div class="container-fluid">
+<nav class="navbar navbar-expand-lg clinicore-navbar fixed-top">
+  <div class="container">
     <!-- Brand Logo -->
     <a href="{% url 'hospital_home'%}" class="navbar-brand clinicore-brand">
       <div class="brand-container">
         <div class="brand-icon">
-          <i class="fas fa-stethoscope"></i>
+          <i class="fas fa-heartbeat"></i>
         </div>
         <span class="brand-text">CliniCore</span>
       </div>
     </a>
 
     <!-- Mobile Menu Toggle -->
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-      <span class="navbar-toggler-icon"></span>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span></span>
+      <span></span>
+      <span></span>
     </button>
 
     <!-- Main Navigation -->
     <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav me-auto clinicore-nav">
+      <ul class="navbar-nav mx-auto clinicore-nav">
         <li class="nav-item">
           <a class="nav-link" href="{% url 'hospital_home'%}">Home</a>
         </li>
@@ -35,6 +37,9 @@
         {% endif %}
         <li class="nav-item">
           <a class="nav-link" href="{% url 'about-us'%}">About</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/contact-us/">Contact</a>
         </li>
       </ul>
 
@@ -58,7 +63,9 @@
 
         {% if user.is_authenticated %}
         <li class="nav-item">
-          <a class="nav-link logout-btn" href="{% url 'logout' %}">Logout</a>
+          <a class="nav-link logout-btn" href="{% url 'logout' %}">
+            <i class="fas fa-sign-out-alt me-1"></i>Logout
+          </a>
         </li>
         {% else %}
         <li class="nav-item">
@@ -75,10 +82,16 @@
 
 <style>
 .clinicore-navbar {
-  background: #fff;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-  padding: 0.75rem 0;
-  border-bottom: 1px solid #e9ecef;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
+  padding: 1rem 0;
+  transition: all 0.3s ease;
+}
+
+.clinicore-navbar.scrolled {
+  padding: 0.5rem 0;
+  background: rgba(255, 255, 255, 0.98);
 }
 
 .clinicore-brand {
@@ -88,116 +101,188 @@
 .brand-container {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .brand-icon {
-  width: 40px;
-  height: 40px;
+  width: 45px;
+  height: 45px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 8px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
-  font-size: 18px;
+  font-size: 20px;
+  transition: transform 0.3s ease;
+}
+
+.brand-icon:hover {
+  transform: scale(1.1);
 }
 
 .brand-text {
-  font-size: 24px;
-  font-weight: 700;
-  color: #2c3e50;
-  letter-spacing: -0.5px;
+  font-size: 28px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -1px;
 }
 
 .clinicore-nav .nav-link {
-  color: #6c757d !important;
-  font-weight: 500;
-  padding: 8px 16px !important;
-  margin: 0 4px;
-  border-radius: 6px;
+  color: #2c3e50 !important;
+  font-weight: 600;
+  font-size: 15px;
+  padding: 10px 20px !important;
+  margin: 0 5px;
+  border-radius: 50px;
   transition: all 0.3s ease;
+  position: relative;
+}
+
+.clinicore-nav .nav-link::before {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: 5px;
+  left: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  transition: all 0.3s ease;
+  transform: translateX(-50%);
+}
+
+.clinicore-nav .nav-link:hover::before {
+  width: calc(100% - 40px);
 }
 
 .clinicore-nav .nav-link:hover {
   color: #667eea !important;
-  background: rgba(102, 126, 234, 0.1);
+  background: rgba(102, 126, 234, 0.05);
 }
 
 .clinicore-actions {
-  gap: 8px;
+  gap: 10px;
 }
 
 .dashboard-link {
-  color: #495057 !important;
-  font-weight: 500;
-  padding: 8px 16px !important;
-  border-radius: 6px;
+  color: #2c3e50 !important;
+  font-weight: 600;
+  padding: 10px 20px !important;
+  border-radius: 50px;
   transition: all 0.3s ease;
+  background: rgba(102, 126, 234, 0.05);
 }
 
 .dashboard-link:hover {
   color: #667eea !important;
   background: rgba(102, 126, 234, 0.1);
+  transform: translateY(-1px);
 }
 
 .login-btn {
   color: #667eea !important;
   font-weight: 600;
-  padding: 8px 20px !important;
+  padding: 10px 25px !important;
   border: 2px solid #667eea;
-  border-radius: 25px;
+  border-radius: 50px;
   transition: all 0.3s ease;
+  background: transparent;
 }
 
 .login-btn:hover {
   background: #667eea;
   color: white !important;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
 }
 
 .register-btn {
-  background: #667eea !important;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
   color: white !important;
   font-weight: 600;
-  padding: 8px 20px !important;
-  border: 2px solid #667eea;
-  border-radius: 25px;
+  padding: 10px 25px !important;
+  border: 2px solid transparent;
+  border-radius: 50px;
   transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
 }
 
 .register-btn:hover {
-  background: #5a6fd8 !important;
-  border-color: #5a6fd8;
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 25px rgba(102, 126, 234, 0.4);
+  color: white !important;
 }
 
 .logout-btn {
   color: #dc3545 !important;
-  font-weight: 500;
-  padding: 8px 16px !important;
-  border-radius: 6px;
+  font-weight: 600;
+  padding: 10px 20px !important;
+  border-radius: 50px;
   transition: all 0.3s ease;
 }
 
 .logout-btn:hover {
   background: rgba(220, 53, 69, 0.1);
+  transform: translateY(-1px);
+}
+
+.navbar-toggler {
+  border: none;
+  padding: 4px 8px;
+  position: relative;
+  width: 30px;
+  height: 30px;
+}
+
+.navbar-toggler span {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: #667eea;
+  margin: 4px 0;
+  transition: 0.3s;
+  border-radius: 2px;
+}
+
+.navbar-toggler:not(.collapsed) span:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+
+.navbar-toggler:not(.collapsed) span:nth-child(2) {
+  opacity: 0;
+}
+
+.navbar-toggler:not(.collapsed) span:nth-child(3) {
+  transform: rotate(-45deg) translate(7px, -6px);
 }
 
 @media (max-width: 991px) {
   .clinicore-actions {
-    margin-top: 1rem;
-    padding-top: 1rem;
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
     border-top: 1px solid #e9ecef;
   }
   
   .brand-text {
-    font-size: 20px;
+    font-size: 24px;
   }
   
   .brand-icon {
-    width: 35px;
-    height: 35px;
-    font-size: 16px;
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
   }
+
+  .clinicore-nav .nav-link {
+    margin: 5px 0;
+  }
+}
+
+/* Add padding to body for fixed navbar */
+body {
+  padding-top: 80px;
 }
 </style>
